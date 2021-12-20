@@ -1,2 +1,2 @@
 # vimure
-Virtual Inference for Multiply-Reported data
+Variational Inference for Multiply-Reported data
