@@ -29,5 +29,7 @@ jobs:
 
     - name: Test VIMuRe
       run: |
-        pytest --cov=vimure --doctest-modules --pyargs vimure
-        codecov
+        pytest --cov=vimure --cov-report=xml --doctest-modules --pyargs vimure 
+        
+    - name: "Upload coverage to Codecov"
+      uses: codecov/codecov-action@v2
