@@ -8,6 +8,7 @@ To understand how you could use the code or to replicate our research, check the
 
 - [`Notebook 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2001%20-%20Generate%20Synthetic%20Networks.ipynb)
 - [`Notebook 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2002%20-%20Run%20Model.ipynb)
+- [`Notebook 03 - Experiment Under and Over Reporters`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2003%20-%20Experiment%20under%20and%20over%20reporters.ipynb)
 
 
 # Setup
