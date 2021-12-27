@@ -253,10 +253,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         # Convert (l,i,j) to format understood by sktensor
         union_subs = tuple(np.moveaxis(union_ties, 1, 0))
         X_union = skt.sptensor(
-            subs=union_subs,
-            vals=np.ones(union_ties.shape[0]),
-            shape=self.X.shape,
-            dtype=np.int8,
+            subs=union_subs, vals=np.ones(union_ties.shape[0]), shape=self.X.shape, dtype=np.int8,
         )
         self.X_union = X_union
 
@@ -279,6 +276,12 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         # TODO: Rethink the baseline union & intersections for the case that X is not a binary matrix (or even if Y is binary)
 
         return self
+
+    def __repr__(self):
+        return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, seed={self.seed})"
+
+    def __str__(self):
+        return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, seed={self.seed})"
 
 
 class StandardSBM(BaseSyntheticNetwork):
@@ -431,6 +434,20 @@ class StandardSBM(BaseSyntheticNetwork):
                 )
                 raise ValueError(msg)
         self.structure = structure
+
+    def __repr__(self):
+        return_str = f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, "
+        return_str + f"K={self.K}, seed={self.seed}, "
+        return_str += f"C={self.C}, structure={self.structure}, avg_degree={self.avg_degree}, "
+        return_str += f"sparsify={self.sparsify}, overlapping={self.overlapping})"
+        return return_str
+
+    def __str__(self):
+        return_str = f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, "
+        return_str + f"K={self.K}, seed={self.seed}, "
+        return_str += f"C={self.C}, structure={self.structure}, avg_degree={self.avg_degree}, "
+        return_str += f"sparsify={self.sparsify}, overlapping={self.overlapping})"
+        return return_str
 
     def build_Y(self):
         """
@@ -635,6 +652,22 @@ class DegreeCorrectedSBM(StandardSBM):
 
         return u_hat, v_hat, w
 
+    def __repr__(self):
+        return_str = f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, "
+        return_str + f"K={self.K}, seed={self.seed}, "
+        return_str += f"C={self.C}, structure={self.structure}, avg_degree={self.avg_degree}, "
+        return_str += f"sparsify={self.sparsify}, overlapping={self.overlapping}, "
+        return_str += f"exp_in={self.exp_in}, exp_out={self.exp_out})"
+        return return_str
+
+    def __str__(self):
+        return_str = f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, "
+        return_str + f"K={self.K}, seed={self.seed}, "
+        return_str += f"C={self.C}, structure={self.structure}, avg_degree={self.avg_degree}, "
+        return_str += f"sparsify={self.sparsify}, overlapping={self.overlapping}, "
+        return_str += f"exp_in={self.exp_in}, exp_out={self.exp_out})"
+        return return_str
+
 
 class GMReciprocity(StandardSBM):
     """
@@ -796,6 +829,22 @@ class GMReciprocity(StandardSBM):
             self.Y[self.Y > self.K - 1] = self.K - 1
 
         self.Y = preprocess(self.Y)
+
+    def __repr__(self):
+        return_str = f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, "
+        return_str + f"K={self.K}, seed={self.seed}, "
+        return_str += f"C={self.C}, structure={self.structure}, avg_degree={self.avg_degree}, "
+        return_str += f"sparsify={self.sparsify}, overlapping={self.overlapping}, "
+        return_str += f", eta={self.eta}, ExpM={self.ExpM})"
+        return return_str
+
+    def __str__(self):
+        return_str = f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, "
+        return_str + f"K={self.K}, seed={self.seed}, "
+        return_str += f"C={self.C}, structure={self.structure}, avg_degree={self.avg_degree}, "
+        return_str += f"sparsify={self.sparsify}, overlapping={self.overlapping}, "
+        return_str += f", eta={self.eta}, ExpM={self.ExpM})"
+        return return_str
 
 
 class HollandLaskeyLeinhardtModel(BaseSyntheticNetwork):
