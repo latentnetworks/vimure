@@ -253,7 +253,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         # Convert (l,i,j) to format understood by sktensor
         union_subs = tuple(np.moveaxis(union_ties, 1, 0))
         X_union = skt.sptensor(
-            subs=union_subs, vals=np.ones(union_ties.shape[0]), shape=self.X.shape, dtype=np.int8,
+            subs=union_subs, vals=np.ones(union_ties.shape[0]), shape=(self.L, self.N, self.N), dtype=np.int8,
         )
         self.X_union = X_union
 
@@ -268,7 +268,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         X_intersection = skt.sptensor(
             subs=intersection_subs,
             vals=np.ones(intersection_ties.shape[0]),
-            shape=self.X.shape,
+            shape=(self.L, self.N, self.N),
             dtype=np.int8,
         )
         self.X_intersection = X_intersection

@@ -61,6 +61,9 @@ class Diagnostics:
         self.model_str += "   - G_exp_theta_f: a %s" % str(self.model.G_exp_theta_f.shape)
         self.model_str += " tensor (to inspect it, run <diag_obj>.model.G_exp_theta_f)\n"
 
+        self.model_str += "   - rho_f: a %s" % str(self.model.rho_f.shape)
+        self.model_str += " tensor (to inspect it, run <diag_obj>.model.rho_f)\n"
+
         # TODO: Add reached_convergence variable to model_str in Diagnostics
 
         if verbose is None:
