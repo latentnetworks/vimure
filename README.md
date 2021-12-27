@@ -2,6 +2,13 @@
 
 Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data.
 
+# Notebooks
+
+To understand how you could use the code or to replicate our research, check the notebooks folder:
+
+- [`Notebook 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2001%20-%20Generate%20Synthetic%20Networks.ipynb)
+
+
 # Setup
 
 Instructions on how to replicate our research either downloading our package via pip or by using the Docker setup used for developing the package.
