@@ -14,4 +14,6 @@ COPY requirements.txt requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+
+
 RUN jupyter labextension install @jupyterlab/toc-extension
