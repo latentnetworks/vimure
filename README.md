@@ -1,5 +1,7 @@
 # VIMuRe
 
+[![codecov](https://codecov.io/gh/latentnetworks/vimure/branch/main/graph/badge.svg?token=NAZP90D12J)](https://codecov.io/gh/latentnetworks/vimure)
+
 Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data.
 
 # Notebooks
