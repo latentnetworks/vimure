@@ -1,0 +1,15 @@
+version: "3.5"
+
+services:
+
+  notebooks:
+    build: notebooks
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    volumes:
+      - ./notebooks:/mnt/code
+      - ./src/python/vimure:/mnt/code/vimure
+      - ./experiments:/mnt/code/experiments
+      - ./data:/mnt/data
+    ports:
+      - 8888:8888
