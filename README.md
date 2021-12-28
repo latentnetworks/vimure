@@ -5,6 +5,12 @@
 
 Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data.
 
+
+If you use this code please cite this article (preprint).
+
+> De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
+
+
 # Notebooks
 
 To understand how you could use the code or to replicate our research, check the notebooks folder:
