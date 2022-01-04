@@ -9,4 +9,4 @@ https://github.com/evertrol/scikit-tensor-py3/archive/99190292b9564e7c4a9312280d
 networkx==2.6.2
 
 ### JUPYTER LAB
-jupyterlab_execute_time==2.0.5
+jupyterlab_execute_time==2.1.0

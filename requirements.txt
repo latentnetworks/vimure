@@ -10,4 +10,4 @@ scikit-tensor-py3 @ https://github.com/jonjoncardoso/scikit-tensor-py3/archive/m
 networkx==2.6.2
 
 ### JUPYTER LAB
-jupyterlab_execute_time==2.0.5
+jupyterlab_execute_time==2.1.0
