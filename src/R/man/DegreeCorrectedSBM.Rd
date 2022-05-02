@@ -9,8 +9,11 @@ DegreeCorrectedSBM(
   M = 100,
   K = 2,
   L = 1,
+  C = 2,
+  avg_degree = 10,
   exp_in = 2,
   exp_out = 2.5,
+  sparsify = TRUE,
   seed = 10
 )
 }

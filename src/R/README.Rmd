@@ -51,6 +51,33 @@ library(vimure)
 vimure:::vimureP  ## The Python package
 ```
 
+Simply create an object with the desired synthetic network class:
+
+```{r}
+library(ggplot2)
+library(ggcorrplot)
+library(igraph)
+
+random_net <- GMReciprocity()
+Y <- extract_Y(random_net)
+
+ggcorrplot(Y) + 
+   scale_fill_gradient(low="white",high="#003396")
+```
+
+
+Create a graph from the adjacency matrix and calculate some network statistics:
+
+```{r}
+graph <- graph_from_adjacency_matrix(Y, mode = "directed")
+paste0(
+  "Nodes: ", length(V(graph)),
+  " | Edges: ", gsize(graph),
+  " | Avg. degree: ", mean(degree(graph)), # TODO: Change to directed graph
+  " | Reciprocity: ", reciprocity(graph)
+)
+```
+
 
 ## Setup (Development mode)
 
