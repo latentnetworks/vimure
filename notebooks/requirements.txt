@@ -6,7 +6,7 @@ plotnine==0.8.0 # Python version of ggplot2
 numpy==1.21.2
 scipy==1.7.1
 https://github.com/evertrol/scikit-tensor-py3/archive/99190292b9564e7c4a9312280db732ceedf7b7e3.zip
-networkx==2.6.2
+networkx==2.8
 pystan==3.2.0
 
 jupyter==1.0.0
