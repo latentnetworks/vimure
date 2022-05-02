@@ -9,6 +9,11 @@ DEFAULT_C <- vimureP$synthetic$DEFAULT_C
 DEFAULT_EXP_IN <- vimureP$synthetic$DEFAULT_EXP_IN
 DEFAULT_EXP_OUT <- vimureP$synthetic$DEFAULT_EXP_OUT
 
+skip_if_no_vimure <- function() {
+  have_vimure <- reticulate::py_module_available("vimure")
+  if (!have_vimure)
+    skip("Vimure not available for testing")
+}
 
 check_default_values <- function(synth_net){
   expect_equal(synth_net$C, DEFAULT_C)
@@ -81,6 +86,8 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
 }
 
 test_that("GMReciprocity - Check default values and adjacency matrix structure", {
+  skip_if_no_vimure()
+
   synth_net <- GMReciprocity(
     N = DEFAULT_N,
     M = DEFAULT_M,
@@ -97,6 +104,8 @@ test_that("GMReciprocity - Check default values and adjacency matrix structure",
 })
 
 test_that("StandardSBM - Check default values, adjacency matrix and affinity matrix structure", {
+  skip_if_no_vimure()
+
   synth_net <- StandardSBM(
     N=DEFAULT_N,
     M=DEFAULT_M,
@@ -111,7 +120,9 @@ test_that("StandardSBM - Check default values, adjacency matrix and affinity mat
   check_affinity_matrix(synth_net)
 })
 
-test_that("DegreeCorrectedSBM -", {
+test_that("DegreeCorrectedSBM - Check default values and adjacency matrix", {
+  skip_if_no_vimure()
+
   synth_net <- DegreeCorrectedSBM(
     N=DEFAULT_N,
     M=DEFAULT_M,
