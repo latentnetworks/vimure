@@ -101,6 +101,8 @@ class TestStandardSBM(TestBaseSyntheticNetwork):
             non_diag_vals = self.synth_net.w[l][non_diag_indices]
 
             msg = "Diagonal values in the affinity matrix should be %s than non-diag."
+
+            # TODO: Remove iteration over C
             for c in enumerate(range(self.synth_net.C)):
                 diag_arr, non_diag_arr = np.meshgrid(diag_vals, non_diag_vals)
                 if self.synth_net.structure[l] == "assortative":
@@ -159,7 +161,7 @@ class TestDegreeCorrectedSBM(TestStandardSBM):
             K=DEFAULT_K,
             C=DEFAULT_C,
             avg_degree=DEFAULT_AVG_DEGREE,
-            xp_in=4,
+            exp_in=4,
             exp_out=6,
             sparsify=False,
         )
