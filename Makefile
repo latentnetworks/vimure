@@ -1,8 +1,17 @@
-up:
-	docker-compose build notebooks
-	docker-compose up notebooks
+VENV           = venv
+SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
+PYTHON         = $(or $(wildcard venv/bin/python), $(SYSTEM_PYTHON))
+
+venv-build: venv-create
+	$(PYTHON) -m pip install -r notebooks/requirements.txt
+	$(PYTHON) -m pip install -e src/python/.
+
+venv-create: 
+	rm -rf $(VENV)
+	$(SYSTEM_PYTHON) -m virtualenv $(VENV)
+
+venv-up:
+	bash -c "source $(VENV)/bin/activate && jupyter lab"
 
 test:
-	docker-compose build
-	docker-compose run --rm notebooks pytest -s --pyargs vimure #/test/test_model.py::TestVimureModel::test_vimure_model_extreme_scenarios_over_reporting_dense
-
+	$(PYTHON) -m pytest -s -vv --pyargs vimure
