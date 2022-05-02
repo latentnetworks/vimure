@@ -37,10 +37,10 @@ You can install the development version of vimure from [GitHub](https://github.c
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="18-vimure-v01-r-write-test_syntheticr")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="23-vimure-v01-r-replicate-the-synthetic-networks-foundational-model")
 ```
 
-## Usage Example
+### Usage Example
 
 This is a basic example showing that virtualenv has been successfully configured 
 
