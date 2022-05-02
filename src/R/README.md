@@ -33,9 +33,9 @@ self-contained conda or venv environment named “r-vimure”. Note that
 
 If you initially declined the miniconda installation prompt, you can
 later manually install miniconda by running
-\[`reticulate::install_miniconda()` or set up your [Python
+`reticulate::install_miniconda()` or set up your [Python
 enviroment](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-virtualenv/)
-manually
+manually.
 
 ## Installation
 
