@@ -32,7 +32,7 @@ Instructions on how to replicate our research either downloading our package via
 Install `vimure==0.1` with the following command:
 
 ```console
-pip install git+https://github.com/latentnetworks/vimure.git#egg=vimure\&subdirectory=src/python/
+pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
 ```
 
 ## Alternative 02: using Virtualenv
