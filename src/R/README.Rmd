@@ -1,0 +1,69 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# VIMuRe
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data.
+
+
+If you use this code please cite this article (preprint).
+
+> De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
+
+The VIMuRe R package wraps the [VIMuRe](https://github.com/latentnetworks/vimure/tree/18-vimure-v01-r-write-test_syntheticr/src/python) Python package. We use the `reticulate` package to embeds a Python session within your R session, enabling seamless, high-performance interoperability.
+
+You may be prompted you if you want it to download and install miniconda if reticulate did not find a non-system installation of python. Miniconda is the recommended installation method for most users, as it ensures that the R python installation is isolated from other python installations. All python packages will by default be installed into a self-contained conda or venv environment named "r-vimure". Note that "conda" is the only supported method on Windows. 
+
+If you initially declined the miniconda installation prompt, you can later manually install miniconda by running `reticulate::install_miniconda()` or set up your [Python enviroment](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-virtualenv/) manually.
+
+## Installation
+
+You can install the development version of vimure from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+```
+
+## Usage Example
+
+This is a basic example showing that virtualenv has been successfully configured 
+
+```{r example}
+library(vimure)
+## basic example code
+
+vimure:::vimureP  ## The Python package
+```
+
+
+## Setup (Development mode)
+
+Use this setup if you want to modify anything in the package. For reproducibility reasons use the R version 4.1.2.
+
+1. [Clone the repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) to a directory in your machine
+2. In prompt, change to `vimure/src/R` directory and open a Rstudio session.
+```bash
+cd vimure/src/R
+rstudio
+```
+3. In Rstudio, load the package:
+``` r
+devtools::install()  # Install the current version of package
+```
+

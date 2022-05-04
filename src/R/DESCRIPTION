@@ -1,0 +1,21 @@
+Package: vimure
+Title: vimure: Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data
+Version: 0.0.0.9000
+Authors@R: 
+    person("Caterina", "de Bacco", , "caterina.debacco@tuebingen.mpg.de", role = c("aut"),
+           comment = c(ORCID = "0000-0002-8634-0211"))
+    person("Jonathan", "Cardoso-Silva", , "j.cardoso-silva@lse.ac.uk", role = c("aut", "cre", "trl"),
+           comment = c(ORCID = "0000-0002-9566-7400"))
+    person("Gabriela", "Borges", , "gabilimaborges@hotmail.com", role = c("cre", "trl"),
+           comment = c(ORCID = "0000-0002-7133-2868"))
+Description: Build and analyze latent network models that can appropriately explore and resolve the biases and noisiness of self-reported network data.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    reticulate,
+    tensorr
