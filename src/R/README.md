@@ -44,7 +44,7 @@ You can install the development version of vimure from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="18-vimure-v01-r-write-test_syntheticr")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
 ## Usage Example
@@ -64,7 +64,8 @@ vimure:::vimureP  ## The Python package
 
 ## Setup (Development mode)
 
-Use this setup if you want to modify anything in the package.
+Use this setup if you want to modify anything in the package. For
+reproducibility reasons use the R version 4.1.2.
 
 1.  [Clone the
     repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
@@ -80,10 +81,5 @@ rstudio
 3.  In Rstudio, load the package:
 
 ``` r
-devtools::load_all()  # Simulate what happens when a package is installed and loaded
-devtools::check()  # Build and check a source package
-devtools::test()  # Run unittests
 devtools::install()  # Install the current version of package
-devtools::document()  # Generate man/ folder with the documentation of each function
-devtools::build_readme()  # Render the README.Rmd on a README.md file
 ```
