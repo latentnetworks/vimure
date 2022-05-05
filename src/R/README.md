@@ -26,6 +26,9 @@ high-performance interoperability.
 
 ## Requirements
 
+Vimure R package depends on R \>= 3.3.0 and Python \>= 3.6 and it is
+expect to work fine in all OS.
+
 ### Default
 
 You may be prompted you if you want it to download and install miniconda
