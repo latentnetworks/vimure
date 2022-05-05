@@ -44,10 +44,10 @@ You can install the development version of vimure from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="23-vimure-v01-r-replicate-the-synthetic-networks-foundational-model")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
-### Usage Example
+## Usage Example
 
 This is a basic example showing that virtualenv has been successfully
 configured
@@ -62,49 +62,10 @@ vimure:::vimureP  ## The Python package
 #> Module(vimure)
 ```
 
-Simply create an object with the desired synthetic network class:
-
-``` r
-library(ggplot2)
-library(ggcorrplot)
-library(igraph)
-#> 
-#> Attaching package: 'igraph'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     decompose, spectrum
-#> The following object is masked from 'package:base':
-#> 
-#>     union
-
-random_net <- GMReciprocity()
-Y <- extract_Y(random_net)
-
-ggcorrplot(Y) + 
-   scale_fill_gradient(low="white",high="#003396")
-#> Scale for 'fill' is already present. Adding another scale for 'fill', which
-#> will replace the existing scale.
-```
-
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
-
-Create a graph from the adjacency matrix and calculate some network
-statistics:
-
-``` r
-graph <- graph_from_adjacency_matrix(Y, mode = "directed")
-paste0(
-  "Nodes: ", length(V(graph)),
-  " | Edges: ", gsize(graph),
-  " | Avg. degree: ", mean(degree(graph)), # TODO: Change to directed graph
-  " | Reciprocity: ", reciprocity(graph)
-)
-#> [1] "Nodes: 100 | Edges: 386 | Avg. degree: 7.72 | Reciprocity: 0.787564766839378"
-```
-
 ## Setup (Development mode)
 
-Use this setup if you want to modify anything in the package.
+Use this setup if you want to modify anything in the package. For
+reproducibility reasons use the R version 4.1.2.
 
 1.  [Clone the
     repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
@@ -120,10 +81,5 @@ rstudio
 3.  In Rstudio, load the package:
 
 ``` r
-devtools::load_all()  # Simulate what happens when a package is installed and loaded
-devtools::check()  # Build and check a source package
-devtools::test()  # Run unittests
 devtools::install()  # Install the current version of package
-devtools::document()  # Generate man/ folder with the documentation of each function
-devtools::build_readme()  # Render the README.Rmd on a README.md file
 ```
