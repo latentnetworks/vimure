@@ -15,7 +15,6 @@ vimureP <- NULL
     packageStartupMessage("Using an existing virtualenv (r-vimure)")
     reticulate::use_virtualenv("r-vimure")
   }
-
   py_path <- reticulate::py_config()$python
   packageStartupMessage("PYTHON_PATH=", py_path)
 }
