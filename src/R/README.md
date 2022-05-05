@@ -19,9 +19,14 @@ If you use this code please cite this article (preprint).
 
 The VIMuRe R package wraps the
 [VIMuRe](https://github.com/latentnetworks/vimure/tree/18-vimure-v01-r-write-test_syntheticr/src/python)
-Python package. We use the `reticulate` package to embeds a Python
-session within your R session, enabling seamless, high-performance
-interoperability.
+Python package. We use the
+[`reticulate`](https://rstudio.github.io/reticulate/) package to embeds
+a Python session within your R session, enabling seamless,
+high-performance interoperability.
+
+## Requirements
+
+### Default
 
 You may be prompted you if you want it to download and install miniconda
 if reticulate did not find a non-system installation of python.
@@ -33,13 +38,17 @@ self-contained conda or venv environment named “r-vimure”. Note that
 
 If you initially declined the miniconda installation prompt, you can
 later manually install miniconda by running
-`reticulate::install_miniconda()` or set up your [Python
+`reticulate::install_miniconda()`
+
+### Set up your own Python Enviroment
+
+If you do not want to install miniconda, you can set up your [Python
 enviroment](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-virtualenv/)
-manually.
+manually. VIMuRe requires Python \>= 3.6.
 
 ## Installation
 
-You can install the development version of vimure from
+You can install the development version of VIMuRe from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -60,6 +69,46 @@ library(vimure)
 
 vimure:::vimureP  ## The Python package
 #> Module(vimure)
+```
+
+Simply create an object with the desired synthetic network class:
+
+``` r
+library(ggplot2)
+library(ggcorrplot)
+library(igraph)
+#> 
+#> Attaching package: 'igraph'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     decompose, spectrum
+#> The following object is masked from 'package:base':
+#> 
+#>     union
+
+random_net <- GMReciprocity()
+Y <- extract_Y(random_net)
+
+ggcorrplot(Y) + 
+   scale_fill_gradient(low="white",high="#003396")
+#> Scale for 'fill' is already present. Adding another scale for 'fill', which
+#> will replace the existing scale.
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+Create a graph from the adjacency matrix and calculate some network
+statistics:
+
+``` r
+graph <- graph_from_adjacency_matrix(Y, mode = "directed")
+paste0(
+  "Nodes: ", length(V(graph)),
+  " | Edges: ", gsize(graph),
+  " | Avg. degree: ", mean(degree(graph)), # TODO: Change to directed graph
+  " | Reciprocity: ", reciprocity(graph)
+)
+#> [1] "Nodes: 100 | Edges: 386 | Avg. degree: 7.72 | Reciprocity: 0.787564766839378"
 ```
 
 ## Setup (Development mode)
