@@ -62,6 +62,46 @@ vimure:::vimureP  ## The Python package
 #> Module(vimure)
 ```
 
+Simply create an object with the desired synthetic network class:
+
+``` r
+library(ggplot2)
+library(ggcorrplot)
+library(igraph)
+#> 
+#> Attaching package: 'igraph'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     decompose, spectrum
+#> The following object is masked from 'package:base':
+#> 
+#>     union
+
+random_net <- GMReciprocity()
+Y <- extract_Y(random_net)
+
+ggcorrplot(Y) + 
+   scale_fill_gradient(low="white",high="#003396")
+#> Scale for 'fill' is already present. Adding another scale for 'fill', which
+#> will replace the existing scale.
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+Create a graph from the adjacency matrix and calculate some network
+statistics:
+
+``` r
+graph <- graph_from_adjacency_matrix(Y, mode = "directed")
+paste0(
+  "Nodes: ", length(V(graph)),
+  " | Edges: ", gsize(graph),
+  " | Avg. degree: ", mean(degree(graph)), # TODO: Change to directed graph
+  " | Reciprocity: ", reciprocity(graph)
+)
+#> [1] "Nodes: 100 | Edges: 386 | Avg. degree: 7.72 | Reciprocity: 0.787564766839378"
+```
+
 ## Setup (Development mode)
 
 Use this setup if you want to modify anything in the package. For
