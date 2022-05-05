@@ -26,15 +26,17 @@ high-performance interoperability.
 
 ## Requirements
 
-Vimure R package depends on R \>= 3.3.0 and Python \>= 3.6 and it is
-expect to work fine in all OS.
+Vimure R package depends on R \>= 3.3.0 and it is expect to work fine in
+all OS. The package also depends on Python \>= 3.6, but you do not have
+to worry about that as we have a default set up that will run the first
+time you call `library(vimure)`.
 
 ### Default
 
-You may be prompted you if you want it to download and install miniconda
-if reticulate did not find a non-system installation of python.
-Miniconda is the recommended installation method for most users, as it
-ensures that the R python installation is isolated from other python
+If reticulate did not find a non-system installation of python you may
+be prompted if you want it to download and install miniconda. Miniconda
+is the recommended installation method for most users, as it ensures
+that the R python installation is isolated from other python
 installations. All python packages will by default be installed into a
 self-contained conda or venv environment named “r-vimure”. Note that
 “conda” is the only supported method on Windows.
@@ -47,7 +49,8 @@ later manually install miniconda by running
 
 If you do not want to install miniconda, you can set up your [Python
 enviroment](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-virtualenv/)
-manually. VIMuRe requires Python \>= 3.6.
+manually or by `reticulate::install_python()`. VIMuRe requires Python
+\>= 3.6.
 
 ## Installation
 
