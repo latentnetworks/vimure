@@ -2,7 +2,7 @@
 % Please edit documentation in R/generate_X.R
 \name{extract_Xavg}
 \alias{extract_Xavg}
-\title{Extract the Xavg matrix (considering the reporter's mask)}
+\title{Extract the Xavg matrix}
 \usage{
 extract_Xavg(synthetic)
 }
@@ -13,11 +13,11 @@ extract_Xavg(synthetic)
 A matrix
 }
 \description{
-Extract the Xavg matrix (considering the reporter's mask)
+Average value of observed network X over reporter mask.
 }
 \examples{
-random_net <- GMReciprocity(N=100, M=100, L=1, eta=0.99)
+random_net <- gm_CReciprocity(N=100, M=100, L=1, eta=0.99)
 X <- build_X(random_net)
-Xavg <- extract_Xavg(synthetic)
+Xavg <- extract_Xavg(random_net)
 dim(Xavg)
 }

@@ -288,6 +288,9 @@ class StandardSBM(BaseSyntheticNetwork):
     """
     Creates a standard stochastic block-model synthetic network
 
+    For more information about this model, see Holland, P. W., Laskey, K. B., & Leinhardt, S. (1983). _Stochastic blockmodels: First steps. Social networks_, 5(2), 109-137.
+    [DOI:10.1016/0378-8733(83)90021-7](https://www.sciencedirect.com/science/article/abs/pii/0378873383900217)
+
     """
 
     # TODO: Add Class Docstrings
@@ -619,6 +622,13 @@ class StandardSBM(BaseSyntheticNetwork):
 
 
 class DegreeCorrectedSBM(StandardSBM):
+    """
+    Degree-corrected stochastic blockmodel.
+
+    A generative model that incorporates heterogeneous vertex degrees into stochastic blockmodels, improving the performance of the models for statistical inference of group structure.
+    For more information about this model, see Karrer, B., & Newman, M. E. (2011). _Stochastic blockmodels and community structure in networks_. Physical review E, 83(1), 016107.
+    [DOI:10.1103/PhysRevE.83.016107](https://arxiv.org/pdf/1008.3926.pdf)
+    """
     # TODO: Add Class Docstrings
 
     def __init__(self, exp_in: float = DEFAULT_EXP_IN, exp_out: float = DEFAULT_EXP_OUT, **kwargs):
@@ -673,8 +683,9 @@ class GMReciprocity(StandardSBM):
     """
     A generative model with reciprocity.
 
+    A mathematically principled generative model for capturing both community and reciprocity patterns in directed networks.
     Adapted from Safdari H., Contisciani M. & De Bacco C. (2021). Generative model for reciprocity and community detection in networks, Phys. Rev. Research 3, 023209.
-
+    [DOI:10.1103/PhysRevResearch.3.023209](https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.3.023209).
     Open Source code available at https://github.com/mcontisc/CRep and modified in accordance with its license, reproduced below:
 
     -------------------------------------------------------------------------------

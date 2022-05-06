@@ -1,4 +1,3 @@
-
 #' Generating Observed Networks - X
 #'
 #' Given a network `Y`, we can generate N observed adjacency matrices as would
@@ -16,11 +15,11 @@
 #' @param seed  Pseudo random generator seed to use
 #' @param verbose Provides additional details
 #'
-#' @return A character vector.
+#' @return A sptensor
 #' @export
 #' @examples
 #'
-#' random_net <- GMReciprocity(N=100, M=100, L=1, eta=0.99)
+#' random_net <- gm_CReciprocity(N=100, M=100, L=1, eta=0.99)
 #' X <- build_X(random_net, flag_self_reporter=TRUE, cutoff_X=FALSE, seed=10L)
 #' dim(X)
 build_X <- function(
@@ -39,10 +38,14 @@ build_X <- function(
     seed=seed,
     verbose=verbose
   )
+
+  return (py_to_r.sktensor.sptensor.sptensor(model$X))
 }
 
 
-#' Extract the Xavg matrix (considering the reporter's mask)
+#' Extract the Xavg matrix
+#'
+#' Average value of observed network X over reporter mask.
 #'
 #' @param synthetic A synthetic model
 #'
@@ -50,15 +53,14 @@ build_X <- function(
 #' @export
 #'
 #' @examples
-#' random_net <- GMReciprocity(N=100, M=100, L=1, eta=0.99)
+#' random_net <- gm_CReciprocity(N=100, M=100, L=1, eta=0.99)
 #' X <- build_X(random_net)
-#' Xavg <- extract_Xavg(synthetic)
+#' Xavg <- extract_Xavg(random_net)
 #' dim(Xavg)
 extract_Xavg <- function(synthetic){
   Xavg <- vimureP$utils$calculate_average_over_reporter_mask(
     synthetic$X, synthetic$R
   )
 
-  Xavg <- extract_data(Xavg)
   return(Xavg)
 }

@@ -15,6 +15,14 @@ skip_if_no_vimure <- function() {
     skip("Vimure not available for testing")
 }
 
+is_identical_tensors <- function(x, y){
+  (
+    (identical(tensorr::nzsubs(x), tensorr::nzsubs(y))) &
+    (identical(tensorr::nzvals(x), tensorr::nzvals(y))) &
+    (identical(dim(x), dim(y)))
+  )
+}
+
 check_default_values <- function(synth_net){
   expect_equal(synth_net$C, DEFAULT_C)
   expect_equal(synth_net$N, DEFAULT_N)
@@ -49,7 +57,7 @@ check_affinity_matrix <- function(synth_net){
 }
 
 check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
-  another_synth_net <- DegreeCorrectedSBM(
+  another_synth_net <- gm_DegreeCorrectedSBM(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,
@@ -61,7 +69,7 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
     sparsify=FALSE
   )
 
-  another_sparse_synth_net <- DegreeCorrectedSBM(
+  another_sparse_synth_net <- gm_DegreeCorrectedSBM(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,
@@ -78,8 +86,8 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
   sparse_Y <- extract_Y(sparse_synth_net)
   another_sparse_Y <- extract_Y(another_sparse_synth_net)
 
-  expect_false(all(Y == another_Y))
-  expect_false(all(sparse_Y == another_sparse_Y))
+  expect_false(is_identical_tensors(Y, another_Y))
+  expect_false(is_identical_tensors(sparse_Y, another_sparse_Y))
   expect_gt(sum(Y), sum(sparse_Y))
   expect_gt(sum(Y), sum(another_Y))
   expect_gt(sum(another_Y), sum(another_sparse_Y))
@@ -88,7 +96,7 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
 test_that("GMReciprocity - Check default values and adjacency matrix structure", {
   skip_if_no_vimure()
 
-  synth_net <- GMReciprocity(
+  synth_net <- gm_CReciprocity(
     N = DEFAULT_N,
     M = DEFAULT_M,
     K = DEFAULT_K,
@@ -103,10 +111,10 @@ test_that("GMReciprocity - Check default values and adjacency matrix structure",
   expect_false(is.null(synth_net$ExpM))
 })
 
-test_that("StandardSBM - Check default values, adjacency matrix and affinity matrix structure", {
+test_that("gm_StandardSBM - Check default values, adjacency matrix and affinity matrix structure", {
   skip_if_no_vimure()
 
-  synth_net <- StandardSBM(
+  synth_net <- gm_StandardSBM(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,
@@ -120,10 +128,10 @@ test_that("StandardSBM - Check default values, adjacency matrix and affinity mat
   check_affinity_matrix(synth_net)
 })
 
-test_that("DegreeCorrectedSBM - Check default values and adjacency matrix", {
+test_that("gm_DegreeCorrectedSBM - Check default values and adjacency matrix", {
   skip_if_no_vimure()
 
-  synth_net <- DegreeCorrectedSBM(
+  synth_net <- gm_DegreeCorrectedSBM(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,
@@ -133,7 +141,7 @@ test_that("DegreeCorrectedSBM - Check default values and adjacency matrix", {
     sparsify=FALSE
   )
 
-  sparse_synth_net <- DegreeCorrectedSBM(
+  sparse_synth_net <- gm_DegreeCorrectedSBM(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,

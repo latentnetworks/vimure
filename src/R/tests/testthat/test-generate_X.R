@@ -32,7 +32,7 @@ check_R <- function(synth_net){
 test_that("multiplication works", {
   skip_if_no_vimure()
 
-  synth_net <- StandardSBM(
+  synth_net <- gm_StandardSBM(
     N=20,
     M=20,
     L=1,
