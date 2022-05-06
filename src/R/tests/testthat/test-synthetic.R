@@ -15,14 +15,6 @@ skip_if_no_vimure <- function() {
     skip("Vimure not available for testing")
 }
 
-is_identical_tensors <- function(x, y){
-  (
-    (identical(tensorr::nzsubs(x), tensorr::nzsubs(y))) &
-    (identical(tensorr::nzvals(x), tensorr::nzvals(y))) &
-    (identical(dim(x), dim(y)))
-  )
-}
-
 check_default_values <- function(synth_net){
   expect_equal(synth_net$C, DEFAULT_C)
   expect_equal(synth_net$N, DEFAULT_N)
@@ -86,8 +78,8 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
   sparse_Y <- extract_Y(sparse_synth_net)
   another_sparse_Y <- extract_Y(another_sparse_synth_net)
 
-  expect_false(is_identical_tensors(Y, another_Y))
-  expect_false(is_identical_tensors(sparse_Y, another_sparse_Y))
+  expect_false(all(Y == another_Y))
+  expect_false(all(sparse_Y == another_sparse_Y))
   expect_gt(sum(Y), sum(sparse_Y))
   expect_gt(sum(Y), sum(another_Y))
   expect_gt(sum(another_Y), sum(another_sparse_Y))

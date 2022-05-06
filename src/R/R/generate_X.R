@@ -39,7 +39,7 @@ build_X <- function(
     verbose=verbose
   )
 
-  return (py_to_r.sktensor.sptensor.sptensor(model$X))
+  return (py_to_r.sktensor.sptensor.sptensor(synthetic$X))
 }
 
 

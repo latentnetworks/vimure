@@ -71,7 +71,6 @@ configured
 library(vimure)
 #> Using an existing virtualenv (r-vimure)
 #> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
-## basic example code
 
 vimure:::vimureP  ## The Python package
 #> Module(vimure)
@@ -80,9 +79,9 @@ vimure:::vimureP  ## The Python package
 Simply create an object with the desired synthetic network class:
 
 ``` r
-library(ggplot2)
-library(ggcorrplot)
-library(igraph)
+library(ggplot2, quietly =T)
+library(ggcorrplot, quietly =T)
+library(igraph, quietly =T)
 #> 
 #> Attaching package: 'igraph'
 #> The following objects are masked from 'package:stats':
@@ -92,10 +91,10 @@ library(igraph)
 #> 
 #>     union
 
-random_net <- GMReciprocity()
-Y <- extract_Y(random_net)
+random_net <- gm_CReciprocity()
+Y <- extract_Y(random_net) # Tensor object
 
-ggcorrplot(Y) + 
+ggcorrplot(Y[1, ,]) + 
    scale_fill_gradient(low="white",high="#003396")
 #> Scale for 'fill' is already present. Adding another scale for 'fill', which
 #> will replace the existing scale.
@@ -107,7 +106,7 @@ Create a graph from the adjacency matrix and calculate some network
 statistics:
 
 ``` r
-graph <- graph_from_adjacency_matrix(Y, mode = "directed")
+graph <- graph_from_adjacency_matrix(Y[1, ,], mode = "directed")
 paste0(
   "Nodes: ", length(V(graph)),
   " | Edges: ", gsize(graph),
@@ -116,6 +115,22 @@ paste0(
 )
 #> [1] "Nodes: 100 | Edges: 386 | Avg. degree: 7.72 | Reciprocity: 0.787564766839378"
 ```
+
+Given a network Y, we can generate N observed adjacency matrices as
+would have been reported by reporting nodes 𝑚 ( 𝑚∈𝑁 ). This is achieved
+by the function `build_X`. Example:
+
+``` r
+X <- build_X(random_net, flag_self_reporter=F, cutoff_X=F, mutuality=0.5, seed=20L)
+Xavg <- extract_Xavg(random_net)
+
+ggcorrplot(Xavg[1, ,]) + 
+   scale_fill_gradient(low="white",high="#003396")
+#> Scale for 'fill' is already present. Adding another scale for 'fill', which
+#> will replace the existing scale.
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 ## Setup (Development mode)
 
