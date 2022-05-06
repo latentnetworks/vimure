@@ -59,7 +59,7 @@ You can install the development version of VIMuRe from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="19-vimure-v01-r-write-test_generate_xr")
 ```
 
 ## Usage Example
