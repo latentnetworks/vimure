@@ -10,13 +10,13 @@ extract_Y(synthetic)
 \item{synthetic}{A synthetic model}
 }
 \value{
-A matrix
+A sptensor
 }
 \description{
 Extract the Y matrix
 }
 \examples{
-random_net <- GMReciprocity(N=100, M=100, L=1, eta=0.99)
+random_net <- gm_CReciprocity(N=100, M=100, L=1, eta=0.99)
 Y <- extract_Y(random_net)
 dim(Y)
 }
