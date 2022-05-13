@@ -10,8 +10,6 @@ scikit-learn==0.24.2
 scikit-tensor-py3 @ https://github.com/jonjoncardoso/scikit-tensor-py3/archive/master.zip
 networkx==2.8
 
-pystan==3.1.0
-
 ### UTILS
 jupyterlab_execute_time==2.0.5
 ipywidgets==7.6.5

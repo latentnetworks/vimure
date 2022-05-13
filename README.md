@@ -66,7 +66,7 @@ source venv/bin/activate
 ```
 3. Install the required packages by running the following command:
 ```{bash}
-pip install -r notebooks/requirements.txt
+pip install -r src/python/requirements.txt
 pip install -e src/python/.   # Install Vimure package
 ```
 4. Create a JupyterLab instance by running the following command:
