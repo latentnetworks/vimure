@@ -11,7 +11,7 @@ import sktensor as skt
 from abc import ABCMeta, abstractmethod
 from .io import BaseNetwork, DEFAULT_SEED
 from .log import setup_logging
-from .utils import preprocess
+from .utils import preprocess, sptensor_from_dense_array
 
 DEFAULT_N = 100
 DEFAULT_M = 100
@@ -245,6 +245,15 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         """
         BASELINE: UNION
+
+        This is one of the simplest possible ways of collating all networks reported by independent reporters (X) 
+        into a single adjacency matrix (Y).
+
+        The baseline union we use here takes the union of all ties (l, i, j) that were reported at least once by someone
+        regardless of who reported it or the strength given to each tie.
+
+        # TODO: Maybe the calculation of baseline adjacency matrices shouldn't be inside the build_X() function, 
+        #       since it isn't a feature of the package itself?
         """
         lij = (subs_lijm[0], subs_lijm[1], subs_lijm[2])
         all_ties = np.stack(lij).T  # dim ((lij)_subs, 3)
@@ -253,25 +262,89 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         # Convert (l,i,j) to format understood by sktensor
         union_subs = tuple(np.moveaxis(union_ties, 1, 0))
         X_union = skt.sptensor(
-            subs=union_subs, vals=np.ones(union_ties.shape[0]), shape=(self.L, self.N, self.N), dtype=np.int8,
+            subs=union_subs,
+            vals=np.ones(union_ties.shape[0]),
+            shape=(self.L, self.N, self.N),
+            dtype=np.int8,
         )
         self.X_union = X_union
 
         """
         BASELINE: INTERSECTION
-        """
-        # If count_ties == 2, it means all reporters agree (intersection) because it is binary
-        # TODO: Double check if count_ties == 2 should be count_ties == M (given the R) instead
-        intersection_ties = union_ties[np.argwhere(count_ties == 2).flatten()]
-        intersection_subs = tuple(np.moveaxis(intersection_ties, 1, 0))
 
-        X_intersection = skt.sptensor(
-            subs=intersection_subs,
-            vals=np.ones(intersection_ties.shape[0]),
-            shape=(self.L, self.N, self.N),
-            dtype=np.int8,
-        )
-        self.X_intersection = X_intersection
+        The intersection is another simple way to combine all networks reported by independent reporters (X) 
+        into a single adjacency matrix (Y).
+
+        Here, a tie (l, i, j) is only considered if all reporters **who were allowed to report on that tie, 
+        as indicated by the reporter's mask R,** reported this tie.
+
+        Similar to the union baseline, here we disregard the strength of ties. 
+
+        # TODO: Maybe the calculation of baseline adjacency matrices shouldn't be inside the build_X() function, 
+        #       since it isn't a feature of the package itself?
+        """
+
+        """
+        Intersection Baseline | Step 1
+        
+        First create a skt.sptensor called max_reports_lij to hold the maximum number of reports a tie (l, i, j) could receive
+        """
+        if isinstance(R, skt.dtensor) or isinstance(R, np.ndarray):
+            # Since R is a dense tensor of dimensions (l, i, j, m), we just need to sum over the m dimension
+            max_reports_lij = sptensor_from_dense_array(R.sum(axis=3))
+
+            df_max_reports_lij = pd.DataFrame(max_reports_lij.subs).T
+            df_max_reports_lij.columns = ["l", "i", "j"]
+            df_max_reports_lij["max"] = max_reports_lij.vals
+        elif isinstance(R, skt.sptensor):
+            # Because R is a sparse tensor, we need to work out the sum another way.
+            
+            # When performing operations with skt.sptensor, I (@jonjoncardoso) find it more intuitive -- and faster -- 
+            # to work with pandas groupby -> apply() than manipulating their subs+vals with numpy directly.
+            R_vals_df = pd.DataFrame(np.stack(self.R.subs).T, columns=["l", "i", "j", "m"])
+
+            df_max_reports_lij = R_vals_df.groupby(["l", "i", "j"])\
+                .apply(lambda x: pd.Series({"max": sum([R[l, i, j, m] if type(R[l, i, j, m]) == int else R[l, i, j, m][0] 
+                                            for m in range(self.M)])}))
+
+
+        """
+        Intersection Baseline | Step 2
+
+        Convert `union_ties` to pd.DataFrame
+        """
+        df_union_ties = pd.DataFrame(union_ties, columns=["l", "i", "j"])
+        df_union_ties["count"] = count_ties
+
+        """
+        Intersection Baseline | Step 3
+
+        Find out how many, of the union ties, were unanimous. 
+        That is: all reporters **that could report** on the tie (l, i, j) did agree that this tie existed and have reported it.
+
+        NOTE: When performing operations with skt.sptensor, I (@jonjoncardoso) find it more intuitive -- and faster -- 
+              to work with pandas groupby -> apply() or pandas merge than manipulating their subs+vals with numpy directly.
+        """
+        aux_df = pd.merge(df_union_ties, df_max_reports_lij, how="left")
+        # Results DataFrame has columns: [l, i, j, count, max]
+        df_intersection_ties = aux_df[aux_df["count"] == aux_df["max"]]
+        
+        """
+        Intersection Baseline | Step 4
+
+        Create a skt.sptensor to represent the intersection of X ties. 
+        """
+
+        if df_intersection_ties.empty:
+            # If NO REPORTER has agreed on any ties, than intersection is empty
+            self.X_intersection = None
+        else:
+            self.X_intersection = skt.sptensor(
+                subs=tuple(df_intersection_ties[["l", "i", "j"]].T.values.tolist()),
+                vals=np.ones(df_intersection_ties.shape[0]).tolist(),
+                shape=(self.L, self.N, self.N),
+                dtype=np.int8,
+            )          
 
         # TODO: Rethink the baseline union & intersections for the case that X is not a binary matrix (or even if Y is binary)
 
