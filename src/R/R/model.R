@@ -17,25 +17,26 @@
 #' @param etol controls when to stop the optimisation algorithm (CAVI)
 #' @param seed Pseudo random generator seed to use
 #' @param verbose Provides additional details
+#' @param ... Additional args of model$fit() method
 #'
 #' @return vimure model
 #' @export
 vimure <- function(X, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1), K=reticulate::py_none(),
                    lambda_prior=c(10.0, 10.0), eta_prior=c(0.5, 1.0), rho_prior=reticulate::py_none(),
-                   seed=reticulate::py_none(),etol=0.1, verbose=T){
+                   seed=reticulate::py_none(),etol=0.1, verbose=T, ...){
   model <- vimureP$model$VimureModel(mutuality=mutuality, undirected=undirected, convergence_tol=etol, verbose=verbose)
 
-  if(length(R)){
+  if(length(R) > 0){
     model$fit(
-      X=X, R=R, K=K, theta_prior=theta_prior,
-      lambda_prior=lambda_prior, eta_prior=eta_prior,
-      rho_prior=rho_prior, seed=seed
+      X=X, R=R, K=K, theta_prior=reticulate::tuple(as.list(theta_prior)),
+      lambda_prior=reticulate::tuple(as.list(lambda_prior)), eta_prior=reticulate::tuple(as.list(eta_prior)),
+      rho_prior=rho_prior, seed=seed, ...
     )
   }else{
     model$fit(
-      X=X, K=K, theta_prior=theta_prior,
-      lambda_prior=lambda_prior, eta_prior=eta_prior,
-      rho_prior=rho_prior, seed=seed
+      X=X, K=K, theta_prior=reticulate::tuple(as.list(theta_prior)),
+      lambda_prior=reticulate::tuple(as.list(lambda_prior)), eta_prior=reticulate::tuple(as.list(eta_prior)),
+      rho_prior=rho_prior, seed=seed, ...
     )
   }
 
@@ -90,11 +91,15 @@ vimure_training_history <- function(diag){
     G_exp_theta_f=diag$model$G_exp_theta_f
   )
 
+  if(reticulate::py_has_attr(diag$model, "rho_f")){
+    posteriors$rho_f <- diag$model$rho_f
+  }
+
   structure(class = "vimure_training_history", list(
     priors = priors,
     posteriors = posteriors,
     trace = diag$model$trace
-  ), comment= diag$reliability_interactions)
+  ))
 }
 
 

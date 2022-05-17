@@ -59,7 +59,7 @@ You can install the development version of VIMuRe from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="19-vimure-v01-r-write-test_generate_xr")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="25-vimure-v01-r-implement-vimuremodel")
 ```
 
 ## Usage Example
@@ -73,8 +73,10 @@ library(vimure)
 #> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
 
 vimure:::vimureP  ## The Python package
-#> Module(vimure)
+#> <pointer: 0x0>
 ```
+
+### Synthetic Data
 
 Simply create an object with the desired synthetic network class:
 
@@ -91,7 +93,7 @@ library(igraph, quietly =T)
 #> 
 #>     union
 
-random_net <- gm_CReciprocity()
+random_net <- gm_CReciprocity(N=50, M=50)
 Y <- extract_Y(random_net) # Tensor object
 
 ggcorrplot(Y[1, ,]) + 
@@ -113,7 +115,7 @@ paste0(
   " | Avg. degree: ", mean(degree(graph)), # TODO: Change to directed graph
   " | Reciprocity: ", reciprocity(graph)
 )
-#> [1] "Nodes: 100 | Edges: 386 | Avg. degree: 7.72 | Reciprocity: 0.787564766839378"
+#> [1] "Nodes: 50 | Edges: 187 | Avg. degree: 7.48 | Reciprocity: 0.812834224598931"
 ```
 
 Given a network Y, we can generate N observed adjacency matrices as
@@ -131,6 +133,36 @@ ggcorrplot(Xavg[1, ,]) +
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+
+### Model
+
+``` r
+model <- vimure(random_net$X, R=random_net$R, mutuality = T, num_realisations=1, max_iter=150)
+summary(model, random_net)
+#> ---------------
+#> - DIAGNOSTICS -
+#> ---------------
+#> 
+#> Model: ViMuRe(T)
+#> 
+#>   Priors:
+#>    - eta:    shp=0.50 rte=1.00
+#>    - theta:  shp=0.10 rte=0.10
+#>    - lambda: shp=10.0 rte=10.0
+#>    - rho:    a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.pr_rho)
+#> 
+#>   Posteriors:
+#>    - G_exp_lambda_f: [[0.02172369 1.08060381 1.08217007 1.08361545 1.08180345 1.08017684
+#>   1.08183233 1.08032291 1.08267137 1.08084451 1.0794326  1.08208748
+#>   1.08272802 1.08122456 1.12196327]]
+#>    - G_exp_nu_f: 0.74
+#>    - G_exp_theta_f: a (1, 50) tensor (to inspect it, run <diag_obj>.model.G_exp_theta_f)
+#>    - rho_f: a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.rho_f)
+#> 
+#> Optimisation:
+#> 
+#>    Elbo: 52373.250092620627
+```
 
 ## Setup (Development mode)
 

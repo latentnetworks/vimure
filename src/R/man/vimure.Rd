@@ -9,14 +9,15 @@ vimure(
   R = NULL,
   mutuality = T,
   undirected = F,
-  theta_prior = c(0.1, 0.1),
+  theta_prior = list(0.1, 0.1),
   K = reticulate::py_none(),
-  lambda_prior = c(10, 10),
-  eta_prior = c(0.5, 1),
+  lambda_prior = list(10, 10),
+  eta_prior = list(0.5, 1),
   rho_prior = reticulate::py_none(),
   seed = reticulate::py_none(),
   etol = 0.1,
-  verbose = T
+  verbose = T,
+  ...
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ If reporters mask was not informed, the model will assume that every reporter ca
 \item{etol}{controls when to stop the optimisation algorithm (CAVI)}
 
 \item{verbose}{Provides additional details}
+
+\item{...}{Additional args of model$fit() method}
 }
 \value{
 vimure model
