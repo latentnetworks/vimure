@@ -17,14 +17,14 @@ class Diagnostics:
     ):
         self.model = model
 
-        if hasattr(net, "Y"):
+        if (net is not None) and hasattr(net, "Y"):
             # If it is a ground truth network, keep relevant info
             self.Y = net.Y
             self.eta = net.eta
 
-        self.L = net.L
-        self.M = net.M
-        self.N = net.N
+        self.L = model.L
+        self.M = model.M
+        self.N = model.N
 
         if self.model.mutuality:
             self.model_str = "ViMuRe(T)"
