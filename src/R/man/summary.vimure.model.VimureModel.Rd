@@ -4,14 +4,14 @@
 \alias{summary.vimure.model.VimureModel}
 \title{Diagnostics metrics}
 \usage{
-\method{summary}{vimure.model.VimureModel}(object, net, ...)
+\method{summary}{vimure.model.VimureModel}(object, net = NULL, ...)
 }
 \arguments{
-\item{object}{a "vimure" object}
+\item{object}{A "vimure" object.}
 
-\item{net}{a "baseNetwork" object}
+\item{net}{A vm.io.baseNetwork object.}
 
-\item{...}{additional arguments affecting the summary produced.}
+\item{...}{Additional arguments affecting the summary produced.}
 }
 \description{
 Diagnostics metrics

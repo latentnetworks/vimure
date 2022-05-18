@@ -5,14 +5,14 @@
 \title{ViMuRe}
 \usage{
 vimure(
-  X,
+  x,
   R = NULL,
   mutuality = T,
   undirected = F,
-  theta_prior = list(0.1, 0.1),
+  theta_prior = c(0.1, 0.1),
   K = reticulate::py_none(),
-  lambda_prior = list(10, 10),
-  eta_prior = list(0.5, 1),
+  lambda_prior = c(10, 10),
+  eta_prior = c(0.5, 1),
   rho_prior = reticulate::py_none(),
   seed = reticulate::py_none(),
   etol = 0.1,
@@ -21,32 +21,32 @@ vimure(
 )
 }
 \arguments{
-\item{X}{The observed data, with dimensions L x N x N x N}
+\item{x}{An adjancency matrix with dimensions L x N x N x N or a igraph object.}
 
 \item{R}{Reporters mask (TRUE/FALSE) indicating whether a node \emph{CAN} report on a particular tie, with dimensions L x N x N x N.
 If reporters mask was not informed, the model will assume that every reporter can report on any tie.}
 
-\item{mutuality}{Whether to use the mutuality parameter}
+\item{mutuality}{Whether to use the mutuality parameter.}
 
-\item{undirected}{Whether the network is undirected}
+\item{undirected}{Whether the network is undirected.}
 
-\item{theta_prior}{Shape and scale hyperparameters for variable theta}
+\item{theta_prior}{Shape and scale hyperparameters for variable theta.}
 
-\item{K}{Value of the maximum entry of the network - i}
+\item{K}{Value of the maximum entry of the network - i.}
 
-\item{lambda_prior}{Shape and scale hyperparameters for variable lambda}
+\item{lambda_prior}{Shape and scale hyperparameters for variable lambda.}
 
-\item{eta_prior}{Shape and scale hyperparameters for variable eta}
+\item{eta_prior}{Shape and scale hyperparameters for variable eta.}
 
 \item{rho_prior}{Array with prior values of the rho parameter - if ndarray.}
 
-\item{seed}{Pseudo random generator seed to use}
+\item{seed}{Pseudo random generator seed to use.}
 
-\item{etol}{controls when to stop the optimisation algorithm (CAVI)}
+\item{etol}{controls when to stop the optimisation algorithm (CAVI).}
 
-\item{verbose}{Provides additional details}
+\item{verbose}{Provides additional details.}
 
-\item{...}{Additional args of model$fit() method}
+\item{...}{Additional args of model$fit() method.}
 }
 \value{
 vimure model

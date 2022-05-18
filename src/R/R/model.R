@@ -4,37 +4,42 @@
 #' reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
 #' network (rho). The inference is performed with a Variational Inference approach.
 #'
-#' @param X The observed data, with dimensions L x N x N x N
+#' @param x An adjancency matrix with dimensions L x N x N x N or a igraph object.
 #' @param R Reporters mask (TRUE/FALSE) indicating whether a node _CAN_ report on a particular tie, with dimensions L x N x N x N.
 #' If reporters mask was not informed, the model will assume that every reporter can report on any tie.
-#' @param K Value of the maximum entry of the network - i
-#' @param undirected Whether the network is undirected
-#' @param mutuality Whether to use the mutuality parameter
-#' @param theta_prior Shape and scale hyperparameters for variable theta
-#' @param lambda_prior Shape and scale hyperparameters for variable lambda
-#' @param eta_prior Shape and scale hyperparameters for variable eta
+#' @param K Value of the maximum entry of the network - i.
+#' @param undirected Whether the network is undirected.
+#' @param mutuality Whether to use the mutuality parameter.
+#' @param theta_prior Shape and scale hyperparameters for variable theta.
+#' @param lambda_prior Shape and scale hyperparameters for variable lambda.
+#' @param eta_prior Shape and scale hyperparameters for variable eta.
 #' @param rho_prior Array with prior values of the rho parameter - if ndarray.
-#' @param etol controls when to stop the optimisation algorithm (CAVI)
-#' @param seed Pseudo random generator seed to use
-#' @param verbose Provides additional details
-#' @param ... Additional args of model$fit() method
+#' @param etol controls when to stop the optimisation algorithm (CAVI).
+#' @param seed Pseudo random generator seed to use.
+#' @param verbose Provides additional details.
+#' @param ... Additional args of model$fit() method.
 #'
 #' @return vimure model
 #' @export
-vimure <- function(X, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1), K=reticulate::py_none(),
+vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1), K=reticulate::py_none(),
                    lambda_prior=c(10.0, 10.0), eta_prior=c(0.5, 1.0), rho_prior=reticulate::py_none(),
                    seed=reticulate::py_none(),etol=0.1, verbose=T, ...){
+  if(class(x)[1] == "igraph"){
+    net <- parse_graph_from_igraph(x)
+    x <- net$X
+  }
+
   model <- vimureP$model$VimureModel(mutuality=mutuality, undirected=undirected, convergence_tol=etol, verbose=verbose)
 
   if(length(R) > 0){
     model$fit(
-      X=X, R=R, K=K, theta_prior=reticulate::tuple(as.list(theta_prior)),
+      X=x, R=R, K=K, theta_prior=reticulate::tuple(as.list(theta_prior)),
       lambda_prior=reticulate::tuple(as.list(lambda_prior)), eta_prior=reticulate::tuple(as.list(eta_prior)),
       rho_prior=rho_prior, seed=seed, ...
     )
   }else{
     model$fit(
-      X=X, K=K, theta_prior=reticulate::tuple(as.list(theta_prior)),
+      X=x, K=K, theta_prior=reticulate::tuple(as.list(theta_prior)),
       lambda_prior=reticulate::tuple(as.list(lambda_prior)), eta_prior=reticulate::tuple(as.list(eta_prior)),
       rho_prior=rho_prior, seed=seed, ...
     )
@@ -46,13 +51,17 @@ vimure <- function(X, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
 #' Diagnostics metrics
 #'
 #'
-#' @param object a "vimure" object
-#' @param net a "baseNetwork" object
-#' @param ... additional arguments affecting the summary produced.
+#' @param object A "vimure" object.
+#' @param net A vm.io.baseNetwork object.
+#' @param ... Additional arguments affecting the summary produced.
 #'
 #' @rdname summary.vimure.model.VimureModel
 #' @export
-summary.vimure.model.VimureModel <- function(object, net, ...){
+summary.vimure.model.VimureModel <- function(object, net=NULL, ...){
+  if(length(net) == 0){
+    net <- reticulate::py_none()
+  }
+
   diag <- vimureP$diagnostics$Diagnostics(object, net)
   print(diag)
   print(diag$plot_elbo_values())
@@ -101,6 +110,4 @@ vimure_training_history <- function(diag){
     trace = diag$model$trace
   ))
 }
-
-
 

@@ -2,9 +2,13 @@
 
 S3method(summary,vimure.model.VimureModel)
 export(build_X)
+export(build_custom_theta)
 export(extract_Xavg)
 export(extract_Y)
 export(gm_CReciprocity)
 export(gm_DegreeCorrectedSBM)
 export(gm_StandardSBM)
+export(parse_graph_from_csv)
+export(parse_graph_from_edgelist)
+export(parse_graph_from_igraph)
 export(vimure)
