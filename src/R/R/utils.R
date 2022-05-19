@@ -22,7 +22,7 @@
 #' @return vimureP$io$RealNetwork
 #' @export
 parse_graph_from_edgelist <- function(
-  edges, nodes=NULL, reporters=NULL, weighted=F, directed=F, ego="Ego", alter="Alter",
+  edges, nodes=NULL, reporters=NULL, weighted=F, directed=T, ego="Ego", alter="Alter",
   reporter="reporter", layer="layer", weight="weight",
   ...
 ){
@@ -56,7 +56,8 @@ parse_graph_from_edgelist <- function(
   }
 
   vimureP$io$parse_graph_from_edgelist(
-    edges, nodes, reporters, is_undirected=!directed, is_weighted=weighted, ...
+    edges, nodes, reporters, is_undirected=!directed, is_weighted=weighted,
+    ego=ego, alter=alter, weight=weight, reporter=reporter, layer=layer, ...
   )
 }
 
