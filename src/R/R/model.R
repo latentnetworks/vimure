@@ -27,6 +27,7 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
   if(class(x)[1] == "igraph"){
     net <- parse_graph_from_igraph(x)
     x <- net$X
+    R <- net$R
   }
 
   model <- vimureP$model$VimureModel(mutuality=mutuality, undirected=undirected, convergence_tol=etol, verbose=verbose)
