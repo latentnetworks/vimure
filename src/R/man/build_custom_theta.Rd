@@ -2,7 +2,7 @@
 % Please edit documentation in R/synthetic.R
 \name{build_custom_theta}
 \alias{build_custom_theta}
-\title{Customize 'Reliability' parameter $\theta$}
+\title{Customize 'Reliability' parameter theta}
 \usage{
 build_custom_theta(
   synthetic,
@@ -14,7 +14,7 @@ build_custom_theta(
 \arguments{
 \item{synthetic}{A synthetic model}
 
-\item{theta_ratio}{Percentage of reporters who exaggerate \link{0,1}}
+\item{theta_ratio}{Percentage of reporters who exaggerate [0,1]}
 
 \item{exaggeration_type}{"over" or "under"}
 

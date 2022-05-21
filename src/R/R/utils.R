@@ -7,6 +7,8 @@
 #' a weighted adjancency matrix
 #' Use the params `ego`, `alter`, `reporter`, `weight` and `layer` to map the dataframe columns.
 #'
+#' @family parse data input
+#'
 #' @param edges data.frame representing the edgelist.
 #' @param nodes List of all nodes.
 #' @param reporters List of the nodes who took the survey.
@@ -26,15 +28,30 @@ parse_graph_from_edgelist <- function(
   reporter="reporter", layer="layer", weight="weight",
   ...
 ){
-  if(class(edges) != "data.frame"){
-    stop("invalid 'type' (", class(edges), ") of argument")
+  if(!("data.frame" %in% class(edges))){
+    stop("invalid 'type' (", class(edges)[1], ") of argument")
   }
+
   col_expected <- c(ego, alter, reporter, layer, weight)
   col_real <- colnames(edges)
   col_diff <- col_expected[!col_expected %in% col_real]
 
+  # Convert factors to characters
+  i <- sapply(edges, is.factor)
+  edges[i] <- lapply(edges[i], as.character)
+
+  if(length(col_diff)==length(col_expected)){
+    stop("invalid columns in `edges`.
+         Hint: Use params ego,alter,... for mapping column names.")
+  }
+
+  if(sum(c(ego, alter) %in% col_diff) > 0){
+    stop("`edges` do not have columns '", ego, "' and '", alter, "'.
+         Hint: Use params ego,alter,... for mapping column names.")
+  }
+
   if(reporter %in% col_diff){
-    warning("UserWarning: ", reporter, " column not found in edges dataframe. Using ", ego, " column as reporter.")
+    warning("'", reporter, "' column not found in `edges`. Using '", ego, "' column as reporter.")
     edges[reporter] <- edges[ego]
   }
 
@@ -44,6 +61,18 @@ parse_graph_from_edgelist <- function(
 
   if(weight %in% col_diff){
     edges[weight] <- 1
+  }
+
+  dtypes <- sapply(edges, class)[c(ego, alter, reporter, weight)]
+  is_character <- !(dtypes %in% c("integer", "numeric"))
+  if(any(is_character)){
+    # Try to convert labels to number
+    # While using tensor, it is only possible to work with indices
+    vars_to_convert <- names(dtypes[is_character])
+    edges[vars_to_convert] <- suppressWarnings(sapply(edges[vars_to_convert], as.numeric))
+    if(any(is.na(edges[vars_to_convert]))){
+      stop("non-numeric values in ", paste(vars_to_convert, collapse = ", "))
+    }
   }
 
   if(length(nodes) == 0){
@@ -70,6 +99,8 @@ parse_graph_from_edgelist <- function(
 #' a weighted adjancency matrix
 #' Use the params `ego`, `alter`, `reporter`, `weight` and `layer` to map the dataframe columns.
 #'
+#' @family parse data input
+#'
 #' @param file data.frame representing the edgelist.
 #' @param weighted 	Whether to add weights to the adjancency matrix.
 #' @param directed Whether to create a directed graph.
@@ -84,7 +115,7 @@ parse_graph_from_edgelist <- function(
 #' @export
 parse_graph_from_csv <- function(
   file, weighted=F, directed=T, ego="Ego", alter="Alter", reporter="reporter", layer="layer", weight="weight", ...){
-  edges <- read.csv(file, ...)
+  edges <- utils::read.csv(file, ...)
   parse_graph_from_edgelist(
     edges, weighted=weighted, directed=directed, ego=ego,
     alter=alter, reporter=reporter, layer=layer, weight=weight
@@ -99,6 +130,8 @@ parse_graph_from_csv <- function(
 #' a weighted adjancency matrix
 #' Use the params `reporter`, `weight` and `layer` to map the edge attribute names.
 #'
+#' @family parse data input
+#'
 #' @param graph An igraph object.
 #' @param directed Whether to create a directed graph.
 #' @param weighted 	Whether to add weights to the adjancency matrix.
@@ -110,15 +143,19 @@ parse_graph_from_csv <- function(
 #' @export
 parse_graph_from_igraph <- function(
   graph, directed = T, weighted=F, weight="weight", reporter="reporter", layer="layer"){
+  if(class(graph) != "igraph"){
+    stop("invalid 'type' (", class(graph), ") of argument")
+  }
+
   df_edges <- data.frame(igraph::as_edgelist(graph))
   colnames(df_edges) <- c("Ego", "Alter")
 
-  edges <- E(graph)
-  df_edges[weight] <- `$`(edges, weight)
-  df_edges[reporter] <- `$`(edges, reporter)
-  df_edges[layer] <- `$`(edges, layer)
+  edges <- igraph::E(graph)
+  df_edges['weight'] <- eval(parse(text=paste0("edges$",weight)))
+  df_edges['reporter'] <- eval(parse(text=paste0("edges$",reporter)))
+  df_edges['layer'] <- eval(parse(text=paste0("edges$",layer)))
 
-  parse_graph_from_edgelist(df_edges, reporter=reporter, layer=layer, weight=weight, directed=directed)
+  parse_graph_from_edgelist(df_edges, directed=directed, weighted=weighted)
 }
 
 py_to_r.sktensor.sptensor.sptensor <- function(x){

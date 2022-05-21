@@ -46,3 +46,9 @@ The dataframe can contains three optional columns:
 a weighted adjancency matrix
 Use the params \code{ego}, \code{alter}, \code{reporter}, \code{weight} and \code{layer} to map the dataframe columns.
 }
+\seealso{
+Other parse data input: 
+\code{\link{parse_graph_from_edgelist}()},
+\code{\link{parse_graph_from_igraph}()}
+}
+\concept{parse data input}

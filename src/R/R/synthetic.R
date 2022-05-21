@@ -115,13 +115,13 @@ gm_CReciprocity <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, sparsify
   return(synthetic)
 }
 
-#' Customize 'Reliability' parameter $\theta$
+#' Customize 'Reliability' parameter theta
 #'
 #' Instead of the regular generative model for theta (theta ~ Gamma(sh, sc)),
 #' create a more extreme scenario where some percentage of reporters are exaggerating.
 #'
 #' @param synthetic A synthetic model
-#' @param theta_ratio Percentage of reporters who exaggerate [0,1]
+#' @param theta_ratio Percentage of reporters who exaggerate \[0,1]
 #' @param exaggeration_type "over" or "under"
 #' @param seed Pseudo random generator seed to use
 #'

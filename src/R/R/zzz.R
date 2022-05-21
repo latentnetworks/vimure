@@ -9,7 +9,7 @@ vimureP <- NULL
     packageStartupMessage("Creating a virtualenv (r-vimure)")
     reticulate::virtualenv_create("r-vimure")
     reticulate::virtualenv_install("r-vimure",
-                                   "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/")
+                                   "git+https://github.com/latentnetworks/vimure.git@25-vimure-v01-r-implement-vimuremodel#egg=vimure&subdirectory=src/python/")
   }else{
     packageStartupMessage("Using an existing virtualenv (r-vimure)")
   }

@@ -36,3 +36,9 @@ The igraph can contains three optional edge attributes:
 a weighted adjancency matrix
 Use the params \code{reporter}, \code{weight} and \code{layer} to map the edge attribute names.
 }
+\seealso{
+Other parse data input: 
+\code{\link{parse_graph_from_csv}()},
+\code{\link{parse_graph_from_edgelist}()}
+}
+\concept{parse data input}

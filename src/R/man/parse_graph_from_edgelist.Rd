@@ -9,7 +9,7 @@ parse_graph_from_edgelist(
   nodes = NULL,
   reporters = NULL,
   weighted = F,
-  directed = F,
+  directed = T,
   ego = "Ego",
   alter = "Alter",
   reporter = "reporter",
@@ -52,3 +52,9 @@ The dataframe can contains three optional columns:
 a weighted adjancency matrix
 Use the params \code{ego}, \code{alter}, \code{reporter}, \code{weight} and \code{layer} to map the dataframe columns.
 }
+\seealso{
+Other parse data input: 
+\code{\link{parse_graph_from_csv}()},
+\code{\link{parse_graph_from_igraph}()}
+}
+\concept{parse data input}
