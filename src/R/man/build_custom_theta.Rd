@@ -8,7 +8,7 @@ build_custom_theta(
   synthetic,
   theta_ratio = 0.5,
   exaggeration_type = c("over", "under"),
-  seed = reticulate::py_none()
+  seed = NULL
 )
 }
 \arguments{

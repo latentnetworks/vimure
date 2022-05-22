@@ -29,7 +29,7 @@ check_R <- function(synth_net){
   expect_gt(sum(synth_net$R), 0)
 }
 
-test_that("multiplication works", {
+test_that("Check X generation", {
   skip_if_no_vimure()
 
   synth_net <- gm_StandardSBM(
@@ -43,7 +43,7 @@ test_that("multiplication works", {
     seed=10,
   )
 
-  X <- build_X(synth_net, flag_self_reporter=F, cutoff_X=F, mutuality=0.5, seed=20L)
+  X <- build_X(synth_net, flag_self_reporter=F, cutoff_X=F, mutuality=0.5)
 
   check_X_matrix(synth_net)
   check_theta(synth_net)

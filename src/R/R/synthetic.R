@@ -129,13 +129,13 @@ gm_CReciprocity <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, sparsify
 #' @export
 build_custom_theta <- function(synthetic, theta_ratio = 0.5,
                                exaggeration_type = c("over", "under"),
-                               seed = reticulate::py_none()){
+                               seed = NULL){
   exaggeration_type <- match.arg(exaggeration_type)
   custom_theta <- vimureP$synthetic$build_custom_theta(
     gt_network = synthetic,
     theta_ratio = theta_ratio,
     exaggeration_type = exaggeration_type,
-    seed = seed
+    seed = as.integer(seed)
   )
   return(custom_theta)
 }

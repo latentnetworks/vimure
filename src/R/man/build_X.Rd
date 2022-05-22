@@ -9,13 +9,13 @@ build_X(
   mutuality = 0.5,
   sh_theta = 2,
   sc_theta = 0.5,
-  theta = reticulate::py_none(),
+  theta = NULL,
   flag_self_reporter = T,
-  Q = reticulate::py_none(),
+  Q = NULL,
   cutoff_X = F,
-  lambda_diff = reticulate::py_none(),
-  seed = reticulate::py_none(),
-  verbose = T
+  lambda_diff = NULL,
+  verbose = T,
+  ...
 )
 }
 \arguments{
@@ -37,9 +37,9 @@ build_X(
 
 \item{lambda_diff}{The difference between each subsequent K}
 
-\item{seed}{Pseudo random generator seed to use}
-
 \item{verbose}{Provides additional details}
+
+\item{...}{Additional args of synthetic$build_X() method.}
 }
 \value{
 A sptensor

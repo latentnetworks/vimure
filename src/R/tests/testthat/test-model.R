@@ -35,7 +35,7 @@ check_parameters <- function(model, synth_net){
 check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   eta <- 0.2
   theta_ratio <- 0.1
-  seed <- 25L
+  seed <- 25
   K <- 2
 
   synth_net <- gm_CReciprocity(N=100, M=100, L=1, C=2,
@@ -52,7 +52,7 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   LAMBDA_0 <- 0.01
   LAMBDA_DIFF <- 0.99
   X <- build_X(synth_net, mutuality=eta, theta=custom_theta, cutoff_X=F, lambda_diff=LAMBDA_DIFF,
-               flag_self_reporter=T, seed=seed, verbose=T
+               flag_self_reporter=T, verbose=T
   )
 
   lambda_k_GT <- matrix(c(LAMBDA_0, LAMBDA_0 + LAMBDA_DIFF), ncol=K)
@@ -86,4 +86,10 @@ test_that("Check vimure model in extreme scenarios of under reporting", {
 
 test_that("Check vimure model in extreme scenarios of over reporting", {
   check_extreme_scenarios("over", 0.92)
+})
+
+test_that("Check vimure model for invalid inputs", {
+  INPUTS <- list("a", list(a="a"), mtcars, 1:10)
+  for(x in INPUTS)
+  expect_error(vimure(x), "invalid 'type'")
 })

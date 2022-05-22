@@ -161,3 +161,7 @@ parse_graph_from_igraph <- function(
 py_to_r.sktensor.sptensor.sptensor <- function(x){
   x$toarray()
 }
+
+r_to_py.dgCMatrix <- function(x){
+  vimureP$utils$sk
+}

@@ -21,10 +21,14 @@
 #'
 #' @return vimure model
 #' @export
-vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1), K=reticulate::py_none(),
-                   lambda_prior=c(10.0, 10.0), eta_prior=c(0.5, 1.0), rho_prior=reticulate::py_none(),
-                   seed=reticulate::py_none(),etol=0.1, verbose=T, ...){
-  if(class(x)[1] == "igraph"){
+vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1), K=NULL,
+                   lambda_prior=c(10.0, 10.0), eta_prior=c(0.5, 1.0), rho_prior=NULL,
+                   seed=NULL, etol=0.1, verbose=T, ...){
+  if(!any(class(x) %in% c("sktensor.sptensor.sptensor", "array", "igraph"))){
+    stop("invalid 'type'", class(x), "of argument")
+  }
+
+  if("igraph" %in% class(x)){
     net <- parse_graph_from_igraph(x)
     x <- net$X
     R <- net$R
@@ -32,15 +36,20 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
 
   model <- vimureP$model$VimureModel(mutuality=mutuality, undirected=undirected, convergence_tol=etol, verbose=verbose)
 
+  if(length(seed)) seed <- as.integer(seed)
   if(length(R) > 0){
+    if(!any(class(R) %in% c("sktensor.sptensor.sptensor", "array"))){
+      stop("invalid 'type'", class(R), "of argument")
+    }
+
     model$fit(
-      X=x, R=R, K=K, theta_prior=reticulate::tuple(as.list(theta_prior)),
+      X=x, R=R, K=as.integer(K), theta_prior=reticulate::tuple(as.list(theta_prior)),
       lambda_prior=reticulate::tuple(as.list(lambda_prior)), eta_prior=reticulate::tuple(as.list(eta_prior)),
       rho_prior=rho_prior, seed=seed, ...
     )
   }else{
     model$fit(
-      X=x, K=K, theta_prior=reticulate::tuple(as.list(theta_prior)),
+      X=x, K=as.integer(K), theta_prior=reticulate::tuple(as.list(theta_prior)),
       lambda_prior=reticulate::tuple(as.list(lambda_prior)), eta_prior=reticulate::tuple(as.list(eta_prior)),
       rho_prior=rho_prior, seed=seed, ...
     )
@@ -65,12 +74,6 @@ summary.vimure.model.VimureModel <- function(object, net=NULL, ...){
 
   diag <- vimureP$diagnostics$Diagnostics(object, net)
   print(diag)
-  print(diag$plot_elbo_values())
-  if(reticulate::py_has_attr(net, "theta")){
-    print(diag$plot_theta(theta_GT = net$theta))
-  } else {
-    print(diag$plot_theta())
-  }
   vimure_training_history(diag)
 }
 
