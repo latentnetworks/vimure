@@ -59,7 +59,7 @@ You can install the development version of VIMuRe from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="25-vimure-v01-r-implement-vimuremodel")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
 ## Usage Example
@@ -69,7 +69,10 @@ configured
 
 ``` r
 library(vimure)
-#> Using an existing virtualenv (r-vimure)
+#> Updating vimure to developing version (r-vimure)
+#> + '/home/gabriela-borges/.virtualenvs/r-vimure/bin/python' -m pip uninstall --yes vimure
+#> Using virtual environment 'r-vimure' ...
+#> + '/home/gabriela-borges/.virtualenvs/r-vimure/bin/python' -m pip install --upgrade 'git+https://github.com/latentnetworks/vimure.git@25-vimure-v01-r-implement-vimuremodel#egg=vimure&subdirectory=src/python/'
 #> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
 
 vimure:::vimureP  ## The Python package
@@ -138,7 +141,7 @@ ggcorrplot(Xavg[1, ,]) +
 
 ``` r
 model <- vimure(random_net$X, R=random_net$R, mutuality = T, num_realisations=1, max_iter=150)
-summary(model, random_net)
+diag <- summary(model, random_net)
 #> ---------------
 #> - DIAGNOSTICS -
 #> ---------------
@@ -152,16 +155,16 @@ summary(model, random_net)
 #>    - rho:    a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.pr_rho)
 #> 
 #>   Posteriors:
-#>    - G_exp_lambda_f: [[0.02172369 1.08060381 1.08217007 1.08361545 1.08180345 1.08017684
-#>   1.08183233 1.08032291 1.08267137 1.08084451 1.0794326  1.08208748
-#>   1.08272802 1.08122456 1.12196327]]
-#>    - G_exp_nu_f: 0.74
+#>    - G_exp_lambda_f: [[0.01099272 1.17038422 0.08609309 1.16937812 1.16941258 1.17034286
+#>   1.16933776 1.16911272 1.17079289 1.17091344 1.16945736 1.17054016
+#>   1.17072429 1.16995159 1.17157099]]
+#>    - G_exp_nu_f: 0.76
 #>    - G_exp_theta_f: a (1, 50) tensor (to inspect it, run <diag_obj>.model.G_exp_theta_f)
 #>    - rho_f: a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.rho_f)
 #> 
 #> Optimisation:
 #> 
-#>    Elbo: 52373.250092620627
+#>    Elbo: 52682.702789146868
 ```
 
 ## Setup (Development mode)

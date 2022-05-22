@@ -48,7 +48,7 @@ You can install the development version of VIMuRe from [GitHub](https://github.c
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="25-vimure-v01-r-implement-vimuremodel")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
 ## Usage Example
@@ -105,7 +105,7 @@ ggcorrplot(Xavg[1, ,]) +
 
 ```{r}
 model <- vimure(random_net$X, R=random_net$R, mutuality = T, num_realisations=1, max_iter=150)
-summary(model, random_net)
+diag <- summary(model, random_net)
 ```
 
 ## Setup (Development mode)

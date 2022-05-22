@@ -25,7 +25,7 @@ layer <- "visit"
 Read villages as csv and convert to `vm.io.RealNetwork` or `graph` objects, convenient for our model usage.
 
 ```{r}
-PATH <- "../"
+PATH <- "../../"
 df_edges <- read.csv(paste0(PATH, "data/input/india_microfinance/formatted/", village, "_edges.csv"))
 
 df_edges$type <- factor(df_edges$type, 
