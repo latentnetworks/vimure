@@ -158,6 +158,17 @@ parse_graph_from_igraph <- function(
   parse_graph_from_edgelist(df_edges, directed=directed, weighted=weighted)
 }
 
+#' Reciprocity of networks
+#'
+#' Calculates the reciprocity of adjancency matrix
+#'
+#' @param X A matrix
+#'
+#' @export
+overall_reciprocity <- function(X){
+  vimureP$utils$calculate_overall_reciprocity(X)
+}
+
 py_to_r.sktensor.sptensor.sptensor <- function(x){
   x$toarray()
 }

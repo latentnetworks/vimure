@@ -1,0 +1,125 @@
+---
+title: "RMarkdown 2"
+author: "Gabriela L. Borges"
+date: "5/18/2022"
+output: html_document
+---
+
+**OBJECTIVE:** Illustrate how to run the foundational model with `vimure` function
+
+```{r setup, include=FALSE}
+library(reshape2)
+library(vimure)
+library(ggplot2)
+library(ggcorrplot)
+library(igraph) 
+library(devtools)
+```
+
+# Generate network
+
+## Generate Y
+
+(see RMarkdown 01 for more information about the synthetic network models used in the study)
+
+Let us generate a synthetic network with reciprocity (`gm_CReciprocity`):
+
+```{r}
+# Eta is the expected reciprocity on the network
+random_net <- gm_CReciprocity(N=100, M=100, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.2) 
+
+layer <- 1
+Y <- extract_Y(random_net)
+
+ggcorrplot(Y[layer, ,]) + 
+   scale_fill_gradient(low="white",high="#003396")
+```
+
+What is the actual overall reciprocity of the network?
+
+```{r}
+overall_reciprocity(Y[layer, , ])
+```
+## Generate X
+
+```{r}
+X <- build_X(random_net, cutoff_X=T, mutuality=0.3, lambda_diff=1.0, flag_self_reporter=T)
+Xavg <- extract_Xavg(random_net)
+
+ggcorrplot(Xavg[layer, ,]) + 
+   scale_fill_gradient(low="white",high="#003396")
+```
+
+## Distribution of $\theta$
+
+```{r}
+theta_df <- data.frame(layer=t(random_net$theta))
+theta_df <- melt(theta_df)
+
+ggplot(theta_df, aes(x = value)) +
+  geom_histogram() +
+  xlab("theta") +
+  ylab("# of nodes") +
+  facet_grid(~variable) +
+  theme_bw() +
+  ggtitle(
+    paste0("Distribution of theta accross different layers of the generated network. (N=",
+           random_net$N,", M=", random_net$M,", C=", random_net$C,")"))
+
+```
+
+# Baseline
+
+## Union of X
+
+```{r}
+X_union <- random_net$X_union$toarray()
+ggcorrplot(X_union[layer, ,]) + 
+   scale_fill_gradient(low="white",high="#003396")
+```
+
+## Intersection of X
+
+```{r}
+X_intersection <- random_net$X_intersection$toarray()
+ggcorrplot(X_intersection[layer, ,]) + 
+   scale_fill_gradient(low="white",high="#003396")
+```
+# VIMuRe model
+
+In R we can construct and fit the vimure model by using the `vimure` function.
+The `vimure` function inherit all arguments from the original `VimudeModel` class and `VimureModel.fit()`.
+See more info about arguments in `help(vimure)`.
+
+In R, the `vimure` takes as data input an adjancency matrix or an igraph object.
+
+## Run model without mutuality ($\eta = 0$)
+
+This is not particularly useful since we know this network has some level of reciprocity and mutuality.
+
+### Using Igraph
+
+```{r}
+graph <- graph_from_adjacency_matrix(Xavg[1,,])
+model <- vimure(graph, mutuality=F, K=2, num_realisations=1, max_iter=150)
+```
+
+
+### Using X matrix
+
+```{r}
+#model <- vimure(random_net$X, random_net$R, mutuality=F, K=2, num_realisations=1, max_iter=150)
+model <- vimure(X, random_net$R, mutuality=F, K=2, num_realisations=1, max_iter=150)
+```
+
+
+## Diagnostics
+
+Use `summary` to produce result summaries of the results of the model. The output of `summary` is a R list that contains vimure's priors and posteriors and more. You can access the results to plot and analyse the final model. 
+
+Open an issue in our [repository](https://github.com/latentnetworks/vimure/issues/new) to make request new metrics in `summary`.
+
+```{r}
+diag <- summary(model)
+```
+

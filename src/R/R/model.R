@@ -36,21 +36,26 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
 
   model <- vimureP$model$VimureModel(mutuality=mutuality, undirected=undirected, convergence_tol=etol, verbose=verbose)
 
-  if(length(seed)) seed <- as.integer(seed)
+  if(length(seed) > 0){seed <- as.integer(seed)}
+  if(length(K) > 0){K <- as.integer(K)}
+  if(length(theta_prior) > 0){theta_prior <- reticulate::tuple(as.list(theta_prior))}
+  if(length(lambda_prior) > 0){lambda_prior <- reticulate::tuple(as.list(lambda_prior))}
+  if(length(eta_prior) > 0){eta_prior <- reticulate::tuple(as.list(eta_prior))}
+
   if(length(R) > 0){
     if(!any(class(R) %in% c("sktensor.sptensor.sptensor", "array"))){
       stop("invalid 'type'", class(R), "of argument")
     }
 
     model$fit(
-      X=x, R=R, K=as.integer(K), theta_prior=reticulate::tuple(as.list(theta_prior)),
-      lambda_prior=reticulate::tuple(as.list(lambda_prior)), eta_prior=reticulate::tuple(as.list(eta_prior)),
+      X=x, R=R, K=K, theta_prior=theta_prior,
+      lambda_prior=lambda_prior, eta_prior=eta_prior,
       rho_prior=rho_prior, seed=seed, ...
     )
   }else{
     model$fit(
-      X=x, K=as.integer(K), theta_prior=reticulate::tuple(as.list(theta_prior)),
-      lambda_prior=reticulate::tuple(as.list(lambda_prior)), eta_prior=reticulate::tuple(as.list(eta_prior)),
+      X=x, K=K, theta_prior=theta_prior,
+      lambda_prior=lambda_prior, eta_prior=eta_prior,
       rho_prior=rho_prior, seed=seed, ...
     )
   }
@@ -74,7 +79,7 @@ summary.vimure.model.VimureModel <- function(object, net=NULL, ...){
 
   diag <- vimureP$diagnostics$Diagnostics(object, net)
   print(diag)
-  vimure_training_history(diag)
+  return(vimure_training_history(diag))
 }
 
 vimure_training_history <- function(diag){
@@ -108,10 +113,18 @@ vimure_training_history <- function(diag){
     posteriors$rho_f <- diag$model$rho_f
   }
 
+  # Realibility dataframe
+  lambda <- posteriors$G_exp_lambda_f[,2]
+  theta_matrix <- t(posteriors$G_exp_theta_f)
+  reliability <- theta_matrix*lambda
+  reliability_df <- data.frame(layer=reliability)
+  reliability_df$node <- row.names(reliability_df)
+
   structure(class = "vimure_training_history", list(
     priors = priors,
     posteriors = posteriors,
-    trace = diag$model$trace
+    trace = diag$model$trace,
+    reliability = reliability_df
   ))
 }
 

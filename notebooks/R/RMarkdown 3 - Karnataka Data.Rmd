@@ -1,0 +1,119 @@
+---
+title: "RMarkdown 4"
+author: "Gabriela L. Borges"
+date: "5/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(vimure)
+library(igraph) 
+library(ggplot2)
+library(reshape2)
+```
+
+**OBJECTIVE:** To assess ViMuRe models on the 75 villages of Karnataka data.
+
+**Change these values to run a different village+layer**
+```{r}
+village <- "vil55"
+layer <- "visit"
+```
+
+# Data Input
+
+Read villages as csv and convert to `vm.io.RealNetwork` or `graph` objects, convenient for our model usage.
+
+```{r}
+PATH <- "../"
+df_edges <- read.csv(paste0(PATH, "data/input/india_microfinance/formatted/", village, "_edges.csv"))
+
+df_edges$type <- factor(df_edges$type, 
+  levels=c(
+    "borrowmoney","receivemoney", "receiveadvice", "helpdecision",
+    "keroricego", "keroricecome", "visitgo", "visitcome"
+    ), labels=c("money", "money", "advice", "advice", "kerorice", "kerorice", "visit", "visit"))
+
+df_edges <- df_edges[df_edges$type %in% layer, ]
+df_edges <- df_edges[df_edges$i != df_edges$j, ]
+df_edges <- df_edges[!duplicated(df_edges), ]
+
+head(df_edges)
+```
+ 
+## Using an igraph network
+
+Vimure models expects as input a graph that can contains the _layer_, _reporter_ and _weight_ of each edge. 
+Use `igraph::graph_from_data_frame` for create a graph using a dataset. The first two columns are the edgelist. Additional columns are considered as edge attributes (See more in ?graph_from_data_frame).
+
+IMPORTANT: Vimure extracts these attributes by name, so it is crucial to rename the attributes before creating the graph (or parse the edgelist directly by `parse_graph_from_edgelist` and use params ego,alter,.. for mapping columns names - section below):
+ 
+```{r}
+edges <- df_edges[c(2:5, 1)] # Reorder columns
+names(edges) <- c("Ego", "Alter", "layer", "weight", "reporter") # Rename
+graph <- igraph::graph_from_data_frame(edges)
+
+message(
+  "Nodes: ", length(V(graph)),
+  " | Edges: ", gsize(graph),
+  " | Avg. degree: ", mean(degree(graph)), #directed graph,
+  " | Reciprocity: ", reciprocity(graph)
+)
+```
+Run the model:
+
+```{r}
+# Graph input
+model <- vimure(graph, num_realisations=5L, max_iter=100L, seed=5)
+```
+
+
+ ## Parsing data to vimure classes
+ 
+Vimure models expect as input the attributes `X` and `R` of a `parse_graph_from_edgelist` result. 
+`parse_graph_from_edgelist` expects a dataframe with two required columns (_Ego_ and _Alter_) and three optional columns ( _layer_, _reporter_ and _weight_). Rename the dataframe's columns or use params ego,alter,... of `parse_graph_from_edgelist` for mapping column names to convert.
+
+ 
+```{r}
+vm_graph <- parse_graph_from_edgelist(df_edges, ego="i", alter="j", reporter="respondent")
+```
+ 
+ Run the model:
+ 
+```{r}
+# Vimure input
+# model <- vimure(vm_graph$X, vm_graph$R, num_realisations=5L, max_iter=100L)
+```
+ 
+ 
+# Diagnostics
+
+Use `summary` to produce result summaries of the results of the model. The output of `summary` is a R list that contains vimure's priors and posteriors and more. You can access the results to plot and analyse the final model. 
+
+Open an issue in our [repository](https://github.com/latentnetworks/vimure/issues/new) to make request new metrics in `summary`.
+
+```{r}
+diag <- summary(model)
+```
+## Elbo values
+
+```{r}
+df_elbo <- diag$trace
+ggplot(df_elbo, aes(x=iter, y=elbo, group=realisation, color=factor(realisation))) +
+  geom_point() +
+  geom_line(size=1.2) +
+  theme_bw() +
+  labs(x = "Iter", y="ELBO", color="Realisation")
+```
+## Estimated realibility
+
+```{r}
+plot_df <- melt(diag$reliability, id = "node")
+ggplot(plot_df, aes(x = reorder(factor(node), -value), y=value)) +
+  geom_point(alpha = 0.4, size=2, color = "#c45241") +
+  theme_bw() +
+  labs(x = "Nodes sorted from over-to under- reporting", y = "Realibility values") +
+  theme(axis.text.x=element_blank())
+```
+
+
