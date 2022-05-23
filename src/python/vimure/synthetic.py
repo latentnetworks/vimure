@@ -1,7 +1,6 @@
 """Code to generate synthetic networks that emulates directed double-sample questions networks"""
 
 import math
-import logging
 
 import numpy as np
 import pandas as pd
@@ -58,10 +57,21 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
     A base abstract class for generation and management of synthetic networks.
 
     Suitable for representing any type of synthetic network (whether SBM or not).
+
+    Parameters
+    ----------
+    N : int
+        Number of nodes.
+    M : int
+        Number of reporters.
+    L : int
+        Number of layers (it has only been tested for L=1).
+    K : int
+        Maximum edge weight in the adjacency matrix.
+        When K=2 (default), the adjacency matrix will contain some Y(ij)=0 and Y(ij)=1.
+    seed : int
+        Pseudo random generator seed to use
     """
-
-    # TODO: Add Class Docstrings
-
     def __init__(
         self,
         N: int = DEFAULT_N,
@@ -95,23 +105,37 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         verbose: bool = True,
     ):
         """
+        Generate Observed Networks - X.
+
         Any object inhereted from BaseSyntheticNetwork will have a ground truth network Y.
         Given that Y, generate the observed network X.
-
-
+        
         Parameters
         ----------
-        gt_network      :   A BaseSyntheticNetwork object that represents the ground-truth network
 
-        Q               :   Cutoff of the maximum entry value allowed in the adjacency matrix (maximum edge weight). 
-                            Similar to the parameter K passed to all the synthetic networks' __init__() method.
+        mutuality : float
+            The mutuality parameter (from 0 to 1)
+        sh_theta : float
+            Shape of gamma distribution from which to draw theta. The 'reliability' of nodes is represented by the parameter $theta_{lm}$ and by default are modelled as a gamma function with shape `sh_theta` and scale `sc_theta`.
+        sc_theta : float
+            Scale of gamma distribution from which to draw theta.
+        flag_self_reporter : bool
+            Indicates whether a node can only report about their own ties (default is true).
+        Q : int
+            Maximum value of X entries. If None, it will use the network's K parameter
+        cutoff_X : bool
+            Whether to set X as a binary
+        lambda_diff : float
+            The difference between each subsequent K
+        seed : int
+            Pseudo random generator seed to use
+        verbose : bool
+            Provides additional details
 
         Returns
         -------
         X : ndarray
             Observed network.
-
-        # TODO: Improve this docstring
         """
 
         logger = setup_logging("vm.synthetic.generate_X", verbose)
@@ -369,12 +393,33 @@ class StandardSBM(BaseSyntheticNetwork):
     """
     Creates a standard stochastic block-model synthetic network
 
+    A generative graph model which assumes the probability of connecting two nodes in a graph is determined entirely by their block assignments.
     For more information about this model, see Holland, P. W., Laskey, K. B., & Leinhardt, S. (1983). _Stochastic blockmodels: First steps. Social networks_, 5(2), 109-137.
     [DOI:10.1016/0378-8733(83)90021-7](https://www.sciencedirect.com/science/article/abs/pii/0378873383900217)
-
+    
+    Parameters
+    ----------
+    N : int
+        Number of nodes.
+    M : int
+        Number of reporters.
+    L : int
+        Number of layers (it has only been tested for L=1).
+    C : int
+        Number of communities
+    K : int
+        Maximum edge weight in the adjacency matrix.
+        When K=2 (default), the adjacency matrix will contain some Y(ij)=0 and Y(ij)=1.
+    avg_degree : float
+        Desired average degree for the network. It is not guaranteed that the ultimate network will have that exact average degree value. Try tweaking this parameter if you want to increase or decrease the density of the network.
+    sparsify : bool
+        If True (default), enforce sparsity.
+    overlapping : float
+        Fraction of nodes with mixed membership. It has to be in [0, 1).
+    seed : int
+        Pseudo random generator seed to use
     """
 
-    # TODO: Add Class Docstrings
     # TODO: Document overlapping communities separately as it involves setting several other parameters
 
     def __init__(
@@ -709,9 +754,27 @@ class DegreeCorrectedSBM(StandardSBM):
     A generative model that incorporates heterogeneous vertex degrees into stochastic blockmodels, improving the performance of the models for statistical inference of group structure.
     For more information about this model, see Karrer, B., & Newman, M. E. (2011). _Stochastic blockmodels and community structure in networks_. Physical review E, 83(1), 016107.
     [DOI:10.1103/PhysRevE.83.016107](https://arxiv.org/pdf/1008.3926.pdf)
-    """
-    # TODO: Add Class Docstrings
 
+    Parameters
+    ----------
+    N : int
+        Number of nodes.
+    M : int
+        Number of reporters.
+    L : int
+        Number of layers (it has only been tested for L=1).
+    C : int
+        Number of communities
+    K : int
+        Maximum edge weight in the adjacency matrix.
+        When K=2 (default), the adjacency matrix will contain some Y(ij)=0 and Y(ij)=1.
+    exp_in : float
+        Exponent power law of in-degree distribution
+    exp_out : float
+        Exponent power law of out-degree distribution
+    seed : int
+        Pseudo random generator seed to use
+    """
     def __init__(self, exp_in: float = DEFAULT_EXP_IN, exp_out: float = DEFAULT_EXP_OUT, **kwargs):
         """
         Set Up Degree Distribution first
@@ -779,9 +842,25 @@ class GMReciprocity(StandardSBM):
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     -------------------------------------------------------------------------------
 
-    """
+    Parameters
+    ----------
+    N : int
+        Number of nodes.
+    M : int
+        Number of reporters.
+    L : int
+        Number of layers (it has only been tested for L=1).
+    C : int
+        Number of communities
+    K : int
+        Maximum edge weight in the adjacency matrix.
+        When K=2 (default), the adjacency matrix will contain some Y(ij)=0 and Y(ij)=1.
+    eta : float
+         Initial value for the reciprocity coefficient. Eta has to be in [0, 1).
+    seed : int
+        Pseudo random generator seed to use
 
-    # TODO: Add Class Docstrings
+    """
 
     def __init__(self, eta=DEFAULT_ETA, ExpM=None, **kwargs):
         """
