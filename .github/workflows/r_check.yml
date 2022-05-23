@@ -3,8 +3,12 @@
 on:
   push:
     branches: [main, develop]
+    paths:
+      - src/R/**
   pull_request:
     branches: [main, develop]
+    paths:
+      - src/R/**
 
 name: R-CMD-check
 
