@@ -56,7 +56,7 @@ If you do not want to install miniconda, you can set up your [Python enviroment]
 Simply create an object with the desired synthetic network class:
 
 ```{r example}
-library(vimure)
+library(vimure, quietly =T)
 library(ggplot2, quietly =T)
 library(ggcorrplot, quietly =T)
 library(igraph, quietly =T)
@@ -78,8 +78,8 @@ class(random_net)
 `random_net` is stored as a Python object. You can access its attributes using the dollar sign `$` or using our `extract_*` functions which always will return a R object.
 
 ```{r}
-random_net$Y # still a python object because it is a sptensor
-extract_Y(random_net) # extract_Y convert to array
+class(random_net$Y) # still a python object because it is a sptensor
+class(extract_Y(random_net)) # extract_Y convert to array
 ```
 
 Create a graph from the adjacency matrix and calculate some network statistics:
