@@ -83,7 +83,7 @@ jobs:
         run: remotes::install_cran("rcmdcheck")
 
       - name: Check
-        run: rcmdcheck::rcmdcheck(args = '--no-manual', error_on = 'warning', check_dir = 'check')
+        run: rcmdcheck::rcmdcheck("src/R/", args = '--no-manual', error_on = 'warning', check_dir = 'check')
 
       - name: Show testthat output
         if: always()
