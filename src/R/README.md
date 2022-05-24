@@ -31,6 +31,16 @@ all OS. The package also depends on Python \>= 3.6, but you do not have
 to worry about that as we have a default set up that will run the first
 time you call `library(vimure)`.
 
+## Installation
+
+You can install the development version of VIMuRe from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+```
+
 ### Default
 
 If reticulate did not find a non-system installation of python you may
@@ -52,33 +62,14 @@ enviroment](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-vir
 manually or by `reticulate::install_python()`. VIMuRe requires Python
 \>= 3.6.
 
-## Installation
-
-You can install the development version of VIMuRe from
-[GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="19-vimure-v01-r-write-test_generate_xr")
-```
-
 ## Usage Example
-
-This is a basic example showing that virtualenv has been successfully
-configured
-
-``` r
-library(vimure)
-#> Using an existing virtualenv (r-vimure)
-#> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
-
-vimure:::vimureP  ## The Python package
-#> Module(vimure)
-```
 
 Simply create an object with the desired synthetic network class:
 
 ``` r
+library(vimure, quietly =T)
+#> Using an existing virtualenv (r-vimure)
+#> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
 library(ggplot2, quietly =T)
 library(ggcorrplot, quietly =T)
 library(igraph, quietly =T)
@@ -92,15 +83,37 @@ library(igraph, quietly =T)
 #>     union
 
 random_net <- gm_CReciprocity()
-Y <- extract_Y(random_net) # Tensor object
-
-ggcorrplot(Y[1, ,]) + 
-   scale_fill_gradient(low="white",high="#003396")
-#> Scale for 'fill' is already present. Adding another scale for 'fill', which
-#> will replace the existing scale.
+Y <- extract_Y(random_net)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+`vimure` is a R binding of a Python package. Many Python basic objects
+are quickly converted to R automatically. Custom Python objects that can
+not be converted automatically are stored in R as a
+`python.builtin.object`. As a `python.builtin.object`, you can access
+all object’s attributes as it is in Python using the dollar sign `$`.
+
+Use the function `class` to check if a object is stored in Python.
+
+``` r
+class(random_net)
+#> [1] "vimure.synthetic.GMReciprocity"       
+#> [2] "vimure.synthetic.StandardSBM"         
+#> [3] "vimure.synthetic.BaseSyntheticNetwork"
+#> [4] "vimure.io.BaseNetwork"                
+#> [5] "python.builtin.object"
+```
+
+`random_net` is stored as a Python object. You can access its attributes
+using the dollar sign `$` or using our `extract_*` functions which
+always will return a R object.
+
+``` r
+class(random_net$Y) # still a python object because it is a sptensor
+#> [1] "sktensor.sptensor.sptensor" "sktensor.core.tensor_mixin"
+#> [3] "python.builtin.object"
+class(extract_Y(random_net)) # extract_Y convert to array
+#> [1] "array"
+```
 
 Create a graph from the adjacency matrix and calculate some network
 statistics:
@@ -130,7 +143,7 @@ ggcorrplot(Xavg[1, ,]) +
 #> will replace the existing scale.
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 ## Setup (Development mode)
 
