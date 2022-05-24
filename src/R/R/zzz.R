@@ -11,11 +11,7 @@ vimureP <- NULL
     reticulate::virtualenv_install("r-vimure",
                                    "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/")
   }else{
-    # Use developing version of Python package
-    packageStartupMessage("Updating vimure to developing version (r-vimure)")
-    reticulate::virtualenv_remove("r-vimure", "vimure")
-    reticulate::virtualenv_install("r-vimure",
-                                   "git+https://github.com/latentnetworks/vimure.git@25-vimure-v01-r-implement-vimuremodel#egg=vimure&subdirectory=src/python/")
+    packageStartupMessage("Using existing virtualenv (r-vimure)")
   }
 
   reticulate::use_virtualenv("r-vimure", required = T)

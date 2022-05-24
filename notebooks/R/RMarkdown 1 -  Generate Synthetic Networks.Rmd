@@ -60,7 +60,7 @@ Plot the network data:
 
 ```{r}
 graph <- graph_from_adjacency_matrix(Y[1, , ], mode = "directed")
-graph <- set_graph_attr(graph, "layout", layout_in_circle(graph))
+graph <- set_graph_attr(graph, "layout", layout_with_fr(graph, niter=600))
 plot(graph,
      vertex.size=5,
      vertex.label=NA,
