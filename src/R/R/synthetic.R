@@ -115,6 +115,31 @@ gm_CReciprocity <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, sparsify
   return(synthetic)
 }
 
+#' Customize 'Reliability' parameter theta
+#'
+#' Instead of the regular generative model for theta (theta ~ Gamma(sh, sc)),
+#' create a more extreme scenario where some percentage of reporters are exaggerating.
+#'
+#' @param synthetic A synthetic model
+#' @param theta_ratio Percentage of reporters who exaggerate \[0,1]
+#' @param exaggeration_type "over" or "under"
+#' @param seed Pseudo random generator seed to use
+#'
+#' @return A L x M matrix for theta
+#' @export
+build_custom_theta <- function(synthetic, theta_ratio = 0.5,
+                               exaggeration_type = c("over", "under"),
+                               seed = NULL){
+  exaggeration_type <- match.arg(exaggeration_type)
+  custom_theta <- vimureP$synthetic$build_custom_theta(
+    gt_network = synthetic,
+    theta_ratio = theta_ratio,
+    exaggeration_type = exaggeration_type,
+    seed = as.integer(seed)
+  )
+  return(custom_theta)
+}
+
 #' Extract the Y matrix
 #'
 #' @param synthetic A synthetic model

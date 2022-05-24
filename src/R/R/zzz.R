@@ -1,7 +1,7 @@
 vimureP <- NULL
 
 .onLoad <- function(libname, pkgname) {
-  vimureP <<- reticulate::import("vimure", delay_load = TRUE)
+  vimureP <<- reticulate::import("vimure", delay_load = T)
 }
 
 .onAttach <- function(libname, pkgname) {
@@ -11,7 +11,7 @@ vimureP <- NULL
     reticulate::virtualenv_install("r-vimure",
                                    "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/")
   }else{
-    packageStartupMessage("Using an existing virtualenv (r-vimure)")
+    packageStartupMessage("Using existing virtualenv (r-vimure)")
   }
 
   reticulate::use_virtualenv("r-vimure", required = T)

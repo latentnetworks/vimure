@@ -44,6 +44,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
                      If True, the given and the estimate networks are undirected.
         mutuality: boolean
                      If this is false, then do not estimate mutuality (network cond. independent)
+        convergence_tol : float
+                    Controls when to stop the optimisation algorithm (CAVI)
         """
 
         self.undirected = undirected

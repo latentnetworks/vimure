@@ -123,7 +123,7 @@ def parse_graph_from_csv(
 
 def parse_graph_from_edgelist(
     df: pd.DataFrame,
-    nodes: list,
+    nodes: list = None,
     reporters: list = None,
     is_weighted: bool = False,
     is_undirected: bool = False,
@@ -168,6 +168,12 @@ def parse_graph_from_edgelist(
 
     # Put nodes and reporters in alphabetical order
     layers = sorted(df[layer].unique())
+    
+    if nodes is None:
+        msg = "The set of nodes was not informed, "
+        msg += "using {} and {} columns to infer nodes.".format(ego, alter)
+        warnings.warn(msg, UserWarning)
+        nodes = set(sum(df[[ego, alter]].values.tolist(), []))
 
     if np.logical_or(~df[ego].isin(nodes), ~df[alter].isin(nodes)).any():
         msg = "Some nodes in the edgelist are not listed in the `nodes` variable."

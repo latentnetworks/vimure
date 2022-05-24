@@ -61,8 +61,8 @@ library(ggplot2, quietly =T)
 library(ggcorrplot, quietly =T)
 library(igraph, quietly =T)
 
-random_net <- gm_CReciprocity()
-Y <- extract_Y(random_net)
+random_net <- gm_CReciprocity(N=50, M=50)
+Y <- extract_Y(random_net) 
 ```
 
 `vimure` is a R binding of a Python package. Many Python basic objects are quickly converted to R automatically.
@@ -104,6 +104,14 @@ ggcorrplot(Xavg[1, ,]) +
    scale_fill_gradient(low="white",high="#003396")
 ```
 
+
+
+### Model
+
+```{r}
+model <- vimure(random_net$X, R=random_net$R, mutuality = T, num_realisations=1, max_iter=150)
+diag <- summary(model, random_net)
+```
 
 ## Setup (Development mode)
 

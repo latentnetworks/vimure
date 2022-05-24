@@ -68,7 +68,7 @@ Simply create an object with the desired synthetic network class:
 
 ``` r
 library(vimure, quietly =T)
-#> Using an existing virtualenv (r-vimure)
+#> Using existing virtualenv (r-vimure)
 #> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
 library(ggplot2, quietly =T)
 library(ggcorrplot, quietly =T)
@@ -82,8 +82,8 @@ library(igraph, quietly =T)
 #> 
 #>     union
 
-random_net <- gm_CReciprocity()
-Y <- extract_Y(random_net)
+random_net <- gm_CReciprocity(N=50, M=50)
+Y <- extract_Y(random_net) 
 ```
 
 `vimure` is a R binding of a Python package. Many Python basic objects
@@ -126,7 +126,7 @@ paste0(
   " | Avg. degree: ", mean(degree(graph)), # TODO: Change to directed graph
   " | Reciprocity: ", reciprocity(graph)
 )
-#> [1] "Nodes: 100 | Edges: 386 | Avg. degree: 7.72 | Reciprocity: 0.787564766839378"
+#> [1] "Nodes: 50 | Edges: 187 | Avg. degree: 7.48 | Reciprocity: 0.812834224598931"
 ```
 
 Given a network Y, we can generate N observed adjacency matrices as
@@ -144,6 +144,36 @@ ggcorrplot(Xavg[1, ,]) +
 ```
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
+### Model
+
+``` r
+model <- vimure(random_net$X, R=random_net$R, mutuality = T, num_realisations=1, max_iter=150)
+diag <- summary(model, random_net)
+#> ---------------
+#> - DIAGNOSTICS -
+#> ---------------
+#> 
+#> Model: ViMuRe(T)
+#> 
+#>   Priors:
+#>    - eta:    shp=0.50 rte=1.00
+#>    - theta:  shp=0.10 rte=0.10
+#>    - lambda: shp=10.0 rte=10.0
+#>    - rho:    a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.pr_rho)
+#> 
+#>   Posteriors:
+#>    - G_exp_lambda_f: [[0.02172165 1.08060468 1.08081214 1.08379199 1.118703   1.0822287
+#>   1.08176838 1.08226119 1.0829089  1.08130364 1.08214852 1.07941268
+#>   1.08103641 1.07958098 1.08394644]]
+#>    - G_exp_nu_f: 0.74
+#>    - G_exp_theta_f: a (1, 50) tensor (to inspect it, run <diag_obj>.model.G_exp_theta_f)
+#>    - rho_f: a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.rho_f)
+#> 
+#> Optimisation:
+#> 
+#>    Elbo: 52373.802197105768
+```
 
 ## Setup (Development mode)
 

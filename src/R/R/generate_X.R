@@ -12,8 +12,8 @@
 #' @param Q Maximum value of X entries. If None, it will use the network's K parameter
 #' @param cutoff_X Whether to set X as a binary
 #' @param lambda_diff The difference between each subsequent K
-#' @param seed  Pseudo random generator seed to use
 #' @param verbose Provides additional details
+#' @param ...  Additional args of synthetic$build_X() method.
 #'
 #' @return A sptensor
 #' @export
@@ -23,8 +23,8 @@
 #' X <- build_X(random_net, flag_self_reporter=TRUE, cutoff_X=FALSE, seed=10L)
 #' dim(X)
 build_X <- function(
-  synthetic, mutuality=0.5, sh_theta=2, sc_theta=0.5, theta=reticulate::py_none(), flag_self_reporter=T,
-  Q=reticulate::py_none(), cutoff_X=F, lambda_diff=reticulate::py_none(), seed=reticulate::py_none(), verbose=T
+  synthetic, mutuality=0.5, sh_theta=2, sc_theta=0.5, theta=NULL, flag_self_reporter=T,
+  Q=NULL, cutoff_X=F, lambda_diff=NULL, verbose=T, ...
 ){
   synthetic$build_X(
     mutuality=mutuality,
@@ -35,8 +35,8 @@ build_X <- function(
     Q=Q,
     cutoff_X=cutoff_X,
     lambda_diff=lambda_diff,
-    seed=seed,
-    verbose=verbose
+    verbose=verbose,
+    ...
   )
 
   return (py_to_r.sktensor.sptensor.sptensor(synthetic$X))
