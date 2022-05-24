@@ -31,6 +31,16 @@ all OS. The package also depends on Python \>= 3.6, but you do not have
 to worry about that as we have a default set up that will run the first
 time you call `library(vimure)`.
 
+## Installation
+
+You can install the development version of VIMuRe from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+```
+
 ### Default
 
 If reticulate did not find a non-system installation of python you may
@@ -52,38 +62,14 @@ enviroment](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-vir
 manually or by `reticulate::install_python()`. VIMuRe requires Python
 \>= 3.6.
 
-## Installation
-
-You can install the development version of VIMuRe from
-[GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
-```
-
 ## Usage Example
-
-This is a basic example showing that virtualenv has been successfully
-configured
-
-``` r
-library(vimure)
-#> Updating vimure to developing version (r-vimure)
-#> + '/home/gabriela-borges/.virtualenvs/r-vimure/bin/python' -m pip uninstall --yes vimure
-#> Using virtual environment 'r-vimure' ...
-#> + '/home/gabriela-borges/.virtualenvs/r-vimure/bin/python' -m pip install --upgrade 'git+https://github.com/latentnetworks/vimure.git@25-vimure-v01-r-implement-vimuremodel#egg=vimure&subdirectory=src/python/'
-#> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
-
-vimure:::vimureP  ## The Python package
-#> <pointer: 0x0>
-```
-
-### Synthetic Data
 
 Simply create an object with the desired synthetic network class:
 
 ``` r
+library(vimure, quietly =T)
+#> Using existing virtualenv (r-vimure)
+#> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
 library(ggplot2, quietly =T)
 library(ggcorrplot, quietly =T)
 library(igraph, quietly =T)
@@ -97,15 +83,37 @@ library(igraph, quietly =T)
 #>     union
 
 random_net <- gm_CReciprocity(N=50, M=50)
-Y <- extract_Y(random_net) # Tensor object
-
-ggcorrplot(Y[1, ,]) + 
-   scale_fill_gradient(low="white",high="#003396")
-#> Scale for 'fill' is already present. Adding another scale for 'fill', which
-#> will replace the existing scale.
+Y <- extract_Y(random_net) 
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+`vimure` is a R binding of a Python package. Many Python basic objects
+are quickly converted to R automatically. Custom Python objects that can
+not be converted automatically are stored in R as a
+`python.builtin.object`. As a `python.builtin.object`, you can access
+all object’s attributes as it is in Python using the dollar sign `$`.
+
+Use the function `class` to check if a object is stored in Python.
+
+``` r
+class(random_net)
+#> [1] "vimure.synthetic.GMReciprocity"       
+#> [2] "vimure.synthetic.StandardSBM"         
+#> [3] "vimure.synthetic.BaseSyntheticNetwork"
+#> [4] "vimure.io.BaseNetwork"                
+#> [5] "python.builtin.object"
+```
+
+`random_net` is stored as a Python object. You can access its attributes
+using the dollar sign `$` or using our `extract_*` functions which
+always will return a R object.
+
+``` r
+class(random_net$Y) # still a python object because it is a sptensor
+#> [1] "sktensor.sptensor.sptensor" "sktensor.core.tensor_mixin"
+#> [3] "python.builtin.object"
+class(extract_Y(random_net)) # extract_Y convert to array
+#> [1] "array"
+```
 
 Create a graph from the adjacency matrix and calculate some network
 statistics:
@@ -135,7 +143,7 @@ ggcorrplot(Xavg[1, ,]) +
 #> will replace the existing scale.
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 ### Model
 
@@ -155,16 +163,16 @@ diag <- summary(model, random_net)
 #>    - rho:    a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.pr_rho)
 #> 
 #>   Posteriors:
-#>    - G_exp_lambda_f: [[0.01099272 1.17038422 0.08609309 1.16937812 1.16941258 1.17034286
-#>   1.16933776 1.16911272 1.17079289 1.17091344 1.16945736 1.17054016
-#>   1.17072429 1.16995159 1.17157099]]
-#>    - G_exp_nu_f: 0.76
+#>    - G_exp_lambda_f: [[0.02172165 1.08060468 1.08081214 1.08379199 1.118703   1.0822287
+#>   1.08176838 1.08226119 1.0829089  1.08130364 1.08214852 1.07941268
+#>   1.08103641 1.07958098 1.08394644]]
+#>    - G_exp_nu_f: 0.74
 #>    - G_exp_theta_f: a (1, 50) tensor (to inspect it, run <diag_obj>.model.G_exp_theta_f)
 #>    - rho_f: a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.rho_f)
 #> 
 #> Optimisation:
 #> 
-#>    Elbo: 52682.702789146868
+#>    Elbo: 52373.802197105768
 ```
 
 ## Setup (Development mode)

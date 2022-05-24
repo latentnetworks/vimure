@@ -101,12 +101,17 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         Parameters
         ----------
-        gt_network : A BaseSyntheticNetwork object that represents the ground-truth network
+        gt_network      :   A BaseSyntheticNetwork object that represents the ground-truth network
+
+        Q               :   Cutoff of the maximum entry value allowed in the adjacency matrix (maximum edge weight). 
+                            Similar to the parameter K passed to all the synthetic networks' __init__() method.
 
         Returns
         -------
         X : ndarray
             Observed network.
+
+        # TODO: Improve this docstring
         """
 
         logger = setup_logging("vm.synthetic.generate_X", verbose)
@@ -252,6 +257,8 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         The baseline union we use here takes the union of all ties (l, i, j) that were reported at least once by someone
         regardless of who reported it or the strength given to each tie.
 
+        Note: the output adjacency matrix is binary
+
         # TODO: Maybe the calculation of baseline adjacency matrices shouldn't be inside the build_X() function, 
         #       since it isn't a feature of the package itself?
         """
@@ -304,8 +311,9 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
             R_vals_df = pd.DataFrame(np.stack(self.R.subs).T, columns=["l", "i", "j", "m"])
 
             df_max_reports_lij = R_vals_df.groupby(["l", "i", "j"])\
-                .apply(lambda x: pd.Series({"max": sum([R[l, i, j, m] if type(R[l, i, j, m]) == int else R[l, i, j, m][0] 
-                                            for m in range(self.M)])}))
+                .apply(lambda x: pd.Series({"max": sum([R[l, i, j, m]
+                                                   if type(R[l, i, j, m]) == int else R[l, i, j, m][0] 
+                                                   for m in range(self.M)])}))
 
 
         """
@@ -943,7 +951,10 @@ FUNCTIONS TO GENERATE X (OBSERVED NETWORK) FROM A GENERATED GROUND TRUTH NETWORK
 
 def build_self_reporter_mask(gt_network):
     """
-    Build the reporters' mask.
+    Build the reporters' mask in a way such that:
+    - a reporter m can report ties in which she is ego:   m --> i
+    - a reporter m can report ties in which she is alter: i --> m
+    - a reporter m CANNOT report ties she is not involved, that is i --> j where i != m and j != m
     """
 
     # TODO: Use sparse matrices instead

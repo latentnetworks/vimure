@@ -174,3 +174,5 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+.vscode
