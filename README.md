@@ -28,8 +28,8 @@ To understand how you could use the code or to replicate our research, check the
 ## R
 
 - [`RMarkdown 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%201%20-%20%20Generate%20Synthetic%20Networks.Rmd)
-- [`RMardown 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%202%20-%20Run%20Model.Rmd)
-- [`RMardown 03 - Read, Parse and Fit Vimure on Karnataka data`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%203%20-%20Karnataka%20Data.Rmd)
+- [`RMarkdown 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%202%20-%20Run%20Model.Rmd)
+- [`RMarkdown 03 - Read, Parse and Fit Vimure on Karnataka data`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%203%20-%20Karnataka%20Data.Rmd)
 
 # Setup
 
