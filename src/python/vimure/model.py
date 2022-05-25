@@ -64,6 +64,12 @@ class VimureModel(TransformerMixin, BaseEstimator):
     # TODO Minor refactoring: make this function easier to read (High cyclomatic complexity)
     #      https://betterembsw.blogspot.com/2014/06/avoid-high-cyclomatic-complexity.html
 
+    def __str__(self) -> str:
+        return super().__str__()
+    
+    def __repr__(self) -> str:
+        return super().__repr__()
+
     def __check_fit_params(
         self,
         X: np.ndarray,
