@@ -15,6 +15,8 @@ If you use this code please cite this article (preprint).
 
 To understand how you could use the code or to replicate our research, check the notebooks folder:
 
+## Python
+
 - [`Notebook 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2001%20-%20Generate%20Synthetic%20Networks.ipynb)
 - [`Notebook 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2002%20-%20Run%20Model.ipynb)
 - [`Notebook 03 - Experiment Under and Over Reporters`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2003%20-%20Experiment%20under%20and%20over%20reporters.ipynb)
@@ -22,6 +24,12 @@ To understand how you could use the code or to replicate our research, check the
 - [`Notebook 04 - Karnataka data (Full)`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2004%20-%20Karnataka%20data.ipynb)
 - [`Notebook 05 - Experiment varying reciprocity`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2005%20-%20Experiment%20varying%20reciprocity.ipynb)
 - [`Notebook 06 - Nicaragua data`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2006%20-%20Nicaragua%20data.ipynb)
+
+## R
+
+- [`RMarkdown 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%201%20-%20%20Generate%20Synthetic%20Networks.Rmd)
+- [`RMardown 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%202%20-%20Run%20Model.Rmd)
+- [`RMardown 03 - Read, Parse and Fit Vimure on Karnataka data`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%203%20-%20Karnataka%20Data.Rmd)
 
 # Setup
 
