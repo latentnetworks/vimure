@@ -3,8 +3,12 @@ name: coverage
 on:
   push:
     branches: [ main ]
+    paths:
+      - src/Python/**
   pull_request:
     branches: [ main ]
+    paths:
+      - src/Python/**
 
 jobs:
   report:
