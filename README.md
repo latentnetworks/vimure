@@ -23,19 +23,19 @@ pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdire
 Vimure Python package depends on Python \>= 3.6 and it is expect to work fine in
 all OS.
 
-See more about Python setup [here](/../../src/Python/README.md)
+See more about Python setup [here](src/python/README.md)
 
 ## Notebooks
 
 To understand how you could use the code, check the notebooks folder:
 
-- [`Notebook 01 - Generate Synthetic Networks`](/../../notebooks/Notebook%2001%20-%20Generate%20Synthetic%20Networks.ipynb)
-- [`Notebook 02 - Run Model`](/../../notebooks/Notebook%2002%20-%20Run%20Model.ipynb)
-- [`Notebook 03 - Experiment Under and Over Reporters`](/../../notebooks/Notebook%2003%20-%20Experiment%20under%20and%20over%20reporters.ipynb)
-- [`Notebook 04 - Karnataka data - Single Run`](/../../notebooks/Notebook%2004%20-%20Karnataka%20data%20-%20Single%20Run.ipynb)
-- [`Notebook 04 - Karnataka data (Full)`](/../../notebooks/Notebook%2004%20-%20Karnataka%20data.ipynb)
-- [`Notebook 05 - Experiment varying reciprocity`](/../../notebooks/Notebook%2005%20-%20Experiment%20varying%20reciprocity.ipynb)
-- [`Notebook 06 - Nicaragua data`](/../../notebooks/Notebook%2006%20-%20Nicaragua%20data.ipynb)
+- [`Notebook 01 - Generate Synthetic Networks`](notebooks/python/Notebook%2001%20-%20Generate%20Synthetic%20Networks.ipynb)
+- [`Notebook 02 - Run Model`](notebooks/python/Notebook%2002%20-%20Run%20Model.ipynb)
+- [`Notebook 03 - Experiment Under and Over Reporters`](notebooks/python/Notebook%2003%20-%20Experiment%20under%20and%20over%20reporters.ipynb)
+- [`Notebook 04 - Karnataka data - Single Run`](notebooks/python/Notebook%2004%20-%20Karnataka%20data%20-%20Single%20Run.ipynb)
+- [`Notebook 04 - Karnataka data (Full)`](notebooks/python/Notebook%2004%20-%20Karnataka%20data.ipynb)
+- [`Notebook 05 - Experiment varying reciprocity`](notebooks/python/Notebook%2005%20-%20Experiment%20varying%20reciprocity.ipynb)
+- [`Notebook 06 - Nicaragua data`](notebooks/python/Notebook%2006%20-%20Nicaragua%20data.ipynb)
 
 # R 
 
@@ -51,15 +51,15 @@ Change the `ref` parameter to install a custom version/release of vimure.
 Vimure R package depends on R \>= 3.3.0 and it is expect to work fine in
 all OS.
 
-See more about R setup [here](/../../src/R/README.md)
+See more about R setup [here](src/R/README.md)
 
 ## RMarkdown
 
 To understand how you could use the code, check the notebooks folder:
 
-- [`RMarkdown 01 - Generate Synthetic Networks`](/../../notebooks/R/RMarkdown%201%20-%20%20Generate%20Synthetic%20Networks.Rmd)
-- [`RMarkdown 02 - Run Model`](/../../notebooks/R/RMarkdown%202%20-%20Run%20Model.Rmd)
-- [`RMarkdown 03 - Read, Parse and Fit Vimure on Karnataka data`](/../../notebooks/R/RMarkdown%203%20-%20Karnataka%20Data.Rmd)
+- [`RMarkdown 01 - Generate Synthetic Networks`](notebooks/R/RMarkdown%201%20-%20%20Generate%20Synthetic%20Networks.Rmd)
+- [`RMarkdown 02 - Run Model`](notebooks/R/RMarkdown%202%20-%20Run%20Model.Rmd)
+- [`RMarkdown 03 - Read, Parse and Fit Vimure on Karnataka data`](notebooks/R/RMarkdown%203%20-%20Karnataka%20Data.Rmd)
 
 # License
 
