@@ -10,12 +10,24 @@ If you use this code please cite this article (preprint).
 
 > De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
 
+VIMuRe package is availaboe in R and Python
 
-# Notebooks
+# Python
 
-To understand how you could use the code or to replicate our research, check the notebooks folder:
+Install `vimure==0.1` with the following command:
 
-## Python
+```console
+pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
+```
+
+Vimure Python package depends on Python \>= 3.6 and it is expect to work fine in
+all OS.
+
+See more about Python setup (here)[src/Python/README.md]
+
+## Notebooks
+
+To understand how you could use the code, check the notebooks folder:
 
 - [`Notebook 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2001%20-%20Generate%20Synthetic%20Networks.ipynb)
 - [`Notebook 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2002%20-%20Run%20Model.ipynb)
@@ -25,66 +37,29 @@ To understand how you could use the code or to replicate our research, check the
 - [`Notebook 05 - Experiment varying reciprocity`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2005%20-%20Experiment%20varying%20reciprocity.ipynb)
 - [`Notebook 06 - Nicaragua data`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2006%20-%20Nicaragua%20data.ipynb)
 
-## R
+# R 
+
+Install `vimure` in R with the following command:
+
+```R
+install.packages("devtools")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+```
+
+Change the `ref` parameter to install a custom version/release of vimure.
+
+Vimure R package depends on R \>= 3.3.0 and it is expect to work fine in
+all OS.
+
+See more about R setup (here)[src/R/README.md]
+
+## RMarkdown
+
+To understand how you could use the code, check the notebooks folder:
 
 - [`RMarkdown 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%201%20-%20%20Generate%20Synthetic%20Networks.Rmd)
 - [`RMarkdown 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%202%20-%20Run%20Model.Rmd)
 - [`RMarkdown 03 - Read, Parse and Fit Vimure on Karnataka data`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%203%20-%20Karnataka%20Data.Rmd)
-
-# Python Setup
-
-Instructions on how to replicate our research either downloading our package via pip or by using the Virtualenv setup used for developing the package.
-
-## Alternative 01: using pip
-
-Install `vimure==0.1` with the following command:
-
-```console
-pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
-```
-
-## Alternative 02: using Virtualenv
-
-If you are familiar with Virtualenv, you could use the Virtualenv provided in this repository. Use this setup if you want to modify anything in the package.
-
-1. [Clone the repository](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository-from-github/cloning-a-repository) to a directory in your machine
-2. [Set up Python, Pip and Virtualenv](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-virtualenv/)
-3. Open the terminal and build the project:
-```{console}
-cd vimure
-make venv-build  # Create a virtualenv
-```
-The first time you run this build, it will take several minutes to complete. Trust me, it is better to run this and wait the building time than having to install each multiple python dependencies by hand and having to figure out why your colleague gets a weird and mysterious, previously unseen Exception when running the same code as you!
-
-4. Still on the terminal, run Jupyter server with the command:
-```{console}
-make venv-up
-```
-
-A URL will show up on your screen, either click on it or copy-paste to your browser and run the notebooks.
-
-Or you can run step by step as below:
-1. Run the following command in `vimure/` directory:
-```{bash}
-virtualenv venv
-```
-2. Activate the virtualenv by running the following command (you always need to run this command before running any other command in the virtualenv):
-```{bash}
-source venv/bin/activate
-```
-3. Install the required packages by running the following command:
-```{bash}
-pip install -r src/python/requirements.txt
-pip install -e src/python/.   # Install Vimure package
-```
-4. Create a JupyterLab instance by running the following command:
-```{bash}
-jupyter lab
-```
-
-# R Setup
-
-Find [here](https://github.com/latentnetworks/vimure/blob/develop/src/R/README.md) instructions on how to install and use `vimure` in R.
 
 # License
 

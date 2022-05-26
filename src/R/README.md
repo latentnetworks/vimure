@@ -1,24 +1,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# VIMuRe
-
-<!-- badges: start -->
-<!-- badges: end -->
-
-Latent Network Models to Account for Noisy, Multiply-Reported Social
-Network Data.
-
-If you use this code please cite this article (preprint).
-
-> De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D,
-> Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D. Latent
-> Network Models to Account for Noisy, Multiply-Reported Social Network
-> Data. arXiv preprint
-> [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
+# R Setup
 
 The VIMuRe R package wraps the
-[VIMuRe](https://github.com/latentnetworks/vimure/tree/18-vimure-v01-r-write-test_syntheticr/src/python)
+[VIMuRe](https://github.com/latentnetworks/vimure/tree/develop/src/python)
 Python package. We use the
 [`reticulate`](https://rstudio.github.io/reticulate/) package to embeds
 a Python session within your R session, enabling seamless,
@@ -26,65 +12,102 @@ high-performance interoperability.
 
 ## Requirements
 
-Vimure R package depends on R \>= 3.3.0 and it is expect to work fine in
-all OS. The package also depends on Python \>= 3.6, but you do not have
-to worry about that as we have a default set up that will run the first
-time you call `library(vimure)`.
+VIMuRe R package depends on R \>= 3.3.0 and it is expect to work fine in
+all OS.
 
-## Installation
+# Installation
 
-You can install the development version of VIMuRe from
-[GitHub](https://github.com/) with:
+First, install the imure R package from GitHub as follows:
 
 ``` r
-# install.packages("devtools")
+install.packages("devtools")
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
-### Default
+Then, use the `install_vimure()` function to install VIMuRe Note that on
+Windows you need a working installation of Anaconda.
 
-If reticulate did not find a non-system installation of python you may
-be prompted if you want it to download and install miniconda. Miniconda
-is the recommended installation method for most users, as it ensures
-that the R python installation is isolated from other python
-installations. All python packages will by default be installed into a
-self-contained conda or venv environment named “r-vimure”. Note that
-“conda” is the only supported method on Windows.
+``` r
+library(vimure)
+vimure::install_vimure()
+```
 
-If you initially declined the miniconda installation prompt, you can
-later manually install miniconda by running
-`reticulate::install_miniconda()`
+    #> Using virtual environment '/home/gabriela-borges/Git/vimure/Python/venv' ...
+    #> 
+    #> Installation complete.
 
-### Set up your own Python Enviroment
+You can confirm that the installation succeeded with:
 
-If you do not want to install miniconda, you can set up your [Python
-enviroment](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-virtualenv/)
-manually or by `reticulate::install_python()`. VIMuRe requires Python
-\>= 3.6.
+``` r
+library(vimure)
+vimureP$utils$is_sparse(matrix(c(1:50), ncol=10))
+```
 
-## Usage Example
+    #> [1] FALSE
+
+This will provide you with a default installation of VIMuRe suitable for
+use with the vimure R package.
+
+## Alternate Versions
+
+VIMuRe is distributed as a Python package and so needs to be installed
+within a Python environment on your system. By default, the
+install_vimure() function attempts to install VIMuRe within an isolated
+Python environment (“r-reticulate”).
+
+Note that `install_vimure()` isn’t required to use VIMuRe with the
+package. If you manually configure a python environment with the
+required dependencies, you can tell R to use it by pointing reticulate
+at it, commonly by setting an environment variable:
+
+``` r
+  Sys.setenv("RETICULATE_PYTHON" = "~/path/to/python-env/bin/python")
+```
+
+By default, `install_vimure()` install the latest *develop* branch of
+VIMuRe You can override this behavior by specifying the version
+parameter. For example:
+
+``` r
+install_vimure(version = "master")
+```
+
+You can also install a local version of VIMuRe by specifying a URL/Path
+to a VIMuRe binary. For example:
+
+``` r
+install_vimure(version = "~/Git/vimure/src/python")
+```
+
+# Quick start
+
+## Generating Ground Truth - `Y` and Observed Network - `X`
 
 Simply create an object with the desired synthetic network class:
 
 ``` r
-library(vimure, quietly =T)
-#> Using existing virtualenv (r-vimure)
-#> PYTHON_PATH=/home/gabriela-borges/.virtualenvs/r-vimure/bin/python
-library(ggplot2, quietly =T)
-library(ggcorrplot, quietly =T)
-library(igraph, quietly =T)
-#> 
-#> Attaching package: 'igraph'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     decompose, spectrum
-#> The following object is masked from 'package:base':
-#> 
-#>     union
+random_net <- gm_Multitensor(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)
+Y <- extract_Y(random_net)
+X <- build_X(random_net, flag_self_reporter=T, cutoff_X=F, seed=10L)
 
-random_net <- gm_Multitensor(N=50, M=50)
-Y <- extract_Y(random_net) 
+paste("Reciprocity Y:", round(overall_reciprocity(Y[1,,]),3))
 ```
+
+    #> [1] "Reciprocity Y: 0.788"
+
+``` r
+paste("Reciprocity X (intersection):", round(overall_reciprocity(random_net$X_intersection$toarray()[1,,]),3))
+```
+
+    #> [1] "Reciprocity X (intersection): 0.688"
+
+``` r
+paste("Reciprocity X (union):", round(overall_reciprocity(random_net$X_union$toarray()[1,,]),3))
+```
+
+    #> [1] "Reciprocity X (union): 0.722"
+
+## Python interface
 
 `vimure` is a R binding of a Python package. Many Python basic objects
 are quickly converted to R automatically. Custom Python objects that can
@@ -96,103 +119,48 @@ Use the function `class` to check if a object is stored in Python.
 
 ``` r
 class(random_net)
-#> [1] "vimure.synthetic.Multitensor"       
-#> [2] "vimure.synthetic.StandardSBM"         
-#> [3] "vimure.synthetic.BaseSyntheticNetwork"
-#> [4] "vimure.io.BaseNetwork"                
-#> [5] "python.builtin.object"
 ```
+
+    #> [1] "vimure.synthetic.Multitensor"         
+    #> [2] "vimure.synthetic.StandardSBM"         
+    #> [3] "vimure.synthetic.BaseSyntheticNetwork"
+    #> [4] "vimure.io.BaseNetwork"                
+    #> [5] "python.builtin.object"
 
 `random_net` is stored as a Python object. You can access its attributes
 using the dollar sign `$` or using our `extract_*` functions which
 always will return a R object.
 
-``` r
-class(random_net$Y) # still a python object because it is a sptensor
-#> [1] "sktensor.sptensor.sptensor" "sktensor.core.tensor_mixin"
-#> [3] "python.builtin.object"
-class(extract_Y(random_net)) # extract_Y convert to array
-#> [1] "array"
-```
+## Run Model
 
-Create a graph from the adjacency matrix and calculate some network
-statistics:
+In R we can construct and fit the vimure model by using the `vimure`
+function. The `vimure` function inherit all arguments from the original
+`VimudeModel` class and `VimureModel.fit()`. See more info about
+arguments in `help(vimure)`.
 
 ``` r
-graph <- graph_from_adjacency_matrix(Y[1, ,], mode = "directed")
-paste0(
-  "Nodes: ", length(V(graph)),
-  " | Edges: ", gsize(graph),
-  " | Avg. degree: ", mean(degree(graph)), # TODO: Change to directed graph
-  " | Reciprocity: ", reciprocity(graph)
-)
-#> [1] "Nodes: 50 | Edges: 187 | Avg. degree: 7.48 | Reciprocity: 0.812834224598931"
+model <- vimure(random_net$X, random_net$R, mutuality=T, K=2, num_realisations=1, max_iter=150)
+diag <- summary(model)
 ```
 
-Given a network Y, we can generate N observed adjacency matrices as
-would have been reported by reporting nodes 𝑚 ( 𝑚∈𝑁 ). This is achieved
-by the function `build_X`. Example:
-
-``` r
-X <- build_X(random_net, flag_self_reporter=F, cutoff_X=F, mutuality=0.5, seed=20L)
-Xavg <- extract_Xavg(random_net)
-
-ggcorrplot(Xavg[1, ,]) + 
-   scale_fill_gradient(low="white",high="#003396")
-#> Scale for 'fill' is already present. Adding another scale for 'fill', which
-#> will replace the existing scale.
-```
-
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
-
-### Model
-
-``` r
-model <- vimure(random_net$X, R=random_net$R, mutuality = T, num_realisations=1, max_iter=150)
-diag <- summary(model, random_net)
-#> ---------------
-#> - DIAGNOSTICS -
-#> ---------------
-#> 
-#> Model: ViMuRe(T)
-#> 
-#>   Priors:
-#>    - eta:    shp=0.50 rte=1.00
-#>    - theta:  shp=0.10 rte=0.10
-#>    - lambda: shp=10.0 rte=10.0
-#>    - rho:    a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.pr_rho)
-#> 
-#>   Posteriors:
-#>    - G_exp_lambda_f: [[0.02172165 1.08060468 1.08081214 1.08379199 1.118703   1.0822287
-#>   1.08176838 1.08226119 1.0829089  1.08130364 1.08214852 1.07941268
-#>   1.08103641 1.07958098 1.08394644]]
-#>    - G_exp_nu_f: 0.74
-#>    - G_exp_theta_f: a (1, 50) tensor (to inspect it, run <diag_obj>.model.G_exp_theta_f)
-#>    - rho_f: a (1, 50, 50, 15) tensor (to inspect it, run <diag_obj>.model.rho_f)
-#> 
-#> Optimisation:
-#> 
-#>    Elbo: 52373.802197105768
-```
-
-## Setup (Development mode)
-
-Use this setup if you want to modify anything in the package. For
-reproducibility reasons use the R version 4.1.2.
-
-1.  [Clone the
-    repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
-    to a directory in your machine
-2.  In prompt, change to `vimure/src/R` directory and open a Rstudio
-    session.
-
-``` bash
-cd vimure/src/R
-rstudio
-```
-
-3.  In Rstudio, load the package:
-
-``` r
-devtools::install()  # Install the current version of package
-```
+    #> ---------------
+    #> - DIAGNOSTICS -
+    #> ---------------
+    #> 
+    #> Model: ViMuRe(T)
+    #> 
+    #>   Priors:
+    #>    - eta:    shp=0.50 rte=1.00
+    #>    - theta:  shp=0.10 rte=0.10
+    #>    - lambda: shp=10.0 rte=10.0
+    #>    - rho:    a (1, 100, 100, 2) tensor (to inspect it, run <diag_obj>.model.pr_rho)
+    #> 
+    #>   Posteriors:
+    #>    - G_exp_lambda_f: [[0.00151633 1.43093229]]
+    #>    - G_exp_nu_f: 0.77
+    #>    - G_exp_theta_f: a (1, 100) tensor (to inspect it, run <diag_obj>.model.G_exp_theta_f)
+    #>    - rho_f: a (1, 100, 100, 2) tensor (to inspect it, run <diag_obj>.model.rho_f)
+    #> 
+    #> Optimisation:
+    #> 
+    #>    Elbo: 1120.418888338589

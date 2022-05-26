@@ -50,7 +50,7 @@ dim(Y)
 }
 \seealso{
 Other generative models: 
-\code{\link{gm_Multitensor}()},
-\code{\link{gm_DegreeCorrectedSBM}()}
+\code{\link{gm_DegreeCorrectedSBM}()},
+\code{\link{gm_Multitensor}()}
 }
 \concept{generative models}

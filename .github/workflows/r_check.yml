@@ -54,6 +54,12 @@ jobs:
         run: |
           echo "::set-output name=year-week::$(date -u "+%Y-%U")"
           echo "::set-output name=date::$(date -u "+%F")"
+      
+      - name: Prints the current branch name
+        shell: bash
+        run: echo "${GITHUB_BRANCH##*/}"
+        env:
+          GITHUB_BRANCH: ${{ github.ref }}
 
       - name: Restore R package cache
         uses: actions/cache@v2
@@ -82,6 +88,9 @@ jobs:
 
       - name: Install Miniconda
         run: reticulate::install_miniconda()
+
+      - name: Install vimure
+        run: reticulate::install_vimure(version = Sys.getenv("GITHUB_BRANCH"))
 
       - name: Install rcmdcheck
         run: remotes::install_cran("rcmdcheck")
