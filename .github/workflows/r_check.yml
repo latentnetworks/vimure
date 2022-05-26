@@ -57,9 +57,9 @@ jobs:
       
       - name: Prints the current branch name
         shell: bash
-        run: echo "${GITHUB_BRANCH##*/}"
+        run: echo "${{ github.head_ref }}"
         env:
-          GITHUB_BRANCH: ${{ github.ref }}
+          GITHUB_BRANCH: ${{ github.head_ref }}
 
       - name: Restore R package cache
         uses: actions/cache@v2
