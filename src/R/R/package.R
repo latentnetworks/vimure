@@ -13,7 +13,8 @@ NULL
       packageStartupMessage("Loaded vimure version ", version)
     },
     on_error = function(e) {
-      stop(vm_config_error_message(), call. = FALSE)
+      config <- vm_config()
+      stop(config$error_message, call. = FALSE)
     }
   ))
 }
