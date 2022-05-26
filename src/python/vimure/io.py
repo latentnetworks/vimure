@@ -27,8 +27,6 @@ class BaseNetwork(metaclass=ABCMeta):
     A base abstract class for generation and management of networks, in an adequate format for this project
 
     Suitable for representing any type of network, synthetic or real.
-
-    #TODO: Add a __repr__ and a __str__ method
     """
 
     def __init__(
@@ -82,7 +80,14 @@ class BaseNetwork(metaclass=ABCMeta):
 
     def getX(self):
         return getattr(self, "X")
+    
+    def __repr__(self):
+        return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, seed={self.seed})"
+    
+    def __str__(self):
+        return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, seed={self.seed})"
 
+    
 
 def parse_graph_from_networkx(networkx_obj):
     raise NotImplementedError
@@ -114,6 +119,7 @@ def parse_graph_from_csv(
         is_weighted=is_weighted,
         is_undirected=is_undirected,
         reporter=reporter,
+        layer=layer,
         ego=ego,
         alter=alter,
         weight=weight,
@@ -301,11 +307,15 @@ class RealNetwork(BaseNetwork):
             Represents the observed network as reported by each reporter M
         R: list of list of sparse COO array NxN, tot dimension is L x N x N x M (same dimension of the data)
             If this is None, we assume reporters only reports their own ties (of any type)
-
-        #TODO: Add a __repr__ and a __str__ method
         """
 
         super().__init__(**kwargs)
 
         self.setX(X)
         self.R = R
+
+        def __repr__(self):
+            return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, number_ties={self.X.vals.sum()})"
+
+        def __str__(self):
+            return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, number_ties={self.X.vals.sum()})"

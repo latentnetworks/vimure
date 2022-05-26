@@ -15,6 +15,8 @@ If you use this code please cite this article (preprint).
 
 To understand how you could use the code or to replicate our research, check the notebooks folder:
 
+## Python
+
 - [`Notebook 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2001%20-%20Generate%20Synthetic%20Networks.ipynb)
 - [`Notebook 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2002%20-%20Run%20Model.ipynb)
 - [`Notebook 03 - Experiment Under and Over Reporters`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2003%20-%20Experiment%20under%20and%20over%20reporters.ipynb)
@@ -23,7 +25,13 @@ To understand how you could use the code or to replicate our research, check the
 - [`Notebook 05 - Experiment varying reciprocity`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2005%20-%20Experiment%20varying%20reciprocity.ipynb)
 - [`Notebook 06 - Nicaragua data`](https://github.com/latentnetworks/vimure/blob/main/notebooks/Notebook%2006%20-%20Nicaragua%20data.ipynb)
 
-# Setup
+## R
+
+- [`RMarkdown 01 - Generate Synthetic Networks`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%201%20-%20%20Generate%20Synthetic%20Networks.Rmd)
+- [`RMarkdown 02 - Run Model`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%202%20-%20Run%20Model.Rmd)
+- [`RMarkdown 03 - Read, Parse and Fit Vimure on Karnataka data`](https://github.com/latentnetworks/vimure/blob/develop/notebooks/R/RMarkdown%203%20-%20Karnataka%20Data.Rmd)
+
+# Python Setup
 
 Instructions on how to replicate our research either downloading our package via pip or by using the Virtualenv setup used for developing the package.
 
@@ -73,6 +81,10 @@ pip install -e src/python/.   # Install Vimure package
 ```{bash}
 jupyter lab
 ```
+
+# R Setup
+
+Find [here](https://github.com/latentnetworks/vimure/blob/develop/src/R/README.md) instructions on how to install and use `vimure` in R.
 
 # License
 
