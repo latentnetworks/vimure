@@ -292,8 +292,8 @@ def main(
 
     time_start = time.time()
 
-    # GMReciprocity won't always produce a single giant component, selecting one seed that is guaranteed to produce one.
-    gt_network = vm.synthetic.GMReciprocity(
+    # Multitensor won't always produce a single giant component, selecting one seed that is guaranteed to produce one.
+    gt_network = vm.synthetic.Multitensor(
         N=N,
         M=M,
         L=L,
@@ -305,7 +305,7 @@ def main(
         sparsify=True,
         seed=gt_network_seed,
     )
-    msg = f"GMReciprocity took {np.round(time.time() - time_start, 2)} seconds to run'"
+    msg = f"Multitensor took {np.round(time.time() - time_start, 2)} seconds to run'"
     module_logger.info(msg)
 
     """

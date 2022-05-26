@@ -38,7 +38,7 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   seed <- 25
   K <- 2
 
-  synth_net <- gm_CReciprocity(N=100, M=100, L=1, C=2,
+  synth_net <- gm_Multitensor(N=100, M=100, L=1, C=2,
                                K=K, avg_degree=5, sparsify=T, seed=seed, eta=eta
   )
 

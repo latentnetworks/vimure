@@ -201,13 +201,13 @@ class TestDegreeCorrectedSBM(TestStandardSBM):
         ), "another_sparser_synth_net.Y should be denser than self.sparser_synth_net.Y"
 
 
-class TestGMReciprocity(TestBaseSyntheticNetwork):
+class TestMultitensor(TestBaseSyntheticNetwork):
     @classmethod
     def setup_class(cls):
         """
-        Creates a single GMReciprocity instance object to be shared by tests in this class
+        Creates a single Multitensor instance object to be shared by tests in this class
         """
-        cls.synth_net = vm.synthetic.GMReciprocity(
+        cls.synth_net = vm.synthetic.Multitensor(
             N=DEFAULT_N,
             M=DEFAULT_M,
             K=DEFAULT_K,

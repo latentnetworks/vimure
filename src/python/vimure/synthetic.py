@@ -823,7 +823,7 @@ class DegreeCorrectedSBM(StandardSBM):
         return return_str
 
 
-class GMReciprocity(StandardSBM):
+class Multitensor(StandardSBM):
     """
     A generative model with reciprocity.
 
@@ -990,7 +990,7 @@ class GMReciprocity(StandardSBM):
             # number of connected components
             n_connected_comp = len(list(nx.weakly_connected_components(G)))
             if n_connected_comp > 1:
-                msg = f"GMReciprocity has produced a network with {n_connected_comp} connected components. "
+                msg = f"Multitensor has produced a network with {n_connected_comp} connected components. "
                 msg += "You can try increasing avg_degree and/or running with different seeds "
                 msg += "until you get a network with just a single giant component."
                 module_logger.warning(msg)

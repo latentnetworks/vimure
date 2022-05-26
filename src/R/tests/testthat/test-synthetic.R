@@ -85,10 +85,10 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
   expect_gt(sum(another_Y), sum(another_sparse_Y))
 }
 
-test_that("GMReciprocity - Check default values and adjacency matrix structure", {
+test_that("Multitensor - Check default values and adjacency matrix structure", {
   skip_if_no_vimure()
 
-  synth_net <- gm_CReciprocity(
+  synth_net <- gm_Multitensor(
     N = DEFAULT_N,
     M = DEFAULT_M,
     K = DEFAULT_K,

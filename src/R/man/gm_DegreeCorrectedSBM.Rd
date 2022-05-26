@@ -53,7 +53,7 @@ dim(Y)
 }
 \seealso{
 Other generative models: 
-\code{\link{gm_CReciprocity}()},
+\code{\link{gm_Multitensor}()},
 \code{\link{gm_StandardSBM}()}
 }
 \concept{generative models}

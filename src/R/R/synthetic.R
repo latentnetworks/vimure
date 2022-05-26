@@ -90,18 +90,18 @@ gm_DegreeCorrectedSBM <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, ex
 #' @param eta Initial value for the reciprocity coefficient. Eta has to be in [0, 1).
 #' @inheritParams gm_StandardSBM
 #'
-#' @return gm_CReciprocity model
+#' @return gm_Multitensor model
 #' @export
 #'
 #' @examples
-#' random_net <- gm_CReciprocity(N=100, M=100, L=1, eta=0.5)
+#' random_net <- gm_Multitensor(N=100, M=100, L=1, eta=0.5)
 #' Y <- extract_Y(random_net)
 #' dim(Y)
-gm_CReciprocity <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, sparsify=TRUE, eta=0.99, seed=10){
+gm_Multitensor <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, sparsify=TRUE, eta=0.99, seed=10){
   INT_ARGS <- c(N=N, M=M, K=K, L=L, C=C, avg_degree=avg_degree, seed=seed)
   mode(INT_ARGS) <- "integer"
 
-  synthetic <- vimureP$synthetic$GMReciprocity(
+  synthetic <- vimureP$synthetic$Multitensor(
     N=INT_ARGS["N"],
     M=INT_ARGS["M"],
     K=INT_ARGS["K"],
@@ -148,7 +148,7 @@ build_custom_theta <- function(synthetic, theta_ratio = 0.5,
 #' @export
 #'
 #' @examples
-#' random_net <- gm_CReciprocity(N=100, M=100, L=1, eta=0.99)
+#' random_net <- gm_Multitensor(N=100, M=100, L=1, eta=0.99)
 #' Y <- extract_Y(random_net)
 #' dim(Y)
 extract_Y <- function(synthetic){

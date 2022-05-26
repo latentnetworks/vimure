@@ -82,7 +82,7 @@ library(igraph, quietly =T)
 #> 
 #>     union
 
-random_net <- gm_CReciprocity(N=50, M=50)
+random_net <- gm_Multitensor(N=50, M=50)
 Y <- extract_Y(random_net) 
 ```
 
@@ -96,7 +96,7 @@ Use the function `class` to check if a object is stored in Python.
 
 ``` r
 class(random_net)
-#> [1] "vimure.synthetic.GMReciprocity"       
+#> [1] "vimure.synthetic.Multitensor"       
 #> [2] "vimure.synthetic.StandardSBM"         
 #> [3] "vimure.synthetic.BaseSyntheticNetwork"
 #> [4] "vimure.io.BaseNetwork"                

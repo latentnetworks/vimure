@@ -110,7 +110,7 @@ class TestVimureModel:
         seed = 25
         K = 2
 
-        gt_network = vm.synthetic.GMReciprocity(
+        gt_network = vm.synthetic.Multitensor(
             N=100,
             M=100,
             L=1,
@@ -180,7 +180,7 @@ class TestVimureModel:
         seed = 25
         K = 2
 
-        gt_network = vm.synthetic.GMReciprocity(
+        gt_network = vm.synthetic.Multitensor(
             N=100,
             M=100,
             L=1,
@@ -250,7 +250,7 @@ class TestVimureModel:
         seed = 25
         K = 2
 
-        gt_network = vm.synthetic.GMReciprocity(
+        gt_network = vm.synthetic.Multitensor(
             N=100,
             M=100,
             L=1,

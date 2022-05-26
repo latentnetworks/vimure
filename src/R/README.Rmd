@@ -61,7 +61,7 @@ library(ggplot2, quietly =T)
 library(ggcorrplot, quietly =T)
 library(igraph, quietly =T)
 
-random_net <- gm_CReciprocity(N=50, M=50)
+random_net <- gm_Multitensor(N=50, M=50)
 Y <- extract_Y(random_net) 
 ```
 
