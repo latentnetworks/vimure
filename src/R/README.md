@@ -4,16 +4,11 @@
 # R Setup
 
 The VIMuRe R package wraps the
-[VIMuRe](https://github.com/latentnetworks/vimure/tree/develop/src/python)
-Python package. We use the
-[`reticulate`](https://rstudio.github.io/reticulate/) package to embeds
-a Python session within your R session, enabling seamless,
-high-performance interoperability.
+[VIMuRe](https://github.com/latentnetworks/vimure/tree/develop/src/python) Python package. We use the [`reticulate`](https://rstudio.github.io/reticulate/) package to embeds a Python session within your R session, enabling seamless, high-performance interoperability.
 
 ## Requirements
 
-VIMuRe R package depends on R \>= 3.3.0 and it is expect to work fine in
-all OS.
+VIMuRe R package depends on R \>= 3.3.0 and it is expect to work fine in all OS.
 
 # Installation
 
@@ -24,8 +19,7 @@ install.packages("devtools")
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
-Then, use the `install_vimure()` function to install VIMuRe Note that on
-Windows you need a working installation of Anaconda.
+Then, use the `install_vimure()` function to install VIMuRe Note that on Windows you need a working installation of Anaconda.
 
 ``` r
 library(vimure)
@@ -45,35 +39,26 @@ vimureP$utils$is_sparse(matrix(c(1:50), ncol=10))
 
     #> [1] FALSE
 
-This will provide you with a default installation of VIMuRe suitable for
-use with the vimure R package.
+This will provide you with a default installation of VIMuRe suitable for use with the vimure R package.
 
 ## Alternate Versions
 
-VIMuRe is distributed as a Python package and so needs to be installed
-within a Python environment on your system. By default, the
-install_vimure() function attempts to install VIMuRe within an isolated
-Python environment (“r-reticulate”).
+VIMuRe is distributed as a Python package and so needs to be installed within a Python environment on your system. By default, the
+install_vimure() function attempts to install VIMuRe within an isolated Python environment (“r-reticulate”).
 
-Note that `install_vimure()` isn’t required to use VIMuRe with the
-package. If you manually configure a python environment with the
-required dependencies, you can tell R to use it by pointing reticulate
-at it, commonly by setting an environment variable:
+Note that `install_vimure()` isn’t required to use VIMuRe with the package. If you manually configure a python environment with the required dependencies, you can tell R to use it by pointing reticulate at it, commonly by setting an environment variable:
 
 ``` r
   Sys.setenv("RETICULATE_PYTHON" = "~/path/to/python-env/bin/python")
 ```
 
-By default, `install_vimure()` install the latest *develop* branch of
-VIMuRe You can override this behavior by specifying the version
-parameter. For example:
+By default, `install_vimure()` install the latest *develop* branch of VIMuRe You can override this behavior by specifying the version parameter. For example:
 
 ``` r
 install_vimure(version = "master")
 ```
 
-You can also install a local version of VIMuRe by specifying a URL/Path
-to a VIMuRe binary. For example:
+You can also install a local version of VIMuRe by specifying a URL/Path to a VIMuRe binary. For example:
 
 ``` r
 install_vimure(version = "~/Git/vimure/src/python")
@@ -109,11 +94,8 @@ paste("Reciprocity X (union):", round(overall_reciprocity(random_net$X_union$toa
 
 ## Python interface
 
-`vimure` is a R binding of a Python package. Many Python basic objects
-are quickly converted to R automatically. Custom Python objects that can
-not be converted automatically are stored in R as a
-`python.builtin.object`. As a `python.builtin.object`, you can access
-all object’s attributes as it is in Python using the dollar sign `$`.
+`vimure` is a R binding of a Python package. Many Python basic objects are quickly converted to R automatically. Custom Python objects that can
+not be converted automatically are stored in R as a `python.builtin.object`. As a `python.builtin.object`, you can access all object’s attributes as it is in Python using the dollar sign `$`.
 
 Use the function `class` to check if a object is stored in Python.
 
@@ -127,16 +109,11 @@ class(random_net)
     #> [4] "vimure.io.BaseNetwork"                
     #> [5] "python.builtin.object"
 
-`random_net` is stored as a Python object. You can access its attributes
-using the dollar sign `$` or using our `extract_*` functions which
-always will return a R object.
+`random_net` is stored as a Python object. You can access its attributes using the dollar sign `$` or using our `extract_*` functions which always will return a R object.
 
 ## Run Model
 
-In R we can construct and fit the vimure model by using the `vimure`
-function. The `vimure` function inherit all arguments from the original
-`VimudeModel` class and `VimureModel.fit()`. See more info about
-arguments in `help(vimure)`.
+In R we can construct and fit the vimure model by using the `vimure` function. The `vimure` function inherit all arguments from the original `VimudeModel` class and `VimureModel.fit()`. See more info about arguments in `help(vimure)`.
 
 ``` r
 model <- vimure(random_net$X, random_net$R, mutuality=T, K=2, num_realisations=1, max_iter=150)
