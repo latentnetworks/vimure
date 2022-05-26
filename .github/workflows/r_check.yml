@@ -90,7 +90,7 @@ jobs:
         run: reticulate::install_miniconda()
 
       - name: Install vimure
-        run: reticulate::install_vimure(version = Sys.getenv("GITHUB_BRANCH"))
+        run: vimure::install_vimure(version = Sys.getenv("GITHUB_BRANCH"))
 
       - name: Install rcmdcheck
         run: remotes::install_cran("rcmdcheck")
