@@ -58,8 +58,6 @@ jobs:
       - name: Prints the current branch name
         shell: bash
         run: echo "${{ github.head_ref }}"
-        env:
-          GITHUB_BRANCH: ${{ github.head_ref }}
 
       - name: Restore R package cache
         uses: actions/cache@v2
@@ -91,6 +89,8 @@ jobs:
 
       - name: Install vimure
         run: vimure::install_vimure(version = Sys.getenv("GITHUB_BRANCH"))
+        env:
+          GITHUB_BRANCH: ${{ github.head_ref || github.ref_name }} 
 
       - name: Install rcmdcheck
         run: remotes::install_cran("rcmdcheck")

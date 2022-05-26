@@ -1,4 +1,4 @@
-NULL
+vimureP <- NULL
 
 # globals
 .globals <- new.env(parent = emptyenv())
@@ -10,7 +10,8 @@ NULL
     environment = "r-reticulate",
     on_load = function(){
       version <- vm_version()
-      packageStartupMessage("Loaded vimure version ", version)
+      emit <- get("packageStartupMessage") # R CMD check
+      emit("Loaded vimure version ", version)
     },
     on_error = function(e) {
       config <- vm_config()
