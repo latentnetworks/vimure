@@ -12,14 +12,18 @@ VIMuRe R package depends on R \>= 3.3.0 and it is expect to work fine in all OS.
 
 # Installation
 
-First, install the imure R package from GitHub as follows:
+First, install the vimure R package from GitHub as follows:
 
 ``` r
 install.packages("devtools")
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
-Then, use the `install_vimure()` function to install VIMuRe Note that on Windows you need a working installation of Anaconda.
+Then, use the `install_vimure()` function to install VIMuRe. 
+
+Note that if reticulate did not find a non-system installation of python you may be prompted if you want it to download and install miniconda. Miniconda is the recommended installation method for most users, as it ensures that the R python installation is isolated from other python installations. All python packages will by default be installed into a self-contained conda or venv environment named “r-vimure”. Note that “conda” is the only supported method on Windows.
+
+If you initially declined the miniconda installation prompt, you can later manually install miniconda by running `reticulate::install_miniconda()`
 
 ``` r
 library(vimure)
