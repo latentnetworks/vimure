@@ -51,7 +51,7 @@ Change the `ref` parameter to install a custom version/release of vimure.
 Vimure R package depends on R \>= 3.3.0 and it is expect to work fine in
 all OS.
 
-See more about R setup [here](src/R/README.md)
+See more about R setup and quick start [here](src/R/README.md)
 
 ## RMarkdown
 
