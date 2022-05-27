@@ -10,7 +10,13 @@ If you use this code please cite this article (preprint).
 
 > De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
 
-VIMuRe package is availaboe in R and Python
+VIMuRe package is available in R and Python. 
+
+## Feedback
+
+Report a bug and give a general feedback about the library:
+- by taking this [survey](https://forms.gle/QaK5AWWYy78jZfyR6) or,
+- by [opening an issue](https://github.com/latentnetworks/vimure/issues/new) on Github.
 
 # Python
 
