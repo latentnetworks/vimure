@@ -52,8 +52,6 @@ install.packages("devtools")
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
-Change the `ref` parameter to install a custom version/release of vimure.
-
 Vimure R package depends on R \>= 3.3.0 and it is expect to work fine in
 all OS.
 
