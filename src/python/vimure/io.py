@@ -2,6 +2,7 @@ import warnings
 
 import numpy as np
 import pandas as pd
+from pytest import raises
 import sktensor as skt
 
 from abc import ABCMeta
@@ -172,6 +173,36 @@ def parse_graph_from_edgelist(
         any other parameters to be sent to RealNetwork.__init__
     """
 
+    if not isinstance(df, pd.DataFrame):
+        msg = "Invalid 'type' ({}) of argument 'df'".format(type(df))
+        raise ValueError(msg)
+
+    expected_columns = [ego, alter, reporter, layer, weight]
+    real_columns = df.columns.values
+    diff_columns = list(set(expected_columns) - set(real_columns))
+
+    # Dataframe has no expected column
+    if len(diff_columns) == len(expected_columns):
+        msg = "Invalid columns in 'df'. Hint: Use params"
+        msg += " ego,alter,... for mapping column names."
+        raise ValueError(msg)
+        
+    if set(diff_columns) >= set([ego,alter]):
+        msg = "'df' do not have columns '{}' and '{}'. Hint: Use params".format(ego, alter)
+        msg += " ego,alter,... for mapping column names."
+        raise ValueError(msg)
+        
+    if reporter in diff_columns:
+        msg = "'{}' column not found in 'df'. Using '{}' columns as reporter.".format(reporter, ego)
+        warnings.warn(msg, UserWarning)
+        df[reporter] = df[ego]
+        
+    if layer in diff_columns:
+        df[layer] = "1"
+        
+    if weight in diff_columns:
+        df[weight] = 1
+
     # Put nodes and reporters in alphabetical order
     layers = sorted(df[layer].unique())
     
@@ -292,7 +323,7 @@ def parse_graph_from_edgelist(
     else:
         K = np.max(X) + 1
 
-    # TODO: For future users, we might want to keep track of nodeName2Id too
+    # TODO: For future users, we might want to keep track of nodeName2Id too (nodeId2Name)
     network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, **kwargs)
     return network
 

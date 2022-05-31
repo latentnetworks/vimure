@@ -13,10 +13,18 @@ logger = logging.getLogger("vm.test.test_model")
 logger.setLevel(logging.DEBUG)
 
 
+class Test:
+    def test_non_dataframe_input(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.io.parse_graph_from_edgelist("string")
+
+
+
 class TestIO:
     @pytest.mark.skip(
         reason="This is being reviewed. Checkout Notebook04 to see the current approach to reading this data."
     )
+
     def test_read_karnataka_village_from_csv(self):
         file = "/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_visit.csv"
         net_obj = vm.io.parse_graph_from_csv(file)

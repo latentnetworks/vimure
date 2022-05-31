@@ -77,11 +77,11 @@ parse_graph_from_edgelist <- function(
 
   if(length(nodes) == 0){
     # Infer nodes from ego and alter columns
-    nodes <- unique(unlist(c(edges[ego],edges[alter])))
+    nodes <- unique(unlist(c(edges[ego],edges[alter],edges[reporter])))
   }
 
   if(length(reporters) == 0){
-    reporters <- nodes
+    reporters <- unique(unlist(edges[ego]))
   }
 
   vimureP$io$parse_graph_from_edgelist(
