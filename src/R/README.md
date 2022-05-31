@@ -43,7 +43,7 @@ vimureP$utils$is_sparse(matrix(c(1:50), ncol=10))
 
 This will provide you with a default installation of VIMuRe suitable for use with the vimure R package.
 
-## Alternate Versions
+## Alternate Versions (advanced mode)
 
 VIMuRe is distributed as a Python package and so needs to be installed within a Python environment on your system. By default, the
 install_vimure() function attempts to install VIMuRe within an isolated Python environment (“r-reticulate”).
