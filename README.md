@@ -8,7 +8,7 @@ Latent Network Models to Account for Noisy, Multiply-Reported Social Network Dat
 
 If you use this code please cite this article (preprint).
 
-> De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
+> De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D, Power EA. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
 
 VIMuRe package is available in R and Python. 
 
