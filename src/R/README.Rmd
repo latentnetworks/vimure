@@ -6,68 +6,85 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  warning = F,
+  message = F
 )
 ```
 
-# VIMuRe
+# R Setup
 
-<!-- badges: start -->
-<!-- badges: end -->
-
-Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data.
-
-
-If you use this code please cite this article (preprint).
-
-> De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
-
-The VIMuRe R package wraps the [VIMuRe](https://github.com/latentnetworks/vimure/tree/18-vimure-v01-r-write-test_syntheticr/src/python) Python package. We use the [`reticulate`](https://rstudio.github.io/reticulate/) package to embeds a Python session within your R session, enabling seamless, high-performance interoperability. 
+The VIMuRe R package wraps the [VIMuRe](https://github.com/latentnetworks/vimure/tree/develop/src/python) Python package. We use the [`reticulate`](https://rstudio.github.io/reticulate/) package to embeds a Python session within your R session, enabling seamless, high-performance interoperability.
 
 ## Requirements
 
-Vimure R package depends on R >= 3.3.0 and it is expect to work fine in all OS. 
-The package also depends on Python >= 3.6, but you do not have to worry about that as we have a default set up that will run the first time you call `library(vimure)`. 
+VIMuRe R package depends on R \>= 3.3.0 and it is expect to work fine in all OS.
 
-## Installation
+# Installation
 
-You can install the development version of VIMuRe from [GitHub](https://github.com/) with:
+First, install the vimure R package from GitHub as follows:
 
-``` r
-# install.packages("devtools")
+```r
+install.packages("devtools")
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
-### Default
+Then, use the `install_vimure()` function to install VIMuRe Note that on Windows you need a working installation of Anaconda.
 
-If reticulate did not find a non-system installation of python you may be prompted if you want it to download and install miniconda. Miniconda is the recommended installation method for most users, as it ensures that the R python installation is isolated from other python installations. All python packages will by default be installed into a self-contained conda or venv environment named "r-vimure". Note that "conda" is the only supported method on Windows. 
+```{r}
+library(vimure)
+vimure::install_vimure()
+```
 
-If you initially declined the miniconda installation prompt, you can later manually install miniconda by running `reticulate::install_miniconda()`
+You can confirm that the installation succeeded with:
 
-### Set up your own Python Enviroment
+```{r}
+library(vimure)
+vimureP$utils$is_sparse(matrix(c(1:50), ncol=10))
+```
+This will provide you with a default installation of VIMuRe suitable for use with the vimure R package. 
 
-If you do not want to install miniconda, you can set up your [Python enviroment](http://timsherratt.org/digital-heritage-handbook/docs/python-pip-virtualenv/) manually or by `reticulate::install_python()`. VIMuRe requires Python >= 3.6.
+## Alternate Versions
 
-## Usage Example
+VIMuRe is distributed as a Python package and so needs to be installed within a Python environment on your system. By default, the install_vimure() function attempts to install VIMuRe within an isolated Python environment (“r-reticulate”).
+
+Note that `install_vimure()` isn't required to use VIMuRe with the package. If you manually configure a python environment with the required dependencies, you can tell R to use it by pointing reticulate at it, commonly by setting an environment variable: 
+``` R
+  Sys.setenv("RETICULATE_PYTHON" = "~/path/to/python-env/bin/python")
+```
+
+By default, `install_vimure()` install the latest *develop* branch of VIMuRe You can override this behavior by specifying the version parameter. For example:
+
+```r
+install_vimure(version = "master")
+```
+
+You can also install a local version of VIMuRe by specifying a URL/Path to a VIMuRe binary. For example:
+```r
+install_vimure(version = "~/Git/vimure/src/python")
+```
+
+
+# Quick start
+
+## Generating Ground Truth - `Y` and Observed Network - `X`
 
 Simply create an object with the desired synthetic network class:
 
-```{r example}
-library(vimure, quietly =T)
-library(ggplot2, quietly =T)
-library(ggcorrplot, quietly =T)
-library(igraph, quietly =T)
+```{r}
+random_net <- gm_Multitensor(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)
+Y <- extract_Y(random_net)
+X <- build_X(random_net, flag_self_reporter=T, cutoff_X=F, seed=10L)
 
-random_net <- gm_Multitensor(N=50, M=50)
-Y <- extract_Y(random_net) 
+paste("Reciprocity Y:", round(overall_reciprocity(Y[1,,]),3))
+paste("Reciprocity X (intersection):", round(overall_reciprocity(random_net$X_intersection$toarray()[1,,]),3))
+paste("Reciprocity X (union):", round(overall_reciprocity(random_net$X_union$toarray()[1,,]),3))
 ```
+## Python interface
 
-`vimure` is a R binding of a Python package. Many Python basic objects are quickly converted to R automatically.
-Custom Python objects that can not be converted automatically are stored in R as a `python.builtin.object`.
-As a `python.builtin.object`, you can access all object's attributes as it is in Python using the dollar sign `$`.
+`vimure` is a R binding of a Python package. Many Python basic objects are quickly converted to R automatically. Custom Python objects that can not be converted automatically are stored in R as a `python.builtin.object`. As a `python.builtin.object`, you can access all object's attributes as it is in Python using the dollar sign `$`.
 
 Use the function `class` to check if a object is stored in Python.
 
@@ -77,54 +94,12 @@ class(random_net)
 
 `random_net` is stored as a Python object. You can access its attributes using the dollar sign `$` or using our `extract_*` functions which always will return a R object.
 
-```{r}
-class(random_net$Y) # still a python object because it is a sptensor
-class(extract_Y(random_net)) # extract_Y convert to array
-```
+## Run Model
 
-Create a graph from the adjacency matrix and calculate some network statistics:
+In R we can construct and fit the vimure model by using the `vimure` function. The `vimure` function inherit all arguments from the original `VimudeModel` class and `VimureModel.fit()`. See more info about arguments in `help(vimure)`.
 
 ```{r}
-graph <- graph_from_adjacency_matrix(Y[1, ,], mode = "directed")
-paste0(
-  "Nodes: ", length(V(graph)),
-  " | Edges: ", gsize(graph),
-  " | Avg. degree: ", mean(degree(graph)), # TODO: Change to directed graph
-  " | Reciprocity: ", reciprocity(graph)
-)
-```
-
-Given a network Y, we can generate N observed adjacency matrices as would have been reported by reporting nodes  𝑚  ( 𝑚∈𝑁 ). This is achieved by the function `build_X`. Example:
-
-```{r}
-X <- build_X(random_net, flag_self_reporter=F, cutoff_X=F, mutuality=0.5, seed=20L)
-Xavg <- extract_Xavg(random_net)
-
-ggcorrplot(Xavg[1, ,]) + 
-   scale_fill_gradient(low="white",high="#003396")
-```
-
-
-
-### Model
-
-```{r}
-model <- vimure(random_net$X, R=random_net$R, mutuality = T, num_realisations=1, max_iter=150)
-diag <- summary(model, random_net)
-```
-
-## Setup (Development mode)
-
-Use this setup if you want to modify anything in the package. For reproducibility reasons use the R version 4.1.2.
-
-1. [Clone the repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) to a directory in your machine
-2. In prompt, change to `vimure/src/R` directory and open a Rstudio session.
-```bash
-cd vimure/src/R
-rstudio
-```
-3. In Rstudio, load the package:
-``` r
-devtools::install()  # Install the current version of package
+model <- vimure(random_net$X, random_net$R, mutuality=T, K=2, num_realisations=1, max_iter=150)
+diag <- summary(model)
 ```
 

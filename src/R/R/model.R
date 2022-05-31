@@ -124,7 +124,13 @@ vimure_training_history <- function(diag){
     priors = priors,
     posteriors = posteriors,
     trace = diag$model$trace,
-    reliability = reliability_df
+    reliability = reliability_df,
+    model_str = diag$model_str
   ))
+}
+
+#' @export
+print.vimure_training_history <- function(x, ...){
+  cat(x$model_str, "\n")
 }
 
