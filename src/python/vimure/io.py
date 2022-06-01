@@ -1,3 +1,4 @@
+from asyncio.log import logger
 import warnings
 
 import numpy as np
@@ -195,13 +196,13 @@ def parse_graph_from_edgelist(
     if reporter in diff_columns:
         msg = "'{}' column not found in 'df'. Using '{}' columns as reporter.".format(reporter, ego)
         warnings.warn(msg, UserWarning)
-        df[reporter] = df[ego]
+        df.loc[:, reporter] = df[ego]
         
     if layer in diff_columns:
-        df[layer] = "1"
+        df.loc[:, layer] = "1"
         
     if weight in diff_columns:
-        df[weight] = 1
+        df.loc[:, weight] = 1
 
     # Put nodes and reporters in alphabetical order
     layers = sorted(df[layer].unique())
@@ -229,6 +230,9 @@ def parse_graph_from_edgelist(
     if not set(reporters).issubset(nodes):
         raise ValueError("Set of reporters is not a subset of nodes!")
     M = len(reporters)
+
+    # Remove duplicates
+    df = df[expected_columns].drop_duplicates()
 
     """
     Configure mappers
