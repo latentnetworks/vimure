@@ -143,6 +143,11 @@ parse_graph_from_csv <- function(
 #' @export
 parse_graph_from_igraph <- function(
   graph, directed = T, weighted=F, weight="weight", reporter="reporter", layer="layer"){
+  if(!requireNamespace("igraph", quietly = TRUE)){
+    stop("Please install igraph to use this function")
+  }
+
+
   if(class(graph) != "igraph"){
     stop("invalid 'type' (", class(graph), ") of argument")
   }
