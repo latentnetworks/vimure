@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>vimure.test.test_io API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>vimure.test.test_io</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import math
+from multiprocessing.sharedctypes import Value
+import pytest
+import logging
+
+import numpy as np
+import pandas as pd
+import vimure as vm
+import sktensor as skt
+
+from sklearn.metrics import f1_score
+
+logger = logging.getLogger(&#34;vm.test.test_model&#34;)
+logger.setLevel(logging.DEBUG)
+
+
+class Test:
+    def dataset(self):
+        data = {
+            &#39;i&#39;: [&#39;Tom&#39;, &#39;nick&#39;, &#39;krish&#39;, &#39;jack&#39;, &#39;jack&#39;],
+            &#39;j&#39;: [&#39;nick&#39;, &#39;Tom&#39;, &#39;jack&#39;, &#39;nick&#39;, &#39;nick&#39;],
+            &#39;respondent&#39;: [&#39;Tom&#39;, &#39;Tom&#39;, &#39;jack&#39;, &#39;jack&#39;, &#39;Tom&#39;]
+        }
+
+        df = pd.DataFrame(data)
+        return df
+
+    def test_non_dataframe_input(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.io.parse_graph_from_edgelist(&#34;string&#34;)
+            assert str(e_info.value) == &#34;Invalid &#39;type&#39; (str) of argument &#39;df&#39;&#34;
+            
+    def test_no_expected_column(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.io.parse_graph_from_edgelist(self.dataset())
+            assert str(e_info.value) == (&#34;Invalid columns in &#39;df&#39;. Hint: Use params&#34; +
+            &#34; ego,alter,... for mapping column names.&#34;)
+
+    def test_no_ego_or_alter(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.io.parse_graph_from_edgelist(self.dataset(), ego = &#34;i&#34;)
+            assert str(e_info.value) == (&#34;Columns &#39;i&#39; or &#39;Alter&#39; were not found in &#39;df&#39;. Hint: Use params&#34; +
+            &#34; ego,alter,... for mapping column names.&#34;)
+
+    def test_mapping_ego_and_alter(self):
+        df = self.dataset()
+        net_obj = vm.io.parse_graph_from_edgelist(df, ego=&#34;i&#34;, alter=&#34;j&#34;, reporter = &#34;respondent&#34;)
+
+        assert net_obj.L == 1
+        assert net_obj.N == len(set(df[&#39;i&#39;].tolist()+df[&#39;j&#39;].tolist()))
+        assert net_obj.M == net_obj.N
+
+        model = vm.model.VimureModel(mutuality=True, verbose=True)
+        model.fit(net_obj.X, R=net_obj.R, num_realisations=2, max_iter=21)
+
+
+class TestIO:
+    @pytest.mark.skip(
+        reason=&#34;This is being reviewed. Checkout Notebook04 to see the current approach to reading this data.&#34;
+    )
+
+    def test_read_karnataka_village_from_csv(self):
+        file = &#34;/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_visit.csv&#34;
+        net_obj = vm.io.parse_graph_from_csv(file)
+
+        assert net_obj.L == 1
+        assert net_obj.N == 214
+        assert net_obj.M == 196
+
+        assert isinstance(net_obj.X, skt.sptensor)
+        assert net_obj.X.vals.sum() &gt; 0  # Not all 0s
+        assert net_obj.X.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        # https://stackoverflow.com/a/48648756/843365
+        assert net_obj.X.vals.sum() &lt; math.prod(net_obj.X.shape)  # Not all 1s
+
+        assert isinstance(net_obj.R, skt.sptensor)
+        assert net_obj.R.vals.sum() &gt; 0  # Not all 0s
+        assert net_obj.R.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        # https://stackoverflow.com/a/48648756/843365
+        assert net_obj.R.vals.sum() &lt; math.prod(net_obj.R.shape)  # Not all 1s
+
+        &#34;&#34;&#34;
+        Since we didn&#39;t inform a custom reporters mask, reporters should only report their own ties
+        &#34;&#34;&#34;
+        idxNodeFrom = 1
+        idxNodeTo = 2
+        idxM = 3
+
+        msg = &#34;Reporter %s is reporting some ties they are not involved in!&#34;
+        for m in range(net_obj.M):
+            idx_reporting = np.argwhere(net_obj.R.subs[idxM] == m).flatten()
+
+            nodes_from = net_obj.R.subs[idxNodeFrom][idx_reporting]
+            nodes_to = net_obj.R.subs[idxNodeTo][idx_reporting]
+            assert np.logical_or(nodes_from == m, nodes_to == m).all(), msg % m
+
+    @pytest.mark.skip(
+        reason=&#34;This is being reviewed. Checkout Notebook04 to see the current approach to reading this data.&#34;
+    )
+    def test_read_karnataka_village_multilayer(self):
+
+        # Read all layers from village 57
+        layers = [&#34;visit&#34;, &#34;kerorice&#34;, &#34;money&#34;, &#34;help&#34;]
+        pattern = &#34;/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_%s.csv&#34;
+
+        df = pd.concat([pd.read_csv(pattern % layer) for layer in layers])
+
+        net_obj = vm.io.parse_graph_from_edgelist(df)
+
+        assert net_obj.L == 4
+        assert net_obj.N == 233
+        assert net_obj.M == 229
+
+        assert isinstance(net_obj.X, skt.sptensor)
+        assert net_obj.X.vals.sum() &gt; 0  # Not all 0s
+        assert net_obj.X.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        # https://stackoverflow.com/a/48648756/843365
+        assert net_obj.X.vals.sum() &lt; math.prod(net_obj.X.shape)  # Not all 1s
+
+        assert isinstance(net_obj.R, skt.sptensor)
+        assert net_obj.R.vals.sum() &gt; 0  # Not all 0s
+        assert net_obj.R.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        # https://stackoverflow.com/a/48648756/843365
+        assert net_obj.R.vals.sum() &lt; math.prod(net_obj.R.shape)  # Not all 1s
+
+        &#34;&#34;&#34;
+        Since we didn&#39;t inform a custom reporters mask, reporters should only report their own ties
+        &#34;&#34;&#34;
+        idxNodeFrom = 1
+        idxNodeTo = 2
+        idxM = 3
+
+        msg = &#34;Reporter %s is reporting some ties they are not involved in!&#34;
+        for m in range(net_obj.M):
+            idx_reporting = np.argwhere(net_obj.R.subs[idxM] == m).flatten()
+
+            nodes_from = net_obj.R.subs[idxNodeFrom][idx_reporting]
+            nodes_to = net_obj.R.subs[idxNodeTo][idx_reporting]
+            assert np.logical_or(nodes_from == m, nodes_to == m).all(), msg % m</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="vimure.test.test_io.Test"><code class="flex name class">
+<span>class <span class="ident">Test</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Test:
+    def dataset(self):
+        data = {
+            &#39;i&#39;: [&#39;Tom&#39;, &#39;nick&#39;, &#39;krish&#39;, &#39;jack&#39;, &#39;jack&#39;],
+            &#39;j&#39;: [&#39;nick&#39;, &#39;Tom&#39;, &#39;jack&#39;, &#39;nick&#39;, &#39;nick&#39;],
+            &#39;respondent&#39;: [&#39;Tom&#39;, &#39;Tom&#39;, &#39;jack&#39;, &#39;jack&#39;, &#39;Tom&#39;]
+        }
+
+        df = pd.DataFrame(data)
+        return df
+
+    def test_non_dataframe_input(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.io.parse_graph_from_edgelist(&#34;string&#34;)
+            assert str(e_info.value) == &#34;Invalid &#39;type&#39; (str) of argument &#39;df&#39;&#34;
+            
+    def test_no_expected_column(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.io.parse_graph_from_edgelist(self.dataset())
+            assert str(e_info.value) == (&#34;Invalid columns in &#39;df&#39;. Hint: Use params&#34; +
+            &#34; ego,alter,... for mapping column names.&#34;)
+
+    def test_no_ego_or_alter(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.io.parse_graph_from_edgelist(self.dataset(), ego = &#34;i&#34;)
+            assert str(e_info.value) == (&#34;Columns &#39;i&#39; or &#39;Alter&#39; were not found in &#39;df&#39;. Hint: Use params&#34; +
+            &#34; ego,alter,... for mapping column names.&#34;)
+
+    def test_mapping_ego_and_alter(self):
+        df = self.dataset()
+        net_obj = vm.io.parse_graph_from_edgelist(df, ego=&#34;i&#34;, alter=&#34;j&#34;, reporter = &#34;respondent&#34;)
+
+        assert net_obj.L == 1
+        assert net_obj.N == len(set(df[&#39;i&#39;].tolist()+df[&#39;j&#39;].tolist()))
+        assert net_obj.M == net_obj.N
+
+        model = vm.model.VimureModel(mutuality=True, verbose=True)
+        model.fit(net_obj.X, R=net_obj.R, num_realisations=2, max_iter=21)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="vimure.test.test_io.Test.dataset"><code class="name flex">
+<span>def <span class="ident">dataset</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def dataset(self):
+    data = {
+        &#39;i&#39;: [&#39;Tom&#39;, &#39;nick&#39;, &#39;krish&#39;, &#39;jack&#39;, &#39;jack&#39;],
+        &#39;j&#39;: [&#39;nick&#39;, &#39;Tom&#39;, &#39;jack&#39;, &#39;nick&#39;, &#39;nick&#39;],
+        &#39;respondent&#39;: [&#39;Tom&#39;, &#39;Tom&#39;, &#39;jack&#39;, &#39;jack&#39;, &#39;Tom&#39;]
+    }
+
+    df = pd.DataFrame(data)
+    return df</code></pre>
+</details>
+</dd>
+<dt id="vimure.test.test_io.Test.test_mapping_ego_and_alter"><code class="name flex">
+<span>def <span class="ident">test_mapping_ego_and_alter</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_mapping_ego_and_alter(self):
+    df = self.dataset()
+    net_obj = vm.io.parse_graph_from_edgelist(df, ego=&#34;i&#34;, alter=&#34;j&#34;, reporter = &#34;respondent&#34;)
+
+    assert net_obj.L == 1
+    assert net_obj.N == len(set(df[&#39;i&#39;].tolist()+df[&#39;j&#39;].tolist()))
+    assert net_obj.M == net_obj.N
+
+    model = vm.model.VimureModel(mutuality=True, verbose=True)
+    model.fit(net_obj.X, R=net_obj.R, num_realisations=2, max_iter=21)</code></pre>
+</details>
+</dd>
+<dt id="vimure.test.test_io.Test.test_no_ego_or_alter"><code class="name flex">
+<span>def <span class="ident">test_no_ego_or_alter</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_no_ego_or_alter(self):
+    with pytest.raises(ValueError) as e_info:
+        vm.io.parse_graph_from_edgelist(self.dataset(), ego = &#34;i&#34;)
+        assert str(e_info.value) == (&#34;Columns &#39;i&#39; or &#39;Alter&#39; were not found in &#39;df&#39;. Hint: Use params&#34; +
+        &#34; ego,alter,... for mapping column names.&#34;)</code></pre>
+</details>
+</dd>
+<dt id="vimure.test.test_io.Test.test_no_expected_column"><code class="name flex">
+<span>def <span class="ident">test_no_expected_column</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_no_expected_column(self):
+    with pytest.raises(ValueError) as e_info:
+        vm.io.parse_graph_from_edgelist(self.dataset())
+        assert str(e_info.value) == (&#34;Invalid columns in &#39;df&#39;. Hint: Use params&#34; +
+        &#34; ego,alter,... for mapping column names.&#34;)</code></pre>
+</details>
+</dd>
+<dt id="vimure.test.test_io.Test.test_non_dataframe_input"><code class="name flex">
+<span>def <span class="ident">test_non_dataframe_input</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_non_dataframe_input(self):
+    with pytest.raises(ValueError) as e_info:
+        vm.io.parse_graph_from_edgelist(&#34;string&#34;)
+        assert str(e_info.value) == &#34;Invalid &#39;type&#39; (str) of argument &#39;df&#39;&#34;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="vimure.test.test_io.TestIO"><code class="flex name class">
+<span>class <span class="ident">TestIO</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class TestIO:
+    @pytest.mark.skip(
+        reason=&#34;This is being reviewed. Checkout Notebook04 to see the current approach to reading this data.&#34;
+    )
+
+    def test_read_karnataka_village_from_csv(self):
+        file = &#34;/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_visit.csv&#34;
+        net_obj = vm.io.parse_graph_from_csv(file)
+
+        assert net_obj.L == 1
+        assert net_obj.N == 214
+        assert net_obj.M == 196
+
+        assert isinstance(net_obj.X, skt.sptensor)
+        assert net_obj.X.vals.sum() &gt; 0  # Not all 0s
+        assert net_obj.X.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        # https://stackoverflow.com/a/48648756/843365
+        assert net_obj.X.vals.sum() &lt; math.prod(net_obj.X.shape)  # Not all 1s
+
+        assert isinstance(net_obj.R, skt.sptensor)
+        assert net_obj.R.vals.sum() &gt; 0  # Not all 0s
+        assert net_obj.R.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        # https://stackoverflow.com/a/48648756/843365
+        assert net_obj.R.vals.sum() &lt; math.prod(net_obj.R.shape)  # Not all 1s
+
+        &#34;&#34;&#34;
+        Since we didn&#39;t inform a custom reporters mask, reporters should only report their own ties
+        &#34;&#34;&#34;
+        idxNodeFrom = 1
+        idxNodeTo = 2
+        idxM = 3
+
+        msg = &#34;Reporter %s is reporting some ties they are not involved in!&#34;
+        for m in range(net_obj.M):
+            idx_reporting = np.argwhere(net_obj.R.subs[idxM] == m).flatten()
+
+            nodes_from = net_obj.R.subs[idxNodeFrom][idx_reporting]
+            nodes_to = net_obj.R.subs[idxNodeTo][idx_reporting]
+            assert np.logical_or(nodes_from == m, nodes_to == m).all(), msg % m
+
+    @pytest.mark.skip(
+        reason=&#34;This is being reviewed. Checkout Notebook04 to see the current approach to reading this data.&#34;
+    )
+    def test_read_karnataka_village_multilayer(self):
+
+        # Read all layers from village 57
+        layers = [&#34;visit&#34;, &#34;kerorice&#34;, &#34;money&#34;, &#34;help&#34;]
+        pattern = &#34;/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_%s.csv&#34;
+
+        df = pd.concat([pd.read_csv(pattern % layer) for layer in layers])
+
+        net_obj = vm.io.parse_graph_from_edgelist(df)
+
+        assert net_obj.L == 4
+        assert net_obj.N == 233
+        assert net_obj.M == 229
+
+        assert isinstance(net_obj.X, skt.sptensor)
+        assert net_obj.X.vals.sum() &gt; 0  # Not all 0s
+        assert net_obj.X.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        # https://stackoverflow.com/a/48648756/843365
+        assert net_obj.X.vals.sum() &lt; math.prod(net_obj.X.shape)  # Not all 1s
+
+        assert isinstance(net_obj.R, skt.sptensor)
+        assert net_obj.R.vals.sum() &gt; 0  # Not all 0s
+        assert net_obj.R.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        # https://stackoverflow.com/a/48648756/843365
+        assert net_obj.R.vals.sum() &lt; math.prod(net_obj.R.shape)  # Not all 1s
+
+        &#34;&#34;&#34;
+        Since we didn&#39;t inform a custom reporters mask, reporters should only report their own ties
+        &#34;&#34;&#34;
+        idxNodeFrom = 1
+        idxNodeTo = 2
+        idxM = 3
+
+        msg = &#34;Reporter %s is reporting some ties they are not involved in!&#34;
+        for m in range(net_obj.M):
+            idx_reporting = np.argwhere(net_obj.R.subs[idxM] == m).flatten()
+
+            nodes_from = net_obj.R.subs[idxNodeFrom][idx_reporting]
+            nodes_to = net_obj.R.subs[idxNodeTo][idx_reporting]
+            assert np.logical_or(nodes_from == m, nodes_to == m).all(), msg % m</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="vimure.test.test_io.TestIO.test_read_karnataka_village_from_csv"><code class="name flex">
+<span>def <span class="ident">test_read_karnataka_village_from_csv</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.skip(
+    reason=&#34;This is being reviewed. Checkout Notebook04 to see the current approach to reading this data.&#34;
+)
+
+def test_read_karnataka_village_from_csv(self):
+    file = &#34;/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_visit.csv&#34;
+    net_obj = vm.io.parse_graph_from_csv(file)
+
+    assert net_obj.L == 1
+    assert net_obj.N == 214
+    assert net_obj.M == 196
+
+    assert isinstance(net_obj.X, skt.sptensor)
+    assert net_obj.X.vals.sum() &gt; 0  # Not all 0s
+    assert net_obj.X.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+    # https://stackoverflow.com/a/48648756/843365
+    assert net_obj.X.vals.sum() &lt; math.prod(net_obj.X.shape)  # Not all 1s
+
+    assert isinstance(net_obj.R, skt.sptensor)
+    assert net_obj.R.vals.sum() &gt; 0  # Not all 0s
+    assert net_obj.R.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+    # https://stackoverflow.com/a/48648756/843365
+    assert net_obj.R.vals.sum() &lt; math.prod(net_obj.R.shape)  # Not all 1s
+
+    &#34;&#34;&#34;
+    Since we didn&#39;t inform a custom reporters mask, reporters should only report their own ties
+    &#34;&#34;&#34;
+    idxNodeFrom = 1
+    idxNodeTo = 2
+    idxM = 3
+
+    msg = &#34;Reporter %s is reporting some ties they are not involved in!&#34;
+    for m in range(net_obj.M):
+        idx_reporting = np.argwhere(net_obj.R.subs[idxM] == m).flatten()
+
+        nodes_from = net_obj.R.subs[idxNodeFrom][idx_reporting]
+        nodes_to = net_obj.R.subs[idxNodeTo][idx_reporting]
+        assert np.logical_or(nodes_from == m, nodes_to == m).all(), msg % m</code></pre>
+</details>
+</dd>
+<dt id="vimure.test.test_io.TestIO.test_read_karnataka_village_multilayer"><code class="name flex">
+<span>def <span class="ident">test_read_karnataka_village_multilayer</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@pytest.mark.skip(
+    reason=&#34;This is being reviewed. Checkout Notebook04 to see the current approach to reading this data.&#34;
+)
+def test_read_karnataka_village_multilayer(self):
+
+    # Read all layers from village 57
+    layers = [&#34;visit&#34;, &#34;kerorice&#34;, &#34;money&#34;, &#34;help&#34;]
+    pattern = &#34;/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_%s.csv&#34;
+
+    df = pd.concat([pd.read_csv(pattern % layer) for layer in layers])
+
+    net_obj = vm.io.parse_graph_from_edgelist(df)
+
+    assert net_obj.L == 4
+    assert net_obj.N == 233
+    assert net_obj.M == 229
+
+    assert isinstance(net_obj.X, skt.sptensor)
+    assert net_obj.X.vals.sum() &gt; 0  # Not all 0s
+    assert net_obj.X.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+    # https://stackoverflow.com/a/48648756/843365
+    assert net_obj.X.vals.sum() &lt; math.prod(net_obj.X.shape)  # Not all 1s
+
+    assert isinstance(net_obj.R, skt.sptensor)
+    assert net_obj.R.vals.sum() &gt; 0  # Not all 0s
+    assert net_obj.R.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+    # https://stackoverflow.com/a/48648756/843365
+    assert net_obj.R.vals.sum() &lt; math.prod(net_obj.R.shape)  # Not all 1s
+
+    &#34;&#34;&#34;
+    Since we didn&#39;t inform a custom reporters mask, reporters should only report their own ties
+    &#34;&#34;&#34;
+    idxNodeFrom = 1
+    idxNodeTo = 2
+    idxM = 3
+
+    msg = &#34;Reporter %s is reporting some ties they are not involved in!&#34;
+    for m in range(net_obj.M):
+        idx_reporting = np.argwhere(net_obj.R.subs[idxM] == m).flatten()
+
+        nodes_from = net_obj.R.subs[idxNodeFrom][idx_reporting]
+        nodes_to = net_obj.R.subs[idxNodeTo][idx_reporting]
+        assert np.logical_or(nodes_from == m, nodes_to == m).all(), msg % m</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="vimure.test" href="index.html">vimure.test</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="vimure.test.test_io.Test" href="#vimure.test.test_io.Test">Test</a></code></h4>
+<ul class="">
+<li><code><a title="vimure.test.test_io.Test.dataset" href="#vimure.test.test_io.Test.dataset">dataset</a></code></li>
+<li><code><a title="vimure.test.test_io.Test.test_mapping_ego_and_alter" href="#vimure.test.test_io.Test.test_mapping_ego_and_alter">test_mapping_ego_and_alter</a></code></li>
+<li><code><a title="vimure.test.test_io.Test.test_no_ego_or_alter" href="#vimure.test.test_io.Test.test_no_ego_or_alter">test_no_ego_or_alter</a></code></li>
+<li><code><a title="vimure.test.test_io.Test.test_no_expected_column" href="#vimure.test.test_io.Test.test_no_expected_column">test_no_expected_column</a></code></li>
+<li><code><a title="vimure.test.test_io.Test.test_non_dataframe_input" href="#vimure.test.test_io.Test.test_non_dataframe_input">test_non_dataframe_input</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="vimure.test.test_io.TestIO" href="#vimure.test.test_io.TestIO">TestIO</a></code></h4>
+<ul class="">
+<li><code><a title="vimure.test.test_io.TestIO.test_read_karnataka_village_from_csv" href="#vimure.test.test_io.TestIO.test_read_karnataka_village_from_csv">test_read_karnataka_village_from_csv</a></code></li>
+<li><code><a title="vimure.test.test_io.TestIO.test_read_karnataka_village_multilayer" href="#vimure.test.test_io.TestIO.test_read_karnataka_village_multilayer">test_read_karnataka_village_multilayer</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

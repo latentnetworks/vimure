@@ -1,0 +1,1071 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>vimure.diagnostics API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>vimure.diagnostics</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import numpy as np
+import scipy as sp
+import pandas as pd
+import networkx as nx
+
+from .log import setup_logging
+from .model import VimureModel
+from .synthetic import BaseSyntheticNetwork
+from .utils import apply_rho_threshold
+
+from plotnine import *
+
+
+class Diagnostics:
+    def __init__(
+        self, model: VimureModel = None, net: BaseSyntheticNetwork = None, verbose: bool = None,
+    ):
+        self.model = model
+
+        if (net is not None) and hasattr(net, &#34;Y&#34;):
+            # If it is a ground truth network, keep relevant info
+            self.Y = net.Y
+            self.eta = net.eta
+
+        self.L = model.L
+        self.M = model.M
+        self.N = model.N
+
+        if self.model.mutuality:
+            self.model_str = &#34;ViMuRe(T)&#34;
+        else:
+            self.model_str = &#34;ViMuRe(F)&#34;
+
+        self.model_str += &#34;\n\n  Priors:\n&#34;
+
+        self.model_str += &#34;   - eta:    shp=%.2f rte=%.2f\n&#34; % (
+            self.model.alpha_mutuality,
+            self.model.beta_mutuality,
+        )
+        try:
+            self.model_str += &#34;   - theta:  shp=%.2f rte=%.2f\n&#34; % (
+                self.model.alpha_theta,
+                self.model.beta_theta,
+            )
+        except Exception:
+            self.model_str += &#34;   - theta:  shp=%.2f rte=%.2f\n&#34; % (
+                self.model.alpha_theta.mean(),
+                self.model.beta_theta.mean(),
+            )
+        self.model_str += &#34;   - lambda: shp=%s rte=%s\n&#34; % (
+            str(self.model.alpha_lambda),
+            str(self.model.beta_lambda),
+        )
+
+        self.model_str += &#34;   - rho:    a %s tensor &#34; % str(self.model.pr_rho.shape)
+        self.model_str += &#34;(to inspect it, run &lt;diag_obj&gt;.model.pr_rho)\n&#34;
+
+        self.model_str += &#34;\n  Posteriors:\n&#34;
+        self.model_str += &#34;   - G_exp_lambda_f: %s\n&#34; % str(self.model.G_exp_lambda_f)
+        self.model_str += &#34;   - G_exp_nu_f: %.2f\n&#34; % self.model.G_exp_nu_f
+        self.model_str += &#34;   - G_exp_theta_f: a %s&#34; % str(self.model.G_exp_theta_f.shape)
+        self.model_str += &#34; tensor (to inspect it, run &lt;diag_obj&gt;.model.G_exp_theta_f)\n&#34;
+
+        self.model_str += &#34;   - rho_f: a %s&#34; % str(self.model.rho_f.shape)
+        self.model_str += &#34; tensor (to inspect it, run &lt;diag_obj&gt;.model.rho_f)\n&#34;
+
+        # TODO: Add reached_convergence variable to model_str in Diagnostics
+
+        if verbose is None:
+            self.verbose = self.model.verbose
+
+        self.logger = setup_logging(&#34;vm.diagnostics.Diagnostics&#34;, verbose)
+
+    def __str__(self):
+        msg = &#34;---------------\n- DIAGNOSTICS -\n---------------\n\n&#34;
+        msg += f&#34;Model: {self.model_str}\n&#34;
+        msg += &#34;Optimisation:\n\n   Elbo: %.12f\n&#34; % self.model.maxL
+        return msg
+
+    def __repr__(self):
+        msg = &#34;---------------\n- DIAGNOSTICS -\n---------------\n\n&#34;
+        msg += f&#34;Model: {self.model_str}\n&#34;
+        msg += &#34;Optimisation:\n\n   Elbo: %.12f\n&#34; % self.model.maxL
+        return msg
+
+    def plot_elbo_values(self):
+        &#34;&#34;&#34;
+        Plot the multiple realisations of ELBO values.
+        &#34;&#34;&#34;
+
+        plot_df = self.model.trace
+        plot_df[&#34;realisation&#34;] = plot_df[&#34;realisation&#34;].astype(str)
+
+        g = (
+            ggplot(plot_df, aes(x=&#34;iter&#34;, y=&#34;elbo&#34;, group_by=&#34;seed&#34;, color=&#34;realisation&#34;))
+            + geom_point()
+            + geom_line()
+            + scale_x_continuous(name=&#34;Iter&#34;)
+            + scale_y_continuous(name=&#34;ELBO&#34;)
+            + scale_color_discrete(name=&#34;Realisation&#34;)
+            + theme_bw()
+            + theme(figure_size=(10, 4))
+        )
+
+        return g
+
+    def plot_theta(
+        self,
+        theta_GT: np.ndarray = None,
+        node_order: list = None,
+        return_node_order: bool = False,
+        return_plot_df: bool = False,
+        remove_nodes: list = None,
+    ):
+        &#34;&#34;&#34;
+        Scatterplot showing theta distribution (reporters&#39; reciprocity),
+            compared to ground truth theta (theta_GT) when that is available
+        &#34;&#34;&#34;
+
+        if node_order is None:
+            if theta_GT is None:
+                node_order = list(map(str, reversed(np.argsort(self.model.G_exp_theta_f[0]))))
+            else:
+                node_order = list(map(str, reversed(np.argsort(theta_GT[0]))))
+
+        plot_df = pd.concat(
+            [
+                pd.DataFrame(
+                    {
+                        &#34;layer&#34;: layer,
+                        &#34;variable&#34;: r&#34;$\theta_{est}$&#34;,
+                        &#34;node&#34;: range(self.N),
+                        &#34;value&#34;: self.model.G_exp_theta_f[layer],
+                    }
+                )
+                for layer in range(self.L)
+            ]
+        )
+
+        # Add lambda * theta
+        aux_df = pd.concat(
+            [
+                pd.DataFrame(
+                    {
+                        &#34;layer&#34;: layer,
+                        &#34;variable&#34;: r&#34;$\theta_{est} \times \lambda_{k=1}$&#34;,
+                        &#34;node&#34;: range(self.N),
+                        &#34;value&#34;: self.model.G_exp_theta_f[layer] * self.model.G_exp_lambda_f[layer][1],
+                    }
+                )
+                for layer in range(self.L)
+            ]
+        )
+        plot_df = pd.concat([plot_df, aux_df])
+
+        if theta_GT is not None:
+            aux_df = pd.concat(
+                [
+                    pd.DataFrame(
+                        {
+                            &#34;layer&#34;: layer,
+                            &#34;variable&#34;: r&#34;$\theta_{GT}$&#34;,
+                            &#34;node&#34;: range(self.N),
+                            &#34;value&#34;: theta_GT[layer],
+                        }
+                    )
+                    for layer in range(self.L)
+                ]
+            )
+            plot_df = pd.concat([plot_df, aux_df])
+            title = r&#34;Estimated vs ground-truth reliability | Experiment:&#34; + r&#34;$\eta_{est} = $ %.2f&#34;
+            title = title % self.model.G_exp_nu_f
+        else:
+            title = r&#34;Reporters&#39; estimated reliability | $\eta_{est} = $ %.2f&#34;
+            title = title % (self.model.G_exp_nu_f)
+
+        plot_df[&#34;layer&#34;] = plot_df[&#34;layer&#34;].astype(str)
+        plot_df[&#34;node&#34;] = plot_df[&#34;node&#34;].astype(str).astype(&#34;category&#34;).cat.reorder_categories(node_order)
+
+        if remove_nodes is not None:
+            plot_df = plot_df[~plot_df[&#34;node&#34;].isin(remove_nodes)].copy()
+
+        g = (
+            ggplot(plot_df, aes(x=&#34;node&#34;, y=&#34;value&#34;, fill=&#34;variable&#34;))
+            + geom_point(alpha=0.6, size=2)
+            + scale_x_discrete(name=&#34;Nodes sorted from over- to under- reporting&#34;)
+            + ylab(r&#34;Reliability ($\theta$) values&#34;)
+            + scale_fill_discrete(name=None)
+            + theme_bw()
+            + theme(
+                figure_size=(11, 5),
+                axis_text_x=element_blank(),
+                axis_title_y=element_text(margin={&#34;r&#34;: 15}),
+                axis_title_x=element_text(margin={&#34;t&#34;: 10}),
+            )
+            + facet_wrap(&#34;~ variable&#34;, labeller=&#34;label_both&#34;, scales=&#34;free_y&#34;, ncol=1)
+            + ggtitle(title)
+        )
+
+        if return_node_order:
+            if return_plot_df:
+                return g, node_order, plot_df
+            else:
+                return g, node_order
+        else:
+            if return_plot_df:
+                return g, plot_df
+            else:
+                return g
+
+    def reliability_interactions(self, rep_id):
+        raise NotImplementedError
+
+    def plot_baseline(self):
+        # TODO: Check if net is a synthetic network, raise error otherwise
+        # TODO: Calculate union
+        # TODO: Calculate average
+        raise NotImplementedError
+
+    def plot_adjacency_matrix(
+        self,
+        layer,
+        node_order=None,
+        return_node_order=False,
+        gradient_low=&#34;#fcfcfc&#34;,
+        gradient_mid=&#34;#86cefa&#34;,
+        gradient_high=&#34;#003396&#34;,
+        hide_legend=False,
+        include_ground_truth=True,
+        additional_Ys={},
+    ):
+        &#34;&#34;&#34;
+        Plot adjacency matrix of layer l, compared to ground truth
+        &#34;&#34;&#34;
+
+        plotnames = [&#34;Y_rec&#34;]
+
+        def calculate_node_order(A):
+            h_clust_mat = sp.cluster.hierarchy.complete(1 - A)
+            h_clust_order = sp.cluster.hierarchy.fcluster(Z=h_clust_mat, t=0.1, criterion=&#34;distance&#34;)
+            h_clust_order = h_clust_order.argsort()
+            node_order = list(map(str, np.arange(0, A.shape[0])[h_clust_order]))
+            return node_order
+
+        def get_network_df(networkx_obj, name):
+            cols = [&#34;node_from&#34;, &#34;node_to&#34;, &#34;weight&#34;]
+
+            # Convert networkx object to a pandas DataFrame
+            plot_df = nx.edges(networkx_obj).data(&#34;weight&#34;)
+            plot_df = pd.DataFrame(plot_df, columns=cols)
+            plot_df[&#34;matrix_source&#34;] = name
+
+            return plot_df
+
+        # TODO: In the future, instead of self.model.rho_sub, read from a function (ex: self.model.get_Yrec())
+        A = apply_rho_threshold(self.model)
+        g = nx.from_numpy_matrix(A, create_using=nx.DiGraph)
+        plot_df = get_network_df(g, name=&#34;Y_rec&#34;)
+
+        # Double check if self.net was a synthetic network and actually contains a ground truth Y
+        if include_ground_truth:
+            if hasattr(self, &#34;Y&#34;):
+
+                g = self.layer_graphs[layer]
+                A = self.Y[layer]  # Overwrite A so node_order makes more sense
+                aux_df = get_network_df(g, name=&#34;Y_true&#34;)
+                plotnames = [&#34;Y_true&#34;, &#34;Y_rec&#34;]
+
+                # Convert networkx object to a pandas DataFrame and concat
+                plot_df = pd.concat([plot_df, aux_df])
+            else:
+                msg = &#34;include_ground_truth=True but network does not contain Y&#34;
+                self.logger.warn(msg)
+
+        if len(additional_Ys) &gt; 0:
+            for net_name, add_Y in additional_Ys.items():
+                g = nx.from_numpy_matrix(add_Y, create_using=nx.DiGraph)
+                aux_df = get_network_df(g, name=net_name)
+
+                plotnames.extend([net_name])
+                # Convert networkx object to a pandas DataFrame and concat
+                plot_df = pd.concat([plot_df, aux_df])
+
+        &#34;&#34;&#34;
+        A heuristic to order nodes in the plot
+        &#34;&#34;&#34;
+        if node_order is None:
+            node_order = calculate_node_order(A)
+
+        plot_df[&#34;matrix_source&#34;] = (
+            plot_df[&#34;matrix_source&#34;].astype(&#34;category&#34;).cat.reorder_categories(plotnames)
+        )
+        plot_df[&#34;node_from&#34;] = plot_df[&#34;node_from&#34;].astype(str)
+        plot_df[&#34;node_to&#34;] = plot_df[&#34;node_to&#34;].astype(str)
+
+        # Ref:https://matthewlincoln.net/2014/12/20/adjacency-matrix-plots-with-r-and-ggplot2.html
+        g = (
+            ggplot(plot_df, aes(x=&#34;node_from&#34;, y=&#34;node_to&#34;, fill=&#34;weight&#34;))
+            + geom_raster()
+            + theme_bw()
+            + scale_fill_gradient2(low=gradient_low, mid=gradient_mid, high=gradient_high)
+            +
+            # Because we need the x and y axis to display every node,
+            # not just the nodes that have connections to each other,
+            # make sure that ggplot does not drop unused factor levels
+            scale_x_discrete(drop=False, breaks=node_order)
+            + scale_y_discrete(drop=False, breaks=node_order)
+            + theme(
+                # Rotate the x-axis lables so they are legible
+                axis_text_x=element_text(angle=270, hjust=0, size=5),
+                axis_text_y=element_text(size=5),
+                # Force the plot into a square aspect ratio
+                aspect_ratio=1,
+                # Figure Size
+                figure_size=(12, 6),
+            )
+            + facet_wrap(&#34;~ matrix_source&#34;, labeller=&#34;label_value&#34;, ncol=2)
+        )
+
+        if hide_legend:
+            # for other options: https://plotnine.readthedocs.io/en/stable/generated/plotnine.themes.themeable.legend_position.html
+            g = g + theme(legend_position=&#34;none&#34;)
+
+        if return_node_order:
+            return g, node_order
+        else:
+            return g
+
+    def plot_posteriors(self, params: dict = {}):
+        # TODO: Borrow interface from posterior package in R
+        raise NotImplementedError
+
+    def plot_pairs(self, params: dict = {}):
+        # TODO: Borrow interface from posterior package in R
+        raise NotImplementedError</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="vimure.diagnostics.Diagnostics"><code class="flex name class">
+<span>class <span class="ident">Diagnostics</span></span>
+<span>(</span><span>model: <a title="vimure.model.VimureModel" href="model.html#vimure.model.VimureModel">VimureModel</a> = None, net: <a title="vimure.synthetic.BaseSyntheticNetwork" href="synthetic.html#vimure.synthetic.BaseSyntheticNetwork">BaseSyntheticNetwork</a> = None, verbose: bool = None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Diagnostics:
+    def __init__(
+        self, model: VimureModel = None, net: BaseSyntheticNetwork = None, verbose: bool = None,
+    ):
+        self.model = model
+
+        if (net is not None) and hasattr(net, &#34;Y&#34;):
+            # If it is a ground truth network, keep relevant info
+            self.Y = net.Y
+            self.eta = net.eta
+
+        self.L = model.L
+        self.M = model.M
+        self.N = model.N
+
+        if self.model.mutuality:
+            self.model_str = &#34;ViMuRe(T)&#34;
+        else:
+            self.model_str = &#34;ViMuRe(F)&#34;
+
+        self.model_str += &#34;\n\n  Priors:\n&#34;
+
+        self.model_str += &#34;   - eta:    shp=%.2f rte=%.2f\n&#34; % (
+            self.model.alpha_mutuality,
+            self.model.beta_mutuality,
+        )
+        try:
+            self.model_str += &#34;   - theta:  shp=%.2f rte=%.2f\n&#34; % (
+                self.model.alpha_theta,
+                self.model.beta_theta,
+            )
+        except Exception:
+            self.model_str += &#34;   - theta:  shp=%.2f rte=%.2f\n&#34; % (
+                self.model.alpha_theta.mean(),
+                self.model.beta_theta.mean(),
+            )
+        self.model_str += &#34;   - lambda: shp=%s rte=%s\n&#34; % (
+            str(self.model.alpha_lambda),
+            str(self.model.beta_lambda),
+        )
+
+        self.model_str += &#34;   - rho:    a %s tensor &#34; % str(self.model.pr_rho.shape)
+        self.model_str += &#34;(to inspect it, run &lt;diag_obj&gt;.model.pr_rho)\n&#34;
+
+        self.model_str += &#34;\n  Posteriors:\n&#34;
+        self.model_str += &#34;   - G_exp_lambda_f: %s\n&#34; % str(self.model.G_exp_lambda_f)
+        self.model_str += &#34;   - G_exp_nu_f: %.2f\n&#34; % self.model.G_exp_nu_f
+        self.model_str += &#34;   - G_exp_theta_f: a %s&#34; % str(self.model.G_exp_theta_f.shape)
+        self.model_str += &#34; tensor (to inspect it, run &lt;diag_obj&gt;.model.G_exp_theta_f)\n&#34;
+
+        self.model_str += &#34;   - rho_f: a %s&#34; % str(self.model.rho_f.shape)
+        self.model_str += &#34; tensor (to inspect it, run &lt;diag_obj&gt;.model.rho_f)\n&#34;
+
+        # TODO: Add reached_convergence variable to model_str in Diagnostics
+
+        if verbose is None:
+            self.verbose = self.model.verbose
+
+        self.logger = setup_logging(&#34;vm.diagnostics.Diagnostics&#34;, verbose)
+
+    def __str__(self):
+        msg = &#34;---------------\n- DIAGNOSTICS -\n---------------\n\n&#34;
+        msg += f&#34;Model: {self.model_str}\n&#34;
+        msg += &#34;Optimisation:\n\n   Elbo: %.12f\n&#34; % self.model.maxL
+        return msg
+
+    def __repr__(self):
+        msg = &#34;---------------\n- DIAGNOSTICS -\n---------------\n\n&#34;
+        msg += f&#34;Model: {self.model_str}\n&#34;
+        msg += &#34;Optimisation:\n\n   Elbo: %.12f\n&#34; % self.model.maxL
+        return msg
+
+    def plot_elbo_values(self):
+        &#34;&#34;&#34;
+        Plot the multiple realisations of ELBO values.
+        &#34;&#34;&#34;
+
+        plot_df = self.model.trace
+        plot_df[&#34;realisation&#34;] = plot_df[&#34;realisation&#34;].astype(str)
+
+        g = (
+            ggplot(plot_df, aes(x=&#34;iter&#34;, y=&#34;elbo&#34;, group_by=&#34;seed&#34;, color=&#34;realisation&#34;))
+            + geom_point()
+            + geom_line()
+            + scale_x_continuous(name=&#34;Iter&#34;)
+            + scale_y_continuous(name=&#34;ELBO&#34;)
+            + scale_color_discrete(name=&#34;Realisation&#34;)
+            + theme_bw()
+            + theme(figure_size=(10, 4))
+        )
+
+        return g
+
+    def plot_theta(
+        self,
+        theta_GT: np.ndarray = None,
+        node_order: list = None,
+        return_node_order: bool = False,
+        return_plot_df: bool = False,
+        remove_nodes: list = None,
+    ):
+        &#34;&#34;&#34;
+        Scatterplot showing theta distribution (reporters&#39; reciprocity),
+            compared to ground truth theta (theta_GT) when that is available
+        &#34;&#34;&#34;
+
+        if node_order is None:
+            if theta_GT is None:
+                node_order = list(map(str, reversed(np.argsort(self.model.G_exp_theta_f[0]))))
+            else:
+                node_order = list(map(str, reversed(np.argsort(theta_GT[0]))))
+
+        plot_df = pd.concat(
+            [
+                pd.DataFrame(
+                    {
+                        &#34;layer&#34;: layer,
+                        &#34;variable&#34;: r&#34;$\theta_{est}$&#34;,
+                        &#34;node&#34;: range(self.N),
+                        &#34;value&#34;: self.model.G_exp_theta_f[layer],
+                    }
+                )
+                for layer in range(self.L)
+            ]
+        )
+
+        # Add lambda * theta
+        aux_df = pd.concat(
+            [
+                pd.DataFrame(
+                    {
+                        &#34;layer&#34;: layer,
+                        &#34;variable&#34;: r&#34;$\theta_{est} \times \lambda_{k=1}$&#34;,
+                        &#34;node&#34;: range(self.N),
+                        &#34;value&#34;: self.model.G_exp_theta_f[layer] * self.model.G_exp_lambda_f[layer][1],
+                    }
+                )
+                for layer in range(self.L)
+            ]
+        )
+        plot_df = pd.concat([plot_df, aux_df])
+
+        if theta_GT is not None:
+            aux_df = pd.concat(
+                [
+                    pd.DataFrame(
+                        {
+                            &#34;layer&#34;: layer,
+                            &#34;variable&#34;: r&#34;$\theta_{GT}$&#34;,
+                            &#34;node&#34;: range(self.N),
+                            &#34;value&#34;: theta_GT[layer],
+                        }
+                    )
+                    for layer in range(self.L)
+                ]
+            )
+            plot_df = pd.concat([plot_df, aux_df])
+            title = r&#34;Estimated vs ground-truth reliability | Experiment:&#34; + r&#34;$\eta_{est} = $ %.2f&#34;
+            title = title % self.model.G_exp_nu_f
+        else:
+            title = r&#34;Reporters&#39; estimated reliability | $\eta_{est} = $ %.2f&#34;
+            title = title % (self.model.G_exp_nu_f)
+
+        plot_df[&#34;layer&#34;] = plot_df[&#34;layer&#34;].astype(str)
+        plot_df[&#34;node&#34;] = plot_df[&#34;node&#34;].astype(str).astype(&#34;category&#34;).cat.reorder_categories(node_order)
+
+        if remove_nodes is not None:
+            plot_df = plot_df[~plot_df[&#34;node&#34;].isin(remove_nodes)].copy()
+
+        g = (
+            ggplot(plot_df, aes(x=&#34;node&#34;, y=&#34;value&#34;, fill=&#34;variable&#34;))
+            + geom_point(alpha=0.6, size=2)
+            + scale_x_discrete(name=&#34;Nodes sorted from over- to under- reporting&#34;)
+            + ylab(r&#34;Reliability ($\theta$) values&#34;)
+            + scale_fill_discrete(name=None)
+            + theme_bw()
+            + theme(
+                figure_size=(11, 5),
+                axis_text_x=element_blank(),
+                axis_title_y=element_text(margin={&#34;r&#34;: 15}),
+                axis_title_x=element_text(margin={&#34;t&#34;: 10}),
+            )
+            + facet_wrap(&#34;~ variable&#34;, labeller=&#34;label_both&#34;, scales=&#34;free_y&#34;, ncol=1)
+            + ggtitle(title)
+        )
+
+        if return_node_order:
+            if return_plot_df:
+                return g, node_order, plot_df
+            else:
+                return g, node_order
+        else:
+            if return_plot_df:
+                return g, plot_df
+            else:
+                return g
+
+    def reliability_interactions(self, rep_id):
+        raise NotImplementedError
+
+    def plot_baseline(self):
+        # TODO: Check if net is a synthetic network, raise error otherwise
+        # TODO: Calculate union
+        # TODO: Calculate average
+        raise NotImplementedError
+
+    def plot_adjacency_matrix(
+        self,
+        layer,
+        node_order=None,
+        return_node_order=False,
+        gradient_low=&#34;#fcfcfc&#34;,
+        gradient_mid=&#34;#86cefa&#34;,
+        gradient_high=&#34;#003396&#34;,
+        hide_legend=False,
+        include_ground_truth=True,
+        additional_Ys={},
+    ):
+        &#34;&#34;&#34;
+        Plot adjacency matrix of layer l, compared to ground truth
+        &#34;&#34;&#34;
+
+        plotnames = [&#34;Y_rec&#34;]
+
+        def calculate_node_order(A):
+            h_clust_mat = sp.cluster.hierarchy.complete(1 - A)
+            h_clust_order = sp.cluster.hierarchy.fcluster(Z=h_clust_mat, t=0.1, criterion=&#34;distance&#34;)
+            h_clust_order = h_clust_order.argsort()
+            node_order = list(map(str, np.arange(0, A.shape[0])[h_clust_order]))
+            return node_order
+
+        def get_network_df(networkx_obj, name):
+            cols = [&#34;node_from&#34;, &#34;node_to&#34;, &#34;weight&#34;]
+
+            # Convert networkx object to a pandas DataFrame
+            plot_df = nx.edges(networkx_obj).data(&#34;weight&#34;)
+            plot_df = pd.DataFrame(plot_df, columns=cols)
+            plot_df[&#34;matrix_source&#34;] = name
+
+            return plot_df
+
+        # TODO: In the future, instead of self.model.rho_sub, read from a function (ex: self.model.get_Yrec())
+        A = apply_rho_threshold(self.model)
+        g = nx.from_numpy_matrix(A, create_using=nx.DiGraph)
+        plot_df = get_network_df(g, name=&#34;Y_rec&#34;)
+
+        # Double check if self.net was a synthetic network and actually contains a ground truth Y
+        if include_ground_truth:
+            if hasattr(self, &#34;Y&#34;):
+
+                g = self.layer_graphs[layer]
+                A = self.Y[layer]  # Overwrite A so node_order makes more sense
+                aux_df = get_network_df(g, name=&#34;Y_true&#34;)
+                plotnames = [&#34;Y_true&#34;, &#34;Y_rec&#34;]
+
+                # Convert networkx object to a pandas DataFrame and concat
+                plot_df = pd.concat([plot_df, aux_df])
+            else:
+                msg = &#34;include_ground_truth=True but network does not contain Y&#34;
+                self.logger.warn(msg)
+
+        if len(additional_Ys) &gt; 0:
+            for net_name, add_Y in additional_Ys.items():
+                g = nx.from_numpy_matrix(add_Y, create_using=nx.DiGraph)
+                aux_df = get_network_df(g, name=net_name)
+
+                plotnames.extend([net_name])
+                # Convert networkx object to a pandas DataFrame and concat
+                plot_df = pd.concat([plot_df, aux_df])
+
+        &#34;&#34;&#34;
+        A heuristic to order nodes in the plot
+        &#34;&#34;&#34;
+        if node_order is None:
+            node_order = calculate_node_order(A)
+
+        plot_df[&#34;matrix_source&#34;] = (
+            plot_df[&#34;matrix_source&#34;].astype(&#34;category&#34;).cat.reorder_categories(plotnames)
+        )
+        plot_df[&#34;node_from&#34;] = plot_df[&#34;node_from&#34;].astype(str)
+        plot_df[&#34;node_to&#34;] = plot_df[&#34;node_to&#34;].astype(str)
+
+        # Ref:https://matthewlincoln.net/2014/12/20/adjacency-matrix-plots-with-r-and-ggplot2.html
+        g = (
+            ggplot(plot_df, aes(x=&#34;node_from&#34;, y=&#34;node_to&#34;, fill=&#34;weight&#34;))
+            + geom_raster()
+            + theme_bw()
+            + scale_fill_gradient2(low=gradient_low, mid=gradient_mid, high=gradient_high)
+            +
+            # Because we need the x and y axis to display every node,
+            # not just the nodes that have connections to each other,
+            # make sure that ggplot does not drop unused factor levels
+            scale_x_discrete(drop=False, breaks=node_order)
+            + scale_y_discrete(drop=False, breaks=node_order)
+            + theme(
+                # Rotate the x-axis lables so they are legible
+                axis_text_x=element_text(angle=270, hjust=0, size=5),
+                axis_text_y=element_text(size=5),
+                # Force the plot into a square aspect ratio
+                aspect_ratio=1,
+                # Figure Size
+                figure_size=(12, 6),
+            )
+            + facet_wrap(&#34;~ matrix_source&#34;, labeller=&#34;label_value&#34;, ncol=2)
+        )
+
+        if hide_legend:
+            # for other options: https://plotnine.readthedocs.io/en/stable/generated/plotnine.themes.themeable.legend_position.html
+            g = g + theme(legend_position=&#34;none&#34;)
+
+        if return_node_order:
+            return g, node_order
+        else:
+            return g
+
+    def plot_posteriors(self, params: dict = {}):
+        # TODO: Borrow interface from posterior package in R
+        raise NotImplementedError
+
+    def plot_pairs(self, params: dict = {}):
+        # TODO: Borrow interface from posterior package in R
+        raise NotImplementedError</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="vimure.diagnostics.Diagnostics.plot_adjacency_matrix"><code class="name flex">
+<span>def <span class="ident">plot_adjacency_matrix</span></span>(<span>self, layer, node_order=None, return_node_order=False, gradient_low='#fcfcfc', gradient_mid='#86cefa', gradient_high='#003396', hide_legend=False, include_ground_truth=True, additional_Ys={})</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot adjacency matrix of layer l, compared to ground truth</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_adjacency_matrix(
+    self,
+    layer,
+    node_order=None,
+    return_node_order=False,
+    gradient_low=&#34;#fcfcfc&#34;,
+    gradient_mid=&#34;#86cefa&#34;,
+    gradient_high=&#34;#003396&#34;,
+    hide_legend=False,
+    include_ground_truth=True,
+    additional_Ys={},
+):
+    &#34;&#34;&#34;
+    Plot adjacency matrix of layer l, compared to ground truth
+    &#34;&#34;&#34;
+
+    plotnames = [&#34;Y_rec&#34;]
+
+    def calculate_node_order(A):
+        h_clust_mat = sp.cluster.hierarchy.complete(1 - A)
+        h_clust_order = sp.cluster.hierarchy.fcluster(Z=h_clust_mat, t=0.1, criterion=&#34;distance&#34;)
+        h_clust_order = h_clust_order.argsort()
+        node_order = list(map(str, np.arange(0, A.shape[0])[h_clust_order]))
+        return node_order
+
+    def get_network_df(networkx_obj, name):
+        cols = [&#34;node_from&#34;, &#34;node_to&#34;, &#34;weight&#34;]
+
+        # Convert networkx object to a pandas DataFrame
+        plot_df = nx.edges(networkx_obj).data(&#34;weight&#34;)
+        plot_df = pd.DataFrame(plot_df, columns=cols)
+        plot_df[&#34;matrix_source&#34;] = name
+
+        return plot_df
+
+    # TODO: In the future, instead of self.model.rho_sub, read from a function (ex: self.model.get_Yrec())
+    A = apply_rho_threshold(self.model)
+    g = nx.from_numpy_matrix(A, create_using=nx.DiGraph)
+    plot_df = get_network_df(g, name=&#34;Y_rec&#34;)
+
+    # Double check if self.net was a synthetic network and actually contains a ground truth Y
+    if include_ground_truth:
+        if hasattr(self, &#34;Y&#34;):
+
+            g = self.layer_graphs[layer]
+            A = self.Y[layer]  # Overwrite A so node_order makes more sense
+            aux_df = get_network_df(g, name=&#34;Y_true&#34;)
+            plotnames = [&#34;Y_true&#34;, &#34;Y_rec&#34;]
+
+            # Convert networkx object to a pandas DataFrame and concat
+            plot_df = pd.concat([plot_df, aux_df])
+        else:
+            msg = &#34;include_ground_truth=True but network does not contain Y&#34;
+            self.logger.warn(msg)
+
+    if len(additional_Ys) &gt; 0:
+        for net_name, add_Y in additional_Ys.items():
+            g = nx.from_numpy_matrix(add_Y, create_using=nx.DiGraph)
+            aux_df = get_network_df(g, name=net_name)
+
+            plotnames.extend([net_name])
+            # Convert networkx object to a pandas DataFrame and concat
+            plot_df = pd.concat([plot_df, aux_df])
+
+    &#34;&#34;&#34;
+    A heuristic to order nodes in the plot
+    &#34;&#34;&#34;
+    if node_order is None:
+        node_order = calculate_node_order(A)
+
+    plot_df[&#34;matrix_source&#34;] = (
+        plot_df[&#34;matrix_source&#34;].astype(&#34;category&#34;).cat.reorder_categories(plotnames)
+    )
+    plot_df[&#34;node_from&#34;] = plot_df[&#34;node_from&#34;].astype(str)
+    plot_df[&#34;node_to&#34;] = plot_df[&#34;node_to&#34;].astype(str)
+
+    # Ref:https://matthewlincoln.net/2014/12/20/adjacency-matrix-plots-with-r-and-ggplot2.html
+    g = (
+        ggplot(plot_df, aes(x=&#34;node_from&#34;, y=&#34;node_to&#34;, fill=&#34;weight&#34;))
+        + geom_raster()
+        + theme_bw()
+        + scale_fill_gradient2(low=gradient_low, mid=gradient_mid, high=gradient_high)
+        +
+        # Because we need the x and y axis to display every node,
+        # not just the nodes that have connections to each other,
+        # make sure that ggplot does not drop unused factor levels
+        scale_x_discrete(drop=False, breaks=node_order)
+        + scale_y_discrete(drop=False, breaks=node_order)
+        + theme(
+            # Rotate the x-axis lables so they are legible
+            axis_text_x=element_text(angle=270, hjust=0, size=5),
+            axis_text_y=element_text(size=5),
+            # Force the plot into a square aspect ratio
+            aspect_ratio=1,
+            # Figure Size
+            figure_size=(12, 6),
+        )
+        + facet_wrap(&#34;~ matrix_source&#34;, labeller=&#34;label_value&#34;, ncol=2)
+    )
+
+    if hide_legend:
+        # for other options: https://plotnine.readthedocs.io/en/stable/generated/plotnine.themes.themeable.legend_position.html
+        g = g + theme(legend_position=&#34;none&#34;)
+
+    if return_node_order:
+        return g, node_order
+    else:
+        return g</code></pre>
+</details>
+</dd>
+<dt id="vimure.diagnostics.Diagnostics.plot_baseline"><code class="name flex">
+<span>def <span class="ident">plot_baseline</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_baseline(self):
+    # TODO: Check if net is a synthetic network, raise error otherwise
+    # TODO: Calculate union
+    # TODO: Calculate average
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+<dt id="vimure.diagnostics.Diagnostics.plot_elbo_values"><code class="name flex">
+<span>def <span class="ident">plot_elbo_values</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Plot the multiple realisations of ELBO values.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_elbo_values(self):
+    &#34;&#34;&#34;
+    Plot the multiple realisations of ELBO values.
+    &#34;&#34;&#34;
+
+    plot_df = self.model.trace
+    plot_df[&#34;realisation&#34;] = plot_df[&#34;realisation&#34;].astype(str)
+
+    g = (
+        ggplot(plot_df, aes(x=&#34;iter&#34;, y=&#34;elbo&#34;, group_by=&#34;seed&#34;, color=&#34;realisation&#34;))
+        + geom_point()
+        + geom_line()
+        + scale_x_continuous(name=&#34;Iter&#34;)
+        + scale_y_continuous(name=&#34;ELBO&#34;)
+        + scale_color_discrete(name=&#34;Realisation&#34;)
+        + theme_bw()
+        + theme(figure_size=(10, 4))
+    )
+
+    return g</code></pre>
+</details>
+</dd>
+<dt id="vimure.diagnostics.Diagnostics.plot_pairs"><code class="name flex">
+<span>def <span class="ident">plot_pairs</span></span>(<span>self, params: dict = {})</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_pairs(self, params: dict = {}):
+    # TODO: Borrow interface from posterior package in R
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+<dt id="vimure.diagnostics.Diagnostics.plot_posteriors"><code class="name flex">
+<span>def <span class="ident">plot_posteriors</span></span>(<span>self, params: dict = {})</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_posteriors(self, params: dict = {}):
+    # TODO: Borrow interface from posterior package in R
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+<dt id="vimure.diagnostics.Diagnostics.plot_theta"><code class="name flex">
+<span>def <span class="ident">plot_theta</span></span>(<span>self, theta_GT: numpy.ndarray = None, node_order: list = None, return_node_order: bool = False, return_plot_df: bool = False, remove_nodes: list = None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Scatterplot showing theta distribution (reporters' reciprocity),
+compared to ground truth theta (theta_GT) when that is available</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def plot_theta(
+    self,
+    theta_GT: np.ndarray = None,
+    node_order: list = None,
+    return_node_order: bool = False,
+    return_plot_df: bool = False,
+    remove_nodes: list = None,
+):
+    &#34;&#34;&#34;
+    Scatterplot showing theta distribution (reporters&#39; reciprocity),
+        compared to ground truth theta (theta_GT) when that is available
+    &#34;&#34;&#34;
+
+    if node_order is None:
+        if theta_GT is None:
+            node_order = list(map(str, reversed(np.argsort(self.model.G_exp_theta_f[0]))))
+        else:
+            node_order = list(map(str, reversed(np.argsort(theta_GT[0]))))
+
+    plot_df = pd.concat(
+        [
+            pd.DataFrame(
+                {
+                    &#34;layer&#34;: layer,
+                    &#34;variable&#34;: r&#34;$\theta_{est}$&#34;,
+                    &#34;node&#34;: range(self.N),
+                    &#34;value&#34;: self.model.G_exp_theta_f[layer],
+                }
+            )
+            for layer in range(self.L)
+        ]
+    )
+
+    # Add lambda * theta
+    aux_df = pd.concat(
+        [
+            pd.DataFrame(
+                {
+                    &#34;layer&#34;: layer,
+                    &#34;variable&#34;: r&#34;$\theta_{est} \times \lambda_{k=1}$&#34;,
+                    &#34;node&#34;: range(self.N),
+                    &#34;value&#34;: self.model.G_exp_theta_f[layer] * self.model.G_exp_lambda_f[layer][1],
+                }
+            )
+            for layer in range(self.L)
+        ]
+    )
+    plot_df = pd.concat([plot_df, aux_df])
+
+    if theta_GT is not None:
+        aux_df = pd.concat(
+            [
+                pd.DataFrame(
+                    {
+                        &#34;layer&#34;: layer,
+                        &#34;variable&#34;: r&#34;$\theta_{GT}$&#34;,
+                        &#34;node&#34;: range(self.N),
+                        &#34;value&#34;: theta_GT[layer],
+                    }
+                )
+                for layer in range(self.L)
+            ]
+        )
+        plot_df = pd.concat([plot_df, aux_df])
+        title = r&#34;Estimated vs ground-truth reliability | Experiment:&#34; + r&#34;$\eta_{est} = $ %.2f&#34;
+        title = title % self.model.G_exp_nu_f
+    else:
+        title = r&#34;Reporters&#39; estimated reliability | $\eta_{est} = $ %.2f&#34;
+        title = title % (self.model.G_exp_nu_f)
+
+    plot_df[&#34;layer&#34;] = plot_df[&#34;layer&#34;].astype(str)
+    plot_df[&#34;node&#34;] = plot_df[&#34;node&#34;].astype(str).astype(&#34;category&#34;).cat.reorder_categories(node_order)
+
+    if remove_nodes is not None:
+        plot_df = plot_df[~plot_df[&#34;node&#34;].isin(remove_nodes)].copy()
+
+    g = (
+        ggplot(plot_df, aes(x=&#34;node&#34;, y=&#34;value&#34;, fill=&#34;variable&#34;))
+        + geom_point(alpha=0.6, size=2)
+        + scale_x_discrete(name=&#34;Nodes sorted from over- to under- reporting&#34;)
+        + ylab(r&#34;Reliability ($\theta$) values&#34;)
+        + scale_fill_discrete(name=None)
+        + theme_bw()
+        + theme(
+            figure_size=(11, 5),
+            axis_text_x=element_blank(),
+            axis_title_y=element_text(margin={&#34;r&#34;: 15}),
+            axis_title_x=element_text(margin={&#34;t&#34;: 10}),
+        )
+        + facet_wrap(&#34;~ variable&#34;, labeller=&#34;label_both&#34;, scales=&#34;free_y&#34;, ncol=1)
+        + ggtitle(title)
+    )
+
+    if return_node_order:
+        if return_plot_df:
+            return g, node_order, plot_df
+        else:
+            return g, node_order
+    else:
+        if return_plot_df:
+            return g, plot_df
+        else:
+            return g</code></pre>
+</details>
+</dd>
+<dt id="vimure.diagnostics.Diagnostics.reliability_interactions"><code class="name flex">
+<span>def <span class="ident">reliability_interactions</span></span>(<span>self, rep_id)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reliability_interactions(self, rep_id):
+    raise NotImplementedError</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="vimure" href="index.html">vimure</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="vimure.diagnostics.Diagnostics" href="#vimure.diagnostics.Diagnostics">Diagnostics</a></code></h4>
+<ul class="">
+<li><code><a title="vimure.diagnostics.Diagnostics.plot_adjacency_matrix" href="#vimure.diagnostics.Diagnostics.plot_adjacency_matrix">plot_adjacency_matrix</a></code></li>
+<li><code><a title="vimure.diagnostics.Diagnostics.plot_baseline" href="#vimure.diagnostics.Diagnostics.plot_baseline">plot_baseline</a></code></li>
+<li><code><a title="vimure.diagnostics.Diagnostics.plot_elbo_values" href="#vimure.diagnostics.Diagnostics.plot_elbo_values">plot_elbo_values</a></code></li>
+<li><code><a title="vimure.diagnostics.Diagnostics.plot_pairs" href="#vimure.diagnostics.Diagnostics.plot_pairs">plot_pairs</a></code></li>
+<li><code><a title="vimure.diagnostics.Diagnostics.plot_posteriors" href="#vimure.diagnostics.Diagnostics.plot_posteriors">plot_posteriors</a></code></li>
+<li><code><a title="vimure.diagnostics.Diagnostics.plot_theta" href="#vimure.diagnostics.Diagnostics.plot_theta">plot_theta</a></code></li>
+<li><code><a title="vimure.diagnostics.Diagnostics.reliability_interactions" href="#vimure.diagnostics.Diagnostics.reliability_interactions">reliability_interactions</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
