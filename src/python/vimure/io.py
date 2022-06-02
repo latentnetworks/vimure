@@ -90,11 +90,9 @@ class BaseNetwork(metaclass=ABCMeta):
         return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, seed={self.seed})"
 
     
-def parse_graph_from_networkx(G):
+def parse_graph_from_networkx(G, **kwargs):
     df = nx.to_pandas_edgelist(G)
-
-    raise NotImplementedError
-
+    return parse_graph_from_edgelist(df, **kwargs)
 
 def parse_graph_from_csv(
     filename: str,
