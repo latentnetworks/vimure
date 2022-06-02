@@ -48,7 +48,7 @@ class Test:
 
         assert net_obj.L == 1
         assert net_obj.N == len(set(df['i'].tolist()+df['j'].tolist()))
-        assert net_obj.M == len(set(df['respondent'].tolist()))
+        assert net_obj.M == net_obj.N
 
         model = vm.model.VimureModel(mutuality=True, verbose=True)
         model.fit(net_obj.X, R=net_obj.R, num_realisations=2, max_iter=21)
