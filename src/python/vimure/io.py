@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import sktensor as skt
 import networkx as nx
+import warnings
 
 from abc import ABCMeta
 from scipy import sparse
@@ -195,7 +196,7 @@ def parse_graph_from_edgelist(
         
     if reporter in diff_columns:
         msg = "'{}' column not found in 'df'. Using '{}' columns as reporter.".format(reporter, ego)
-        module_logger.warning(msg)
+        warnings.warn(msg, UserWarning)
         df.loc[:, reporter] = df[ego]
         
     if layer in diff_columns:
@@ -210,7 +211,7 @@ def parse_graph_from_edgelist(
     if nodes is None:
         msg = "The set of nodes was not informed, "
         msg += "using {} and {} columns to infer nodes.".format(ego, alter)
-        module_logger.warning(msg)
+        warnings.warn(msg, UserWarning)
         nodes = set(sum(df[[ego, alter]].values.tolist(), []))
 
     if np.logical_or(~df[ego].isin(nodes), ~df[alter].isin(nodes)).any():
@@ -222,7 +223,7 @@ def parse_graph_from_edgelist(
     if reporters is None:
         msg = "The set of reporters was not informed, "
         msg += "assuming set(reporters) = set(nodes) and N = M."
-        module_logger.warning(msg)
+        warnings.warn(msg, UserWarning)
 
         reporters = nodes
 
@@ -254,7 +255,7 @@ def parse_graph_from_edgelist(
         msg += "Parser will build it from reporter column, "
         msg += "assuming a reporter can only report their own ties."
 
-        module_logger.warning(msg)
+        warnings.warn(msg, UserWarning)
 
         """
         Infer R
@@ -320,7 +321,7 @@ def parse_graph_from_edgelist(
     if K is None:
         K = np.max(X.vals) + 1
         msg = f"Parameter K was None. Defaulting to: {K}"
-        module_logger.warning(msg)
+        warnings.warn(msg, UserWarning)
     else:
         K = np.max(X) + 1
 
