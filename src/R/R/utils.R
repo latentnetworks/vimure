@@ -63,15 +63,6 @@ parse_graph_from_edgelist <- function(
     edges[weight] <- 1
   }
 
-  if(length(nodes) == 0){
-    # Infer nodes from ego and alter columns
-    nodes <- unique(unlist(c(edges[ego],edges[alter],edges[reporter])))
-  }
-
-  if(length(reporters) == 0){
-    reporters <- unique(unlist(edges[ego]))
-  }
-
   vimureP$io$parse_graph_from_edgelist(
     edges, nodes, reporters, is_undirected=!directed, is_weighted=weighted,
     ego=ego, alter=alter, weight=weight, reporter=reporter, layer=layer, ...
