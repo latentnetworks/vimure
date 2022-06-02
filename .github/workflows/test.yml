@@ -6,11 +6,11 @@ on:
   push:
     branches: [ develop, main ]
     paths:
-      - src/Python/**
+      - src/python/**
   pull_request:
     branches: [ develop, main ]
     paths:
-      - src/Python/**
+      - src/python/**
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
