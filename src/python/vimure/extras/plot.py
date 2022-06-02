@@ -1,3 +1,4 @@
+import sys
 import scipy as sp
 import numpy as np
 import pandas as pd
@@ -5,7 +6,10 @@ import networkx as nx
 
 import scipy.cluster
 
-from plotnine import *
+try:
+    from plotnine import *
+except ModuleNotFoundError as e:
+    pass
 
 
 def plot_adjacency_matrix(
@@ -17,6 +21,9 @@ def plot_adjacency_matrix(
     gradient_high="#003396",
     hide_legend=False,
 ):
+    if not 'plotnine' in sys.modules:
+        raise ModuleNotFoundError("Please install plotnine to use this function.")
+
     """
     Plot adjacency matrix of layer l
     """
