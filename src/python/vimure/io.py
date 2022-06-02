@@ -1,10 +1,10 @@
+"""Read and parse data"""
 from asyncio.log import logger
-import warnings
 
 import numpy as np
 import pandas as pd
-from pytest import raises
 import sktensor as skt
+import networkx as nx
 
 from abc import ABCMeta
 from scipy import sparse
@@ -26,8 +26,7 @@ module_logger = setup_logging("vm.io")
 
 class BaseNetwork(metaclass=ABCMeta):
     """
-    A base abstract class for generation and management of networks, in an adequate format for this project
-
+    A base abstract class for generation and management of networks, in an adequate format for this project.
     Suitable for representing any type of network, synthetic or real.
     """
 
@@ -37,17 +36,17 @@ class BaseNetwork(metaclass=ABCMeta):
         """
         Parameters
         ------------
-
         N: int
-            number of nodes
+            Number of nodes.
         M: int
-            number of reporters
+            Number of reporters.
         L: int
-            number of layers
+            Number of layers.
         K: int
-            maximum value of the entries of X and Y
+            Maximum edge weight in the adjacency matrix. 
+            When `K=2`, the adjacency matrix will contain some `Y_{ij}=0` and `Y_{ij}=1`.
         seed: int
-            random number generator
+            Pseudo random generator seed to use.
 
         """
 
@@ -90,8 +89,9 @@ class BaseNetwork(metaclass=ABCMeta):
         return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, seed={self.seed})"
 
     
+def parse_graph_from_networkx(G):
+    df = nx.to_pandas_edgelist(G)
 
-def parse_graph_from_networkx(networkx_obj):
     raise NotImplementedError
 
 
@@ -188,14 +188,14 @@ def parse_graph_from_edgelist(
         msg += " ego,alter,... for mapping column names."
         raise ValueError(msg)
         
-    if set(diff_columns) >= set([ego,alter]):
-        msg = "'df' do not have columns '{}' and '{}'. Hint: Use params".format(ego, alter)
+    if ego in diff_columns or alter in diff_columns:
+        msg = "Columns '{}' or '{}' were not found in 'df'. Hint: Use params".format(ego, alter)
         msg += " ego,alter,... for mapping column names."
         raise ValueError(msg)
         
     if reporter in diff_columns:
         msg = "'{}' column not found in 'df'. Using '{}' columns as reporter.".format(reporter, ego)
-        warnings.warn(msg, UserWarning)
+        module_logger.warning(msg)
         df.loc[:, reporter] = df[ego]
         
     if layer in diff_columns:
@@ -210,7 +210,7 @@ def parse_graph_from_edgelist(
     if nodes is None:
         msg = "The set of nodes was not informed, "
         msg += "using {} and {} columns to infer nodes.".format(ego, alter)
-        warnings.warn(msg, UserWarning)
+        module_logger.warning(msg)
         nodes = set(sum(df[[ego, alter]].values.tolist(), []))
 
     if np.logical_or(~df[ego].isin(nodes), ~df[alter].isin(nodes)).any():
@@ -222,8 +222,7 @@ def parse_graph_from_edgelist(
     if reporters is None:
         msg = "The set of reporters was not informed, "
         msg += "assuming set(reporters) = set(nodes) and N = M."
-        # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
-        warnings.warn(msg, UserWarning)
+        module_logger.warning(msg)
 
         reporters = nodes
 
@@ -255,8 +254,7 @@ def parse_graph_from_edgelist(
         msg += "Parser will build it from reporter column, "
         msg += "assuming a reporter can only report their own ties."
 
-        # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
-        warnings.warn(msg, UserWarning)
+        module_logger.warning(msg)
 
         """
         Infer R
@@ -321,14 +319,13 @@ def parse_graph_from_edgelist(
     """
     if K is None:
         K = np.max(X.vals) + 1
-        # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
         msg = f"Parameter K was None. Defaulting to: {K}"
-        warnings.warn(msg, UserWarning)
+        module_logger.warning(msg)
     else:
         K = np.max(X) + 1
 
     # TODO: For future users, we might want to keep track of nodeName2Id too (nodeId2Name)
-    network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, **kwargs)
+    network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, nodeNames=nodeId2Name, **kwargs)
     return network
 
 
@@ -348,6 +345,9 @@ class RealNetwork(BaseNetwork):
 
         self.setX(X)
         self.R = R
+
+        if "nodeNames" in kwargs:
+            self.nodeNames = pd.DataFrame(kwargs["nodeNames"].items(), columns = ["id", "name"])
 
         def __repr__(self):
             return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, number_ties={self.X.vals.sum()})"
