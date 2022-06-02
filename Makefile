@@ -17,4 +17,4 @@ test:
 	$(PYTHON) -m pytest -s -vv --pyargs vimure
 
 docs:
-	$(PYTHON) -m pdoc --html vimure --force
+	$(PYTHON) -m pdoc --html --force -o ./docs vimure

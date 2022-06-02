@@ -436,7 +436,7 @@ class StandardSBM(BaseSyntheticNetwork):
         overlapping : float
             Fraction of nodes with mixed membership. It has to be in `[0, 1)`.
         kwargs : 
-            Additional arguments of BaseSyntheticNetwork.
+            Additional arguments of `vimure.synthetic.StandardSBM` 
         &#34;&#34;&#34;
         self.init_sbm_params(
             C=C,
@@ -877,7 +877,7 @@ class Multitensor(StandardSBM):
         Returns
         -------
         M : numpy.array
-            Mean $\lambda^{0}_{ij}$ for all entries.
+            Mean `\lambda^{0}_{ij}` for all entries.
         &#34;&#34;&#34;
 
         M = np.einsum(&#34;ik,jq-&gt;ijkq&#34;, u, v)
@@ -887,7 +887,7 @@ class Multitensor(StandardSBM):
 
     def build_Y(self):
         &#34;&#34;&#34;
-        Generate network layers G (and adjacency matrix A) using the latent variables,
+        Generate network layers G and adjacency matrix A using the latent variables,
         with the generative model `(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A_{ij},u,v,w,eta)`
         &#34;&#34;&#34;
 
@@ -2245,7 +2245,7 @@ Can be used to generate benchmarks for networks with reciprocity.</p>
         Returns
         -------
         M : numpy.array
-            Mean $\lambda^{0}_{ij}$ for all entries.
+            Mean `\lambda^{0}_{ij}` for all entries.
         &#34;&#34;&#34;
 
         M = np.einsum(&#34;ik,jq-&gt;ijkq&#34;, u, v)
@@ -2255,7 +2255,7 @@ Can be used to generate benchmarks for networks with reciprocity.</p>
 
     def build_Y(self):
         &#34;&#34;&#34;
-        Generate network layers G (and adjacency matrix A) using the latent variables,
+        Generate network layers G and adjacency matrix A using the latent variables,
         with the generative model `(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A_{ij},u,v,w,eta)`
         &#34;&#34;&#34;
 
@@ -2388,7 +2388,7 @@ Can be used to generate benchmarks for networks with reciprocity.</p>
 <h2 id="returns">Returns</h2>
 <dl>
 <dt><strong><code>M</code></strong> :&ensp;<code>numpy.array</code></dt>
-<dd>Mean $\lambda^{0}_{ij}$ for all entries.</dd>
+<dd>Mean <code>\lambda^{0}_{ij}</code> for all entries.</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -2410,7 +2410,7 @@ Can be used to generate benchmarks for networks with reciprocity.</p>
     Returns
     -------
     M : numpy.array
-        Mean $\lambda^{0}_{ij}$ for all entries.
+        Mean `\lambda^{0}_{ij}` for all entries.
     &#34;&#34;&#34;
 
     M = np.einsum(&#34;ik,jq-&gt;ijkq&#34;, u, v)
@@ -2423,7 +2423,7 @@ Can be used to generate benchmarks for networks with reciprocity.</p>
 <span>def <span class="ident">build_Y</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Generate network layers G (and adjacency matrix A) using the latent variables,
+<div class="desc"><p>Generate network layers G and adjacency matrix A using the latent variables,
 with the generative model <code>(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A_{ij},u,v,w,eta)</code></p></div>
 <details class="source">
 <summary>
@@ -2431,7 +2431,7 @@ with the generative model <code>(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A
 </summary>
 <pre><code class="python">def build_Y(self):
     &#34;&#34;&#34;
-    Generate network layers G (and adjacency matrix A) using the latent variables,
+    Generate network layers G and adjacency matrix A using the latent variables,
     with the generative model `(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A_{ij},u,v,w,eta)`
     &#34;&#34;&#34;
 
@@ -2563,7 +2563,7 @@ density of the network.</dd>
 <dt><strong><code>overlapping</code></strong> :&ensp;<code>float</code></dt>
 <dd>Fraction of nodes with mixed membership. It has to be in <code>[0, 1)</code>.</dd>
 <dt><strong><code>kwargs</code></strong></dt>
-<dd>Additional arguments of BaseSyntheticNetwork.</dd>
+<dd>Additional arguments of <code><a title="vimure.synthetic.StandardSBM" href="#vimure.synthetic.StandardSBM">StandardSBM</a></code></dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -2607,7 +2607,7 @@ density of the network.</dd>
         overlapping : float
             Fraction of nodes with mixed membership. It has to be in `[0, 1)`.
         kwargs : 
-            Additional arguments of BaseSyntheticNetwork.
+            Additional arguments of `vimure.synthetic.StandardSBM` 
         &#34;&#34;&#34;
         self.init_sbm_params(
             C=C,
