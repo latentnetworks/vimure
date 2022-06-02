@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 
+import scipy.cluster
+
 try:
     from plotnine import *
 except ModuleNotFoundError as e:
