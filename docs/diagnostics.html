@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>vimure.diagnostics API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="Diagnostics metrics" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,11 +22,14 @@
 <h1 class="title">Module <code>vimure.diagnostics</code></h1>
 </header>
 <section id="section-intro">
+<p>Diagnostics metrics</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import numpy as np
+<pre><code class="python">&#34;&#34;&#34;Diagnostics metrics&#34;&#34;&#34;
+import sys
+import numpy as np
 import scipy as sp
 import pandas as pd
 import networkx as nx
@@ -36,7 +39,10 @@ from .model import VimureModel
 from .synthetic import BaseSyntheticNetwork
 from .utils import apply_rho_threshold
 
-from plotnine import *
+try:
+    from plotnine import *
+except ModuleNotFoundError as e:
+    pass
 
 
 class Diagnostics:
@@ -115,6 +121,8 @@ class Diagnostics:
         &#34;&#34;&#34;
         Plot the multiple realisations of ELBO values.
         &#34;&#34;&#34;
+        if not &#39;plotnine&#39; in sys.modules:
+            raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
 
         plot_df = self.model.trace
         plot_df[&#34;realisation&#34;] = plot_df[&#34;realisation&#34;].astype(str)
@@ -144,6 +152,9 @@ class Diagnostics:
         Scatterplot showing theta distribution (reporters&#39; reciprocity),
             compared to ground truth theta (theta_GT) when that is available
         &#34;&#34;&#34;
+
+        if not &#39;plotnine&#39; in sys.modules:
+            raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
 
         if node_order is None:
             if theta_GT is None:
@@ -260,6 +271,9 @@ class Diagnostics:
         &#34;&#34;&#34;
         Plot adjacency matrix of layer l, compared to ground truth
         &#34;&#34;&#34;
+
+        if not &#39;plotnine&#39; in sys.modules:
+            raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
 
         plotnames = [&#34;Y_rec&#34;]
 
@@ -458,6 +472,8 @@ class Diagnostics:
         &#34;&#34;&#34;
         Plot the multiple realisations of ELBO values.
         &#34;&#34;&#34;
+        if not &#39;plotnine&#39; in sys.modules:
+            raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
 
         plot_df = self.model.trace
         plot_df[&#34;realisation&#34;] = plot_df[&#34;realisation&#34;].astype(str)
@@ -487,6 +503,9 @@ class Diagnostics:
         Scatterplot showing theta distribution (reporters&#39; reciprocity),
             compared to ground truth theta (theta_GT) when that is available
         &#34;&#34;&#34;
+
+        if not &#39;plotnine&#39; in sys.modules:
+            raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
 
         if node_order is None:
             if theta_GT is None:
@@ -603,6 +622,9 @@ class Diagnostics:
         &#34;&#34;&#34;
         Plot adjacency matrix of layer l, compared to ground truth
         &#34;&#34;&#34;
+
+        if not &#39;plotnine&#39; in sys.modules:
+            raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
 
         plotnames = [&#34;Y_rec&#34;]
 
@@ -732,6 +754,9 @@ class Diagnostics:
     Plot adjacency matrix of layer l, compared to ground truth
     &#34;&#34;&#34;
 
+    if not &#39;plotnine&#39; in sys.modules:
+        raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
+
     plotnames = [&#34;Y_rec&#34;]
 
     def calculate_node_order(A):
@@ -855,6 +880,8 @@ class Diagnostics:
     &#34;&#34;&#34;
     Plot the multiple realisations of ELBO values.
     &#34;&#34;&#34;
+    if not &#39;plotnine&#39; in sys.modules:
+        raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
 
     plot_df = self.model.trace
     plot_df[&#34;realisation&#34;] = plot_df[&#34;realisation&#34;].astype(str)
@@ -923,6 +950,9 @@ compared to ground truth theta (theta_GT) when that is available</p></div>
     Scatterplot showing theta distribution (reporters&#39; reciprocity),
         compared to ground truth theta (theta_GT) when that is available
     &#34;&#34;&#34;
+
+    if not &#39;plotnine&#39; in sys.modules:
+        raise ModuleNotFoundError(&#34;Please install &#39;plotnine&#39; to use this method.&#34;)
 
     if node_order is None:
         if theta_GT is None:

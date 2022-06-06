@@ -53,6 +53,16 @@ DEFAULT_NUM_REALISATIONS = 20
 
 
 class VimureModel(TransformerMixin, BaseEstimator):
+    &#34;&#34;&#34;
+    **ViMuRe**
+
+    Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
+    reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
+    network (rho). The inference is performed with a Variational Inference approach.
+    
+    .. note::This closely follows the scikit-learn structure of classes:
+        https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py
+    &#34;&#34;&#34;
     @_deprecate_positional_args
     def __init__(
         self,
@@ -63,18 +73,14 @@ class VimureModel(TransformerMixin, BaseEstimator):
         verbose: bool = True,
     ):
         &#34;&#34;&#34;
-
-        This closely follows the scikit-learn structure of classes:
-        https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py
-
         Parameters
         ----------
         undirected : boolean
-                     If True, the given and the estimate networks are undirected.
-        mutuality: boolean
-                     If this is false, then do not estimate mutuality (network cond. independent)
+            Whether the network is undirected.
+        mutuality : boolean
+            Whether to use the mutuality parameter.
         convergence_tol : float
-                    Controls when to stop the optimisation algorithm (CAVI)
+            Controls when to stop the optimisation algorithm (CAVI)
         &#34;&#34;&#34;
 
         self.undirected = undirected
@@ -317,10 +323,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
         **extra_params,
     ):
         &#34;&#34;&#34;
-        Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
-        reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
-        network (rho). The inference is performed with a Variational Inference approach.
-
         Parameters
         ----------
         X : ndarray
@@ -1099,15 +1101,20 @@ def categorical_elbo_term(rho, prior_rho, EPS):
 <span>(</span><span>undirected: bool = False, mutuality: bool = True, convergence_tol: float = 0.1, decision: int = 1, verbose: bool = True)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Mixin class for all transformers in scikit-learn.</p>
-<p>This closely follows the scikit-learn structure of classes:
-<a href="https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py">https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py</a></p>
+<div class="desc"><p><strong>ViMuRe</strong></p>
+<p>Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
+reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
+network (rho). The inference is performed with a Variational Inference approach.</p>
+<div class="admonition note">
+<p class="admonition-title">Note:&ensp;This closely follows the scikit-learn structure of classes:</p>
+<p><a href="https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py">https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py</a></p>
+</div>
 <h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>undirected</code></strong> :&ensp;<code>boolean</code></dt>
-<dd>If True, the given and the estimate networks are undirected.</dd>
+<dd>Whether the network is undirected.</dd>
 <dt><strong><code>mutuality</code></strong> :&ensp;<code>boolean</code></dt>
-<dd>If this is false, then do not estimate mutuality (network cond. independent)</dd>
+<dd>Whether to use the mutuality parameter.</dd>
 <dt><strong><code>convergence_tol</code></strong> :&ensp;<code>float</code></dt>
 <dd>Controls when to stop the optimisation algorithm (CAVI)</dd>
 </dl></div>
@@ -1116,6 +1123,16 @@ def categorical_elbo_term(rho, prior_rho, EPS):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class VimureModel(TransformerMixin, BaseEstimator):
+    &#34;&#34;&#34;
+    **ViMuRe**
+
+    Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
+    reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
+    network (rho). The inference is performed with a Variational Inference approach.
+    
+    .. note::This closely follows the scikit-learn structure of classes:
+        https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py
+    &#34;&#34;&#34;
     @_deprecate_positional_args
     def __init__(
         self,
@@ -1126,18 +1143,14 @@ def categorical_elbo_term(rho, prior_rho, EPS):
         verbose: bool = True,
     ):
         &#34;&#34;&#34;
-
-        This closely follows the scikit-learn structure of classes:
-        https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py
-
         Parameters
         ----------
         undirected : boolean
-                     If True, the given and the estimate networks are undirected.
-        mutuality: boolean
-                     If this is false, then do not estimate mutuality (network cond. independent)
+            Whether the network is undirected.
+        mutuality : boolean
+            Whether to use the mutuality parameter.
         convergence_tol : float
-                    Controls when to stop the optimisation algorithm (CAVI)
+            Controls when to stop the optimisation algorithm (CAVI)
         &#34;&#34;&#34;
 
         self.undirected = undirected
@@ -1380,10 +1393,6 @@ def categorical_elbo_term(rho, prior_rho, EPS):
         **extra_params,
     ):
         &#34;&#34;&#34;
-        Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
-        reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
-        network (rho). The inference is performed with a Variational Inference approach.
-
         Parameters
         ----------
         X : ndarray
@@ -2166,10 +2175,7 @@ def categorical_elbo_term(rho, prior_rho, EPS):
 <span>def <span class="ident">fit</span></span>(<span>self, X: numpy.ndarray, theta_prior=(0.1, 0.1), lambda_prior=(10.0, 10.0), eta_prior=(0.5, 1.0), rho_prior=None, seed: int = None, **extra_params)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
-reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
-network (rho). The inference is performed with a Variational Inference approach.</p>
-<h2 id="parameters">Parameters</h2>
+<div class="desc"><h2 id="parameters">Parameters</h2>
 <dl>
 <dt><strong><code>X</code></strong> :&ensp;<code>ndarray</code></dt>
 <dd>Network adjacency tensor.</dd>
@@ -2213,10 +2219,6 @@ Maximum number of iteration steps before aborting. Default=500</p>
     **extra_params,
 ):
     &#34;&#34;&#34;
-    Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
-    reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
-    network (rho). The inference is performed with a Variational Inference approach.
-
     Parameters
     ----------
     X : ndarray

@@ -17,4 +17,4 @@ ipywidgets==7.6.5
 tqdm==4.62.0
 wget==3.2
 
-pydoc #dev
+pdoc3 #dev

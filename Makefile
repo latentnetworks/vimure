@@ -16,5 +16,7 @@ venv-up:
 test:
 	$(PYTHON) -m pytest -s -vv --pyargs vimure
 
-docs:
-	$(PYTHON) -m pdoc --html --force -o ./docs vimure
+doc:
+	$(PYTHON) -m pdoc --html --force -o . vimure
+	mv vimure/ docs/
+	rm -rf vimure
