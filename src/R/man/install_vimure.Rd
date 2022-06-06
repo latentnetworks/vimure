@@ -13,6 +13,7 @@ install_vimure(
   conda_python_version = NULL,
   ...,
   pip_ignore_installed = TRUE,
+  force = FALSE,
   python_version = conda_python_version
 )
 }
@@ -24,7 +25,7 @@ available on Windows.}
 
 \item{conda}{The path to a \code{conda} executable. Use \code{"auto"} to allow
 \code{reticulate} to automatically find an appropriate \code{conda} binary.
-See \strong{Finding Conda} and \code{\link[reticulate:conda-tools]{conda_binary()}} for more details.}
+See \strong{Finding Conda} and \code{\link[reticulate:conda_binary]{conda_binary()}} for more details.}
 
 \item{version}{Vimure version to install. Valid values include:
 \itemize{
@@ -50,6 +51,8 @@ only occur within RStudio).}
 packages and reinstall all already installed python packages. This defaults
 to \code{TRUE}, to ensure that Vimure dependencies like NumPy are compatible
 with the prebuilt Vimure binaries.}
+
+\item{force}{Whether pip should recreate 'r-reticulate' virtualenv. This defaults to \code{FALSE}.}
 
 \item{python_version, conda_python_version}{Pass a string like "3.8" to
 request that conda install a specific Python version. This is ignored when
@@ -77,7 +80,9 @@ manually install miniconda by running \code{\link[reticulate:install_miniconda]{
  \code{install_vimure()} isn't required to use vimure with the package.
 If you manually configure a python environment with the required
 dependencies, you can tell R to use it by pointing reticulate at it,
-commonly by setting an environment variable:\if{html}{\out{<div class="sourceCode R">}}\preformatted{Sys.setenv("RETICULATE_PYTHON" = "~/path/to/python-env/bin/python")
+commonly by setting an environment variable:
+
+\if{html}{\out{<div class="sourceCode R">}}\preformatted{Sys.setenv("RETICULATE_PYTHON" = "~/path/to/python-env/bin/python")
 }\if{html}{\out{</div>}}
 }
 
