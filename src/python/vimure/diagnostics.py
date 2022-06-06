@@ -1,3 +1,5 @@
+"""Diagnostics metrics"""
+import sys
 import numpy as np
 import scipy as sp
 import pandas as pd
@@ -8,7 +10,10 @@ from .model import VimureModel
 from .synthetic import BaseSyntheticNetwork
 from .utils import apply_rho_threshold
 
-from plotnine import *
+try:
+    from plotnine import *
+except ModuleNotFoundError as e:
+    pass
 
 
 class Diagnostics:
@@ -87,6 +92,8 @@ class Diagnostics:
         """
         Plot the multiple realisations of ELBO values.
         """
+        if not 'plotnine' in sys.modules:
+            raise ModuleNotFoundError("Please install 'plotnine' to use this method.")
 
         plot_df = self.model.trace
         plot_df["realisation"] = plot_df["realisation"].astype(str)
@@ -116,6 +123,9 @@ class Diagnostics:
         Scatterplot showing theta distribution (reporters' reciprocity),
             compared to ground truth theta (theta_GT) when that is available
         """
+
+        if not 'plotnine' in sys.modules:
+            raise ModuleNotFoundError("Please install 'plotnine' to use this method.")
 
         if node_order is None:
             if theta_GT is None:
@@ -232,6 +242,9 @@ class Diagnostics:
         """
         Plot adjacency matrix of layer l, compared to ground truth
         """
+
+        if not 'plotnine' in sys.modules:
+            raise ModuleNotFoundError("Please install 'plotnine' to use this method.")
 
         plotnames = ["Y_rec"]
 

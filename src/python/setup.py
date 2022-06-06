@@ -16,8 +16,7 @@ setup(
         "pandas >= 0.20.3",
         "scikit-learn >= 0.19.0",
         "scikit-tensor-py3 @ https://github.com/jonjoncardoso/scikit-tensor-py3/archive/master.zip",
-        "networkx >= 2.0.0",
-        "plotnine >= 0.7.0"
+        "networkx >= 2.0.0"
     ],
     packages=find_packages(),
     python_requires=">=3",
