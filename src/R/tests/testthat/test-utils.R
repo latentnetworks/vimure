@@ -17,10 +17,3 @@ test_that("Parse graph without Ego and Alter columns", {
     parse_graph_from_edgelist(data, ego="Ego", alter="Alter", reporter="mpg", layer="cyl"),
     "`edges` do not have columns")
 })
-
-test_that("Parse graph with non-numeric Ego/Alter", {
-  data <- iris
-  expect_error(
-    parse_graph_from_edgelist(data, ego="Species", alter="Sepal.Length", reporter="Petal.Width"),
-    "non-numeric values in")
-})
