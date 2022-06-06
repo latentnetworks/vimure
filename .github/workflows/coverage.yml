@@ -2,13 +2,13 @@ name: coverage
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop, main ]
     paths:
-      - src/Python/**
+      - src/python/**
   pull_request:
-    branches: [ main ]
+    branches: [ develop, main ]
     paths:
-      - src/Python/**
+      - src/python/**
 
 jobs:
   report:
