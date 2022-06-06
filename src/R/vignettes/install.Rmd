@@ -1,0 +1,75 @@
+---
+title: "Install"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Install}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Vimure requires R >= 3.3.0.  If you do not already have a R environment configured on your computer, please see the instructions for installing [R and Rstudio](http://web.cs.ucla.edu/~gulzar/rstudio/).
+
+Below we assume you have a default R environment already configured on your computer and you intend to install `vimure` inside of it.  If you want to create and work with R virtual environments to test the package in a separate environment, please follow instructions on [renv](https://rstudio.github.io/renv/articles/renv.html).
+
+The VIMuRe R package wraps the [VIMuRe](https://github.com/latentnetworks/vimure/tree/develop/src/python) Python package. We use the [`reticulate`](https://rstudio.github.io/reticulate/) package to embeds a Python session within your R session, enabling seamless, high-performance interoperability.
+
+## Install the released version
+
+First, install the vimure R package from GitHub as follows:
+
+```{r message=FALSE, warning=FALSE}
+#install.packages("devtools")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+```
+
+Then, use the `install_vimure()` function to install VIMuRe. 
+
+> Note that if *reticulate* did not find a non-system installation of python you may be prompted if you want it to download and install miniconda. Miniconda is the recommended installation method for most users, as it ensures that the R python installation is isolated from other python installations. If you initially declined the miniconda installation prompt, you can later manually install miniconda by running `reticulate::install_miniconda()`
+
+```{r warning=FALSE}
+library(vimure)
+vimure::install_vimure()
+```
+
+You can confirm that the installation succeeded with:
+
+```{r warning=FALSE}
+library(vimure)
+vimure::vm_config()
+```
+
+This will provide you with a default installation of VIMuRe suitable for use with the vimure R package.
+
+# Advanced setup
+
+VIMuRe is distributed as a Python package and so needs to be installed within a Python environment on your system. By default, the `install_vimure()` function attempts to install VIMuRe within an isolated Python environment (“r-reticulate”).
+
+Note that `install_vimure()` isn’t required to use VIMuRe with the package. If you manually configure a python environment with the required dependencies, you can tell R to use it by pointing reticulate at it, commonly by setting an environment variable:
+  
+  ``` r
+Sys.setenv("RETICULATE_PYTHON" = "~/path/to/python-env/bin/python")
+```
+
+By default, `install_vimure()` install the latest *develop* branch of VIMuRe You can override this behavior by specifying the version parameter. For example:
+  
+  ``` r
+install_vimure(version = "master")
+```
+
+You can also install a local version of VIMuRe by specifying a URL/Path to a VIMuRe binary. For example:
+  
+  ``` r
+install_vimure(version = "~/Git/vimure/src/python")
+```

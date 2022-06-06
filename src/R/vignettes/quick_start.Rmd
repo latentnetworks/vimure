@@ -1,0 +1,98 @@
+---
+title: "Introduction to vimure"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to vimure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The goal of vimure is to make available latent network models to account for noisy, multiply-reported social network Data.
+
+```{r setup}
+library(vimure)
+library(igraph)
+library(ggcorrplot)
+```
+
+# Generate synthetic data
+
+First create an object with the desired synthetic network class:
+
+```{r}
+net <- gm_Multitensor(N=100, M=50, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.2)
+
+# Ground Truth Network
+Y <- extract_Y(net)
+layer <- 1 # Change to plot others layers for multiply-layers networks
+
+graph <- graph_from_adjacency_matrix(Y[layer, , ], mode = "directed") 
+graph <- set_graph_attr(graph, "layout", layout_with_fr(graph, niter=600))
+plot(graph,
+     vertex.size=5,
+     vertex.label=NA,
+     edge.width=0.5,
+     edge.arrow.size=0.5, 
+     edge.arrow.width=0.5)
+```
+
+Calculate some network statistics from the adjacency matrix:
+
+```{r}
+message(
+  "Nodes: ", length(V(graph)),
+  " | Edges: ", gsize(graph),
+  " | Avg. degree: ", mean(degree(graph)), #directed graph,
+  " | Reciprocity: ", reciprocity(graph)
+)
+```
+
+Then, given a network Y, we can generate N observed adjacency matrices as would have been reported by reporting nodes $m$ for $m \in N$ This is achieved by the function `build_X`. Example:
+
+```{r}
+X <- build_X(net, flag_self_reporter=T, cutoff_X=F, seed=10L)
+dim(X)
+```
+Use the code below to explore the network from the point of view of different reporting nodes:
+
+```{r}
+reporter_id <- 31
+message("Reporter ID=", reporter_id," | theta= ", net$theta[layer, reporter_id])
+
+X_current <- X[layer,,,reporter_id]
+X_current <- X_current[rowSums(X_current[,-1]) != 0, colSums(X_current[-1,]) != 0]
+
+ggcorrplot( X_current) + 
+   scale_fill_gradient(low="white",high="#003396")
+```
+
+# Run model
+
+In R we can construct and fit the vimure model by using the `vimure` function.
+The `vimure` function inherit all arguments from the original `VimudeModel` class and `VimureModel.fit()`.
+See more info about arguments in `help(vimure)`.
+
+In R, the `vimure` takes as data input an adjancency matrix or an igraph object.
+
+```{r}
+model <- vimure(X, net$R, mutuality=F, K=2, num_realisations=1, max_iter=150)
+```
+
+> Note: Run model without mutuality is not particularly useful since we know this network has some level of reciprocity and mutuality. We are doing this for testing purposes only.
+
+## Diagnostics
+
+Use `summary` to produce result summaries of the results of the model. The output of `summary` is a R list that contains vimure's priors and posteriors and more. You can access the results to plot and analyse the final model. 
+Open an issue in our [repository](https://github.com/latentnetworks/vimure/issues/new) to make request new metrics in `summary`.
+
+```{r}
+diag <- summary(model)
+```
+
