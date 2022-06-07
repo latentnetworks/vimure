@@ -79,9 +79,6 @@ install_vimure <- function(method = c("auto", "virtualenv", "conda"),
     }
 
     if(force){
-      if(lenght(envname) == 0){
-        envname <- "r-reticulate"
-      }
       reticulate::virtualenv_remove(envname)
     }
 
