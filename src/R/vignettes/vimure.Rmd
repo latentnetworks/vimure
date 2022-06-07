@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 
 Vimure requires R >= 3.3.0.  If you do not already have a R environment configured on your computer, please see the instructions for installing [R and Rstudio](http://web.cs.ucla.edu/~gulzar/rstudio/).
 
-Below we assume you have a default R environment already configured on your computer and you intend to install `vimure` inside of it.  If you want to create and work with R virtual environments to test the package in a separate environment, please follow instructions on [renv](https://rstudio.github.io/renv/articles/renv.html).
+Below we assume you have a default R environment already configured on your computer and you intend to install `vimure` inside of it.  If you want to create and work with R virtual environments to test the package in a separate environment, please follow instructions on [renv](https://rstudio.github.io/renv/articles/renv.html) or use a cloud computing service ([RStudio Cloud](https://rstudio.cloud/), [Google colab](https://colab.research.google.com/notebook#create=true&language=r))
 
 The VIMuRe R package wraps the [VIMuRe](https://github.com/latentnetworks/vimure/tree/develop/src/python) Python package. We use the [`reticulate`](https://rstudio.github.io/reticulate/) package to embeds a Python session within your R session, enabling seamless, high-performance interoperability.
 

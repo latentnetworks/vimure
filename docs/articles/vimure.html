@@ -80,7 +80,7 @@ body {
 text-align: justify}
 </style>
 <p>Vimure requires R &gt;= 3.3.0. If you do not already have a R environment configured on your computer, please see the instructions for installing <a href="http://web.cs.ucla.edu/~gulzar/rstudio/" class="external-link">R and Rstudio</a>.</p>
-<p>Below we assume you have a default R environment already configured on your computer and you intend to install <code>vimure</code> inside of it. If you want to create and work with R virtual environments to test the package in a separate environment, please follow instructions on <a href="https://rstudio.github.io/renv/articles/renv.html" class="external-link">renv</a>.</p>
+<p>Below we assume you have a default R environment already configured on your computer and you intend to install <code>vimure</code> inside of it. If you want to create and work with R virtual environments to test the package in a separate environment, please follow instructions on <a href="https://rstudio.github.io/renv/articles/renv.html" class="external-link">renv</a> or use a cloud computing service (<a href="https://rstudio.cloud/" class="external-link">RStudio Cloud</a>, <a href="https://colab.research.google.com/notebook#create=true&amp;language=r" class="external-link">Google colab</a>)</p>
 <p>The VIMuRe R package wraps the <a href="https://github.com/latentnetworks/vimure/tree/develop/src/python" class="external-link">VIMuRe</a> Python package. We use the <a href="https://rstudio.github.io/reticulate/" class="external-link"><code>reticulate</code></a> package to embeds a Python session within your R session, enabling seamless, high-performance interoperability.</p>
 <div class="section level2">
 <h2 id="install-the-released-version">Install the released version<a class="anchor" aria-label="anchor" href="#install-the-released-version"></a>
@@ -89,7 +89,7 @@ text-align: justify}
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"latentnetworks/vimure"</span>, subdir<span class="op">=</span><span class="st">"src/R"</span>, ref<span class="op">=</span><span class="st">"develop"</span><span class="op">)</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; * checking for file ‘/tmp/RtmpEHTLx2/remotes4dce2156d7a19/latentnetworks-vimure-514f119/src/R/DESCRIPTION’ ... OK</span>
+<span class="co">#&gt; * checking for file ‘/tmp/Rtmp4uStEe/remotes4fdb22f9e127a/latentnetworks-vimure-514f119/src/R/DESCRIPTION’ ... OK</span>
 <span class="co">#&gt; * preparing ‘vimure’:</span>
 <span class="co">#&gt; * checking DESCRIPTION meta-information ... OK</span>
 <span class="co">#&gt; * checking for LF line-endings in source and make files and shell scripts</span>
