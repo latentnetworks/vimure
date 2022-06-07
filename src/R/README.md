@@ -12,7 +12,7 @@ Latent Network Models to Account for Noisy, Multiply-Reported Social Network Dat
 
 VIMuRe package is available in R and Python. 
 
-## Instalation
+## Installation
 
 ```r
 install.packages("devtools")

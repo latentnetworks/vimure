@@ -125,7 +125,7 @@
 <p><code>net</code> is stored as a Python object. You can access its attributes using the dollar sign <code>$</code> or using our <code>extract_*</code> functions which always will return a R object.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">net</span><span class="op">$</span><span class="va">Y</span> <span class="co"># still a python object because it is a sptensor</span>
-<span class="co">#&gt; &lt;sktensor.sptensor.sptensor object at 0x7f8f04dffc40&gt;</span>
+<span class="co">#&gt; &lt;sktensor.sptensor.sptensor object at 0x7fcf51ab6c40&gt;</span>
 <span class="va">Y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract_Y.html">extract_Y</a></span><span class="op">(</span><span class="va">net</span><span class="op">)</span> <span class="co"># extract_Y convert to array</span></code></pre></div>
 <p>Calculate some network statistics from the adjacency matrix:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -186,14 +186,14 @@
 <span class="co">#&gt;    - rho:    a (1, 100, 100, 2) tensor (to inspect it, run &lt;diag_obj&gt;.model.pr_rho)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Posteriors:</span>
-<span class="co">#&gt;    - G_exp_lambda_f: [[0.00238928 2.00042488]]</span>
+<span class="co">#&gt;    - G_exp_lambda_f: [[0.00237715 1.99025564]]</span>
 <span class="co">#&gt;    - G_exp_nu_f: 0.00</span>
 <span class="co">#&gt;    - G_exp_theta_f: a (1, 50) tensor (to inspect it, run &lt;diag_obj&gt;.model.G_exp_theta_f)</span>
 <span class="co">#&gt;    - rho_f: a (1, 100, 100, 2) tensor (to inspect it, run &lt;diag_obj&gt;.model.rho_f)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Optimisation:</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;    Elbo: -500018.107903348282</span></code></pre></div>
+<span class="co">#&gt;    Elbo: -500018.096475138445</span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
