@@ -29,7 +29,7 @@ The VIMuRe R package wraps the [VIMuRe](https://github.com/latentnetworks/vimure
 
 First, install the vimure R package from GitHub as follows:
 
-```{r message=FALSE, warning=FALSE}
+```r
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
@@ -37,7 +37,7 @@ Then, use the `install_vimure()` function on R to install the python package its
 
 > Note that if *reticulate* did not find a non-system installation of python you may be prompted if you want it to download and install miniconda. Miniconda is the recommended installation method for most users, as it ensures that the R python installation is isolated from other python installations. If you initially declined the miniconda installation prompt, you can later manually install miniconda by running `reticulate::install_miniconda()`
 
-```{r warning=FALSE}
+```r
 library(vimure)
 vimure::install_vimure()
 ```
