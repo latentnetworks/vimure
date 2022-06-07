@@ -86,9 +86,8 @@
 <span class="co">#&gt; The following object is masked from 'package:base':</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     union</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.sthda.com/english/wiki/ggcorrplot" class="external-link">ggcorrplot</a></span><span class="op">)</span>
-<span class="co">#&gt; Loading required package: ggplot2</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hadley/reshape" class="external-link">reshape2</a></span><span class="op">)</span></code></pre></div>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hadley/reshape" class="external-link">reshape2</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></code></pre></div>
 <p>The goal of this article is to run the <code>vimure</code> model on the real dataset Karnataka.</p>
 <div class="section level2">
 <h2 id="read-the-edgelist">Read the edgelist<a class="anchor" aria-label="anchor" href="#read-the-edgelist"></a>
@@ -159,7 +158,7 @@
 <p>Run the model:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Graph input</span>
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vimure.html">vimure</a></span><span class="op">(</span><span class="va">graph</span>, num_realisations<span class="op">=</span><span class="fl">5L</span>, max_iter<span class="op">=</span><span class="fl">100L</span>, seed<span class="op">=</span><span class="fl">5</span><span class="op">)</span>
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vimure.html">vimure</a></span><span class="op">(</span><span class="va">graph</span>, num_realisations<span class="op">=</span><span class="fl">1L</span>, max_iter<span class="op">=</span><span class="fl">100L</span>, seed<span class="op">=</span><span class="fl">5</span><span class="op">)</span>
 <span class="co">#&gt; Loaded vimure version</span></code></pre></div>
 </div>
 <div class="section level3">
@@ -170,7 +169,7 @@
 <code class="sourceCode R"><span class="va">vm_graph</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_graph_from_edgelist.html">parse_graph_from_edgelist</a></span><span class="op">(</span><span class="va">df_edges</span>, ego<span class="op">=</span><span class="st">"i"</span>, alter<span class="op">=</span><span class="st">"j"</span>, reporter<span class="op">=</span><span class="st">"respondent"</span><span class="op">)</span></code></pre></div>
 <p>And run the model:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vimure.html">vimure</a></span><span class="op">(</span><span class="va">vm_graph</span><span class="op">$</span><span class="va">X</span>, <span class="va">vm_graph</span><span class="op">$</span><span class="va">R</span>, num_realisations<span class="op">=</span><span class="fl">5L</span>, max_iter<span class="op">=</span><span class="fl">100L</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vimure.html">vimure</a></span><span class="op">(</span><span class="va">vm_graph</span><span class="op">$</span><span class="va">X</span>, <span class="va">vm_graph</span><span class="op">$</span><span class="va">R</span>, num_realisations<span class="op">=</span><span class="fl">1L</span>, max_iter<span class="op">=</span><span class="fl">100L</span><span class="op">)</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -191,24 +190,25 @@
 <span class="co">#&gt;    - rho:    a (1, 336, 336, 2) tensor (to inspect it, run &lt;diag_obj&gt;.model.pr_rho)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   Posteriors:</span>
-<span class="co">#&gt;    - G_exp_lambda_f: [[8.29947456e-05 4.42536495e-01]]</span>
+<span class="co">#&gt;    - G_exp_lambda_f: [[8.29897955e-05 4.42474514e-01]]</span>
 <span class="co">#&gt;    - G_exp_nu_f: 0.67</span>
 <span class="co">#&gt;    - G_exp_theta_f: a (1, 336) tensor (to inspect it, run &lt;diag_obj&gt;.model.G_exp_theta_f)</span>
 <span class="co">#&gt;    - rho_f: a (1, 336, 336, 2) tensor (to inspect it, run &lt;diag_obj&gt;.model.rho_f)</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Optimisation:</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;    Elbo: 67.118538478266</span></code></pre></div>
+<span class="co">#&gt;    Elbo: 67.023318478318</span></code></pre></div>
 <div class="section level3">
 <h3 id="elbo-values">Elbo values<a class="anchor" aria-label="anchor" href="#elbo-values"></a>
 </h3>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df_elbo</span> <span class="op">&lt;-</span> <span class="va">diag</span><span class="op">$</span><span class="va">trace</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_elbo</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">iter</span>, y<span class="op">=</span><span class="va">elbo</span>, group<span class="op">=</span><span class="va">realisation</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">realisation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Iter"</span>, y<span class="op">=</span><span class="st">"ELBO"</span>, color<span class="op">=</span><span class="st">"Realisation"</span><span class="op">)</span></code></pre></div>
+
+<span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_elbo</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">iter</span>, y<span class="op">=</span><span class="va">elbo</span>, group<span class="op">=</span><span class="va">realisation</span>, color<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">realisation</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>size<span class="op">=</span><span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Iter"</span>, y<span class="op">=</span><span class="st">"ELBO"</span>, color<span class="op">=</span><span class="st">"Realisation"</span><span class="op">)</span></code></pre></div>
 <p><img src="karnataka_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 </div>
 <div class="section level3">
@@ -216,11 +216,12 @@
 </h3>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">plot_df</span> <span class="op">&lt;-</span> <span class="fu">reshape2</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">diag</span><span class="op">$</span><span class="va">reliability</span>, id <span class="op">=</span> <span class="st">"node"</span><span class="op">)</span>
-<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">node</span><span class="op">)</span>, <span class="op">-</span><span class="va">value</span><span class="op">)</span>, y<span class="op">=</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span>, size<span class="op">=</span><span class="fl">2</span>, color <span class="op">=</span> <span class="st">"#c45241"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Nodes sorted from over-to under- reporting"</span>, y <span class="op">=</span> <span class="st">"Realibility values"</span><span class="op">)</span> <span class="op">+</span>
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+
+<span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">plot_df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">node</span><span class="op">)</span>, <span class="op">-</span><span class="va">value</span><span class="op">)</span>, y<span class="op">=</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span>, size<span class="op">=</span><span class="fl">2</span>, color <span class="op">=</span> <span class="st">"#c45241"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Nodes sorted from over-to under- reporting"</span>, y <span class="op">=</span> <span class="st">"Realibility values"</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <p><img src="karnataka_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 </div>
 </div>

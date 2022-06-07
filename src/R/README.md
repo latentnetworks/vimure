@@ -24,4 +24,4 @@ devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 Report a bug and give a general feedback about the library:
 
 - by taking this [survey](https://forms.gle/QaK5AWWYy78jZfyR6) or,
-- by [opening an issue](https://github.com/latentnetworks/vimure/issues/new) on Github.
+- by [opening an issue](https://github.com/latentnetworks/vimure/issues/new/choose) on Github.

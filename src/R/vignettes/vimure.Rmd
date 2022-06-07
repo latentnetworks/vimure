@@ -42,6 +42,8 @@ library(vimure)
 vimure::install_vimure()
 ```
 
+> Please restart your R session after `install_vimure`. PS: It's not necessary for Rstudio users.
+
 You can confirm that the installation succeeded with:
 
 ```{r warning=FALSE}
