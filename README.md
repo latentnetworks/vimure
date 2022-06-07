@@ -16,7 +16,7 @@ VIMuRe package is available in R and Python.
 
 Report a bug and give a general feedback about the library:
 - by taking this [survey](https://forms.gle/QaK5AWWYy78jZfyR6) or,
-- by [opening an issue](https://github.com/latentnetworks/vimure/issues/new) on Github.
+- by [opening an issue](https://github.com/latentnetworks/vimure/issues/new/choose) on Github.
 
 # Python
 
@@ -55,15 +55,7 @@ devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 Vimure R package depends on R \>= 3.3.0 and it is expect to work fine in
 all OS.
 
-See more about R setup and quick start [here](src/R/README.md)
-
-## RMarkdown
-
-To understand how you could use the code, check the notebooks folder:
-
-- [`RMarkdown 01 - Generate Synthetic Networks`](notebooks/R/RMarkdown%201%20-%20%20Generate%20Synthetic%20Networks.Rmd)
-- [`RMarkdown 02 - Run Model`](notebooks/R/RMarkdown%202%20-%20Run%20Model.Rmd)
-- [`RMarkdown 03 - Read, Parse and Fit Vimure on Karnataka data`](notebooks/R/RMarkdown%203%20-%20Karnataka%20Data.Rmd)
+See more about R setup and quick start [here](https://latentnetworks.github.io/vimure/)
 
 # License
 
