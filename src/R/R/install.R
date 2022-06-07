@@ -51,6 +51,9 @@
 #'   to `TRUE`, to ensure that Vimure dependencies like NumPy are compatible
 #'   with the prebuilt Vimure binaries.
 #'
+#' @param force Whether pip should recreate 'r-reticulate' virtualenv.
+#'   This defaults to `FALSE`.
+#'
 #' @param ... other arguments passed to [`reticulate::conda_install()`] or
 #'   [`reticulate::virtualenv_install()`], depending on the `method` used.
 #'
@@ -62,6 +65,7 @@ install_vimure <- function(method = c("auto", "virtualenv", "conda"),
            restart_session = TRUE,
            conda_python_version = NULL,
            ...,
+           force = FALSE,
            pip_ignore_installed = TRUE,
            python_version = conda_python_version){
 
@@ -72,6 +76,13 @@ install_vimure <- function(method = c("auto", "virtualenv", "conda"),
     } else {
       package <- paste0(
         "git+https://github.com/latentnetworks/vimure.git@", version, "#egg=vimure&subdirectory=src/python/")
+    }
+
+    if(force){
+      if(lenght(envname) == 0){
+        envname <- "r-reticulate"
+      }
+      reticulate::virtualenv_remove(envname)
     }
 
     reticulate::py_install(
