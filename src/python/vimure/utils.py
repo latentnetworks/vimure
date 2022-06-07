@@ -5,6 +5,8 @@ import sktensor as skt
 
 from sktensor.sptensor import fromarray
 
+def match_arg(x, lst):
+    return [el for el in lst if x == el]
 
 def calculate_average_over_reporter_mask(X, R):
     if not isinstance(R, np.ndarray):
