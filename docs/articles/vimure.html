@@ -22,7 +22,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-dark"><div class="container">
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">vimure</a>
 
@@ -35,11 +35,19 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
+<li class="active nav-item">
   <a class="nav-link" href="../articles/vimure.html">Get started</a>
 </li>
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
+</li>
+<li class="nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/karnataka.html">Karnataka Data</a>
+    <a class="dropdown-item" href="../articles/quick_start.html">Introduction to vimure</a>
+    <a class="dropdown-item" href="../articles/synthetic.html">Synthetic data</a>
+  </div>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -62,7 +70,7 @@
             
       
       
-      <div class="d-none name"><code>install.Rmd</code></div>
+      <div class="d-none name"><code>vimure.Rmd</code></div>
     </div>
 
     
@@ -74,21 +82,20 @@ text-align: justify}
 <p>Vimure requires R &gt;= 3.3.0. If you do not already have a R environment configured on your computer, please see the instructions for installing <a href="http://web.cs.ucla.edu/~gulzar/rstudio/" class="external-link">R and Rstudio</a>.</p>
 <p>Below we assume you have a default R environment already configured on your computer and you intend to install <code>vimure</code> inside of it. If you want to create and work with R virtual environments to test the package in a separate environment, please follow instructions on <a href="https://rstudio.github.io/renv/articles/renv.html" class="external-link">renv</a>.</p>
 <p>The VIMuRe R package wraps the <a href="https://github.com/latentnetworks/vimure/tree/develop/src/python" class="external-link">VIMuRe</a> Python package. We use the <a href="https://rstudio.github.io/reticulate/" class="external-link"><code>reticulate</code></a> package to embeds a Python session within your R session, enabling seamless, high-performance interoperability.</p>
-<div class="section level3">
-<h3 id="install-the-released-version">Install the released version<a class="anchor" aria-label="anchor" href="#install-the-released-version"></a>
-</h3>
+<div class="section level2">
+<h2 id="install-the-released-version">Install the released version<a class="anchor" aria-label="anchor" href="#install-the-released-version"></a>
+</h2>
 <p>First, install the vimure R package from GitHub as follows:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co">#install.packages("devtools")</span>
-<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"latentnetworks/vimure"</span>, subdir<span class="op">=</span><span class="st">"src/R"</span>, ref<span class="op">=</span><span class="st">"develop"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"latentnetworks/vimure"</span>, subdir<span class="op">=</span><span class="st">"src/R"</span>, ref<span class="op">=</span><span class="st">"develop"</span><span class="op">)</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt; * checking for file ‘/tmp/RtmpAejocB/remotes37e6765d846df/latentnetworks-vimure-b5a9438/src/R/DESCRIPTION’ ... OK</span>
+<span class="co">#&gt; * checking for file ‘/tmp/RtmpikYl7n/remotes4082be415fd6/latentnetworks-vimure-b5a9438/src/R/DESCRIPTION’ ... OK</span>
 <span class="co">#&gt; * preparing ‘vimure’:</span>
 <span class="co">#&gt; * checking DESCRIPTION meta-information ... OK</span>
 <span class="co">#&gt; * checking for LF line-endings in source and make files and shell scripts</span>
 <span class="co">#&gt; * checking for empty or unneeded directories</span>
 <span class="co">#&gt; * building ‘vimure_0.0.0.9000.tar.gz’</span></code></pre></div>
-<p>Then, use the <code><a href="../reference/install_vimure.html">install_vimure()</a></code> function to install VIMuRe.</p>
+<p>Then, use the <code><a href="../reference/install_vimure.html">install_vimure()</a></code> function on R to install the python package its dependencies.</p>
 <blockquote>
 <p>Note that if <em>reticulate</em> did not find a non-system installation of python you may be prompted if you want it to download and install miniconda. Miniconda is the recommended installation method for most users, as it ensures that the R python installation is isolated from other python installations. If you initially declined the miniconda installation prompt, you can later manually install miniconda by running <code><a href="https://rstudio.github.io/reticulate/reference/install_miniconda.html" class="external-link">reticulate::install_miniconda()</a></code></p>
 </blockquote>
@@ -130,7 +137,7 @@ text-align: justify}
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Gabriela Borges.</p>
+<p>Developed by Caterina de Bacco, Jonathan Cardoso-Silva, Gabriela Borges.</p>
 </div>
 
 <div class="pkgdown-footer-right">

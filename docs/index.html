@@ -36,13 +36,17 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item">
+  <a class="nav-link" href="articles/vimure.html">Get started</a>
+</li>
+<li class="nav-item">
   <a class="nav-link" href="reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/install.html">Install</a>
+    <a class="dropdown-item" href="articles/karnataka.html">Karnataka Data</a>
     <a class="dropdown-item" href="articles/quick_start.html">Introduction to vimure</a>
+    <a class="dropdown-item" href="articles/synthetic.html">Synthetic data</a>
   </div>
 </li>
       </ul>
@@ -64,6 +68,13 @@
 <p>Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data.</p>
 <blockquote><p>De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D, Power EA. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint <a href="https://arxiv.org/abs/2112.11396" class="external-link">arXiv:2112.11396</a>.</p></blockquote>
 <p>VIMuRe package is available in R and Python.</p>
+<div class="section level2">
+<h2 id="instalation">Instalation<a class="anchor" aria-label="anchor" href="#instalation"></a>
+</h2>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span>
+<span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/remote-reexports.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"latentnetworks/vimure"</span>, subdir<span class="op">=</span><span class="st">"src/R"</span>, ref<span class="op">=</span><span class="st">"develop"</span><span class="op">)</span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="feedback">Feedback<a class="anchor" aria-label="anchor" href="#feedback"></a>
 </h2>
@@ -93,6 +104,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
+<li>Caterina de Bacco <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8634-0211" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Jonathan Cardoso-Silva <br><small class="roles"> Author, translator </small> <a href="https://orcid.org/0000-0002-9566-7400" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Gabriela Borges <br><small class="roles"> Maintainer, translator </small> <a href="https://orcid.org/0000-0002-7133-2868" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
@@ -110,7 +123,7 @@
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Gabriela Borges.</p>
+<p>Developed by Caterina de Bacco, Jonathan Cardoso-Silva, Gabriela Borges.</p>
 </div>
 
 <div class="pkgdown-footer-right">

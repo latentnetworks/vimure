@@ -20,14 +20,18 @@ direct dependencies."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
-      <ul class="navbar-nav me-auto"><li class="active nav-item">
+      <ul class="navbar-nav me-auto"><li class="nav-item">
+  <a class="nav-link" href="../articles/vimure.html">Get started</a>
+</li>
+<li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/install.html">Install</a>
+    <a class="dropdown-item" href="../articles/karnataka.html">Karnataka Data</a>
     <a class="dropdown-item" href="../articles/quick_start.html">Introduction to vimure</a>
+    <a class="dropdown-item" href="../articles/synthetic.html">Synthetic data</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -61,6 +65,7 @@ direct dependencies.</p>
   conda_python_version <span class="op">=</span> <span class="cn">NULL</span>,
   <span class="va">...</span>,
   pip_ignore_installed <span class="op">=</span> <span class="cn">TRUE</span>,
+  force <span class="op">=</span> <span class="cn">FALSE</span>,
   python_version <span class="op">=</span> <span class="va">conda_python_version</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -99,6 +104,8 @@ only occur within RStudio).</p></dd>
 packages and reinstall all already installed python packages. This defaults
 to <code>TRUE</code>, to ensure that Vimure dependencies like NumPy are compatible
 with the prebuilt Vimure binaries.</p></dd>
+<dt>force</dt>
+<dd><p>Whether pip should recreate 'r-reticulate' virtualenv. This defaults to <code>FALSE</code>.</p></dd>
 <dt>python_version, conda_python_version</dt>
 <dd><p>Pass a string like "3.8" to
 request that conda install a specific Python version. This is ignored when
@@ -123,7 +130,8 @@ manually install miniconda by running <code><a href="https://rstudio.github.io/r
     <p><code>install_vimure()</code> isn't required to use vimure with the package.
 If you manually configure a python environment with the required
 dependencies, you can tell R to use it by pointing reticulate at it,
-commonly by setting an environment variable:</p><div class="sourceCode R"><pre><code><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span><span class="st">"RETICULATE_PYTHON"</span> <span class="op">=</span> <span class="st">"~/path/to/python-env/bin/python"</span><span class="op">)</span></code></pre><p></p></div>
+commonly by setting an environment variable:</p>
+<p></p><div class="sourceCode R"><pre><code><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span><span class="st">"RETICULATE_PYTHON"</span> <span class="op">=</span> <span class="st">"~/path/to/python-env/bin/python"</span><span class="op">)</span></code></pre><p></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -131,7 +139,7 @@ commonly by setting an environment variable:</p><div class="sourceCode R"><pre><
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Gabriela Borges.</p>
+  <p></p><p>Developed by Caterina de Bacco, Jonathan Cardoso-Silva, Gabriela Borges.</p>
 </div>
 
 <div class="pkgdown-footer-right">

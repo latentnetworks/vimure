@@ -1,3 +1,7 @@
+navbar:
+  structure:
+    left:  [intro, reference, articles]
+    right: [github]
 destination: ../../docs/.
 url: ~
 template:

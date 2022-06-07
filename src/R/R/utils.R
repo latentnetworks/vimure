@@ -63,6 +63,18 @@ parse_graph_from_edgelist <- function(
     edges[weight] <- 1
   }
 
+  dtypes <- sapply(edges, class)[c(ego, alter, reporter, weight)]
+  is_character <- !(dtypes %in% c("integer", "numeric"))
+  if(any(is_character)){
+    # Try to convert labels to number
+    # While using tensor, it is only possible to work with indices
+    vars_to_convert <- names(dtypes[is_character])
+    edges[vars_to_convert] <- suppressWarnings(sapply(edges[vars_to_convert], as.numeric))
+    if(any(is.na(edges[vars_to_convert]))){
+      stop("non-numeric values in ", paste(vars_to_convert, collapse = ", "))
+    }
+  }
+
   vimureP$io$parse_graph_from_edgelist(
     edges, nodes, reporters, is_undirected=!directed, is_weighted=weighted,
     ego=ego, alter=alter, weight=weight, reporter=reporter, layer=layer, ...

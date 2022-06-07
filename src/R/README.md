@@ -12,6 +12,13 @@ Latent Network Models to Account for Noisy, Multiply-Reported Social Network Dat
 
 VIMuRe package is available in R and Python. 
 
+## Instalation
+
+```r
+install.packages("devtools")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+```
+
 ## Feedback
 
 Report a bug and give a general feedback about the library:

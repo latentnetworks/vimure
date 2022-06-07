@@ -43,6 +43,25 @@ plot(graph,
      edge.arrow.width=0.5)
 ```
 
+## Python interface
+
+`vimure` is a R binding of a Python package. Many Python basic objects are quickly converted to R automatically.
+Custom Python objects that can not be converted automatically are stored in R as a `python.builtin.object`.
+As a `python.builtin.object`, you can access all object's attributes as it is in Python using the dollar sign `$`.
+
+Use the function `class` to check if a object is stored in Python.
+
+```{r}
+class(net)
+```
+
+`net` is stored as a Python object. You can access its attributes using the dollar sign `$` or using our `extract_*` functions which always will return a R object.
+
+```{r}
+net$Y # still a python object because it is a sptensor
+Y <- extract_Y(net) # extract_Y convert to array
+```
+
 Calculate some network statistics from the adjacency matrix:
 
 ```{r}
@@ -70,7 +89,7 @@ X_current <- X[layer,,,reporter_id]
 X_current <- X_current[rowSums(X_current[,-1]) != 0, colSums(X_current[-1,]) != 0]
 
 ggcorrplot( X_current) + 
-   scale_fill_gradient(low="white",high="#003396")
+   ggplot2::scale_fill_gradient(low="white",high="#003396")
 ```
 
 # Run model

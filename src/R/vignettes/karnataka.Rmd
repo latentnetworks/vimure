@@ -1,0 +1,135 @@
+---
+title: "Karnataka Data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Karnataka Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(vimure)
+library(igraph)
+library(reshape2)
+library(ggplot2)
+```
+
+The goal of this article is to run the `vimure` model on the real dataset Karnataka.
+
+# Read the edgelist
+
+First you'll need to read a edgelist.
+
+```{r}
+URL <- "https://raw.githubusercontent.com/latentnetworks/vimure/develop/data/input/india_microfinance/formatted/"
+village <- "12" # change this parameter to run in other village
+
+PATH <- paste0(URL, paste0("vil", village, "_edges.csv"))
+df_edges <- read.csv(PATH, stringsAsFactors = F)
+head(df_edges)
+```
+Then, run the code below to preprocess the data, removing self-loops and re-labeling layers names.
+
+```{r}
+df_edges$layer <- factor(df_edges$type, 
+  levels=c(
+    "borrowmoney","receivemoney", "receiveadvice", "helpdecision",
+    "keroricego", "keroricecome", "visitgo", "visitcome"
+    ), labels=c("money", "money", "advice", "advice", "kerorice", "kerorice", "visit", "visit"))
+
+layer <- "visit" # Change this to run for a different layer
+df_edges <- df_edges[df_edges$layer %in% layer, ]
+df_edges <- df_edges[df_edges$i != df_edges$j, ]
+head(df_edges)
+```
+
+## Using an igraph network
+
+Vimure models expects as input an igraph object that can contains the _layer_, _reporter_ and _weight_ of each edge. 
+Use `igraph::graph_from_data_frame` for create a graph using a dataset. The first two columns are the edgelist. Additional columns are considered as edge attributes (See more in ?graph_from_data_frame).
+
+> Vimure extracts these attributes by name, so it is crucial to rename the attributes before creating the graph (or parse the edgelist directly by `parse_graph_from_edgelist` and use params ego,alter,.. for mapping columns names - section below):
+
+```{r}
+edges <- df_edges[c(2:5, 1)] # Reorder columns
+names(edges) <- c("Ego", "Alter", "layer", "weight", "reporter") # Rename
+graph <- igraph::graph_from_data_frame(edges)
+
+graph <- set_graph_attr(graph, "layout", layout_with_fr(graph, niter=600))
+plot(graph,
+     vertex.size=5,
+     vertex.label=NA,
+     edge.width=0.5,
+     edge.arrow.size=0.5, 
+     edge.arrow.width=0.5)
+```
+
+Calculate some network statistics from the adjacency matrix:
+
+```{r}
+message(
+  "Nodes: ", length(V(graph)),
+  " | Edges: ", gsize(graph),
+  " | Avg. degree: ", mean(degree(graph)), #directed graph,
+  " | Reciprocity: ", reciprocity(graph)
+)
+```
+
+Run the model:
+
+```{r}
+# Graph input
+model <- vimure(graph, num_realisations=1L, max_iter=100L, seed=5)
+```
+
+
+## Parsing data to vimure classes
+ 
+Vimure models expect as input the attributes `X` and `R` of a `parse_graph_from_edgelist` result. 
+`parse_graph_from_edgelist` expects a dataframe with two required columns (_Ego_ and _Alter_) and three optional columns ( _layer_, _reporter_ and _weight_). Rename the dataframe's columns or use params ego,alter,... of `parse_graph_from_edgelist` for mapping column names to convert.
+
+```{r}
+vm_graph <- parse_graph_from_edgelist(df_edges, ego="i", alter="j", reporter="respondent")
+```
+
+And run the model:
+```{r}
+model <- vimure(vm_graph$X, vm_graph$R, num_realisations=1L, max_iter=100L)
+```
+
+# Diagnostics
+
+```{r}
+diag <- summary(model)
+```
+
+## Elbo values
+
+```{r}
+df_elbo <- diag$trace
+
+ggplot2::ggplot(df_elbo, ggplot2::aes(x=iter, y=elbo, group=realisation, color=factor(realisation))) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line(size=1.2) +
+  ggplot2::theme_bw() +
+  ggplot2::labs(x = "Iter", y="ELBO", color="Realisation")
+```
+
+## Estimated realibility
+
+```{r}
+plot_df <- reshape2::melt(diag$reliability, id = "node")
+
+ggplot2::ggplot(plot_df, aes(x = reorder(factor(node), -value), y=value)) +
+  ggplot2::geom_point(alpha = 0.4, size=2, color = "#c45241") +
+  ggplot2::theme_bw() +
+  ggplot2::labs(x = "Nodes sorted from over-to under- reporting", y = "Realibility values") +
+  ggplot2::theme(axis.text.x=element_blank())
+```
