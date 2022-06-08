@@ -78,11 +78,11 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
 #' @param object A "vimure" object.
 #' @param method A character string indicating which method is to be computed.
 #' One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".
-#' @param threshold A threshold to be used when method = "fixed_threshold".
+  #' @param threshold A threshold to be used when method = "fixed_threshold".
 #'
 #' @export
 get_inferred_model <- function(object, method = "rho_max", threshold = NULL){
-  if('rho_f' %in% names(model)){
+  if('rho_f' %in% names(object)){
     return(vimureP$model$get_inferred_model(object, method, threshold))
   } else {
     stop('"object" is not a fitted vimure model')
