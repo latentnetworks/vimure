@@ -181,6 +181,9 @@ UTIL functions related to VimureModel
 
 
 def get_optimal_threshold(model):
+    """
+    https://arxiv.org/pdf/2112.11396.pdf pg 8
+    """
     return 0.54 * model.G_exp_nu - 0.01
 
 
