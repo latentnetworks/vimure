@@ -1123,7 +1123,7 @@ def get_inferred_model(model, method="rho_max", threshold=None):
     It will use `model.rho_f` values to extract an estimated Y matrix.
 
     - *rho_max*: Assign the value of the highest probability
-    - *rho_mean*: Expected value of the multinomial
+    - *rho_mean*: Expected value of a discrete distribution
     - *fixed_threshold*: Check if the probability is higher than a threshold (Only for K=2)
     - *heuristic_threshold*: Calculate and use the best threshold (Only for K=2)
 
