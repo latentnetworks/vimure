@@ -1170,7 +1170,7 @@ def get_inferred_model(model, method="rho_max", threshold=None):
 
     def rho_mean(model, threshold=None):
         K = model.rho_f.shape[-1]
-        return (np.dot(model.rho_f, range(0,K))).astype("int") # It returns the rounded number
+        return (np.dot(model.rho_f, range(0, K)))  # It returns the rounded number
 
     def fixed_threshold(model, threshold):
         if (threshold is None) or (threshold > 1) or (threshold < 0):
@@ -1195,8 +1195,10 @@ def get_inferred_model(model, method="rho_max", threshold=None):
         "heuristic_threshold": heuristic_threshold,
     }
 
-    if (not model.mutuality or model.rho_f.shape[-1] > 2) and method != "rho_max":
-        msg = "'method' is incompatible with VIMuRe's mutuality=False or for data with more than 2 categories. Using \"rho_max\" method."
+    if (not model.mutuality and method != "rho_max") or (
+        model.rho_f.shape[-1] > 2 and "threshold" in method
+    ):
+        msg = 'threshold methods is incompatible with VIMuRe\'s mutuality=False or for data with more than 2 categories. Using "rho_max" method.'
         warnings.warn(msg, UserWarning)
         method = "rho_max"
 
