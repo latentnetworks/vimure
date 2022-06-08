@@ -45,7 +45,7 @@ For more information about this model, see Safdari, H., Contisciani, M., & De Ba
 }
 \examples{
 random_net <- gm_Multitensor(N=100, M=100, L=1, eta=0.5)
-Y <- extract_Y(random_net)
+Y <- random_net$Y$toarray()
 dim(Y)
 }
 \seealso{
