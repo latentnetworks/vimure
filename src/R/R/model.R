@@ -69,7 +69,7 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
 #' It will use `model$rho_f` values to extract an estimated Y matrix.
 #' \itemize{
 #'  \item{*rho_max*: }{Assign the value of the highest probability}
-#'  \item{*rho_mean*: }{N/A}
+#'  \item{*rho_mean*: }{Expected value of the multinomial}
 #'  \item{*fixed_threshold*: }{Check if the probability is higher than a threshold (Only for 2 categories)}
 #'  \item{*heuristic_threshold*: }{Calculate and use the best threshold (Only for 2 categories)}
 #' }

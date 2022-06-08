@@ -1,5 +1,6 @@
 """Inference model"""
 import sys
+import math
 import time
 import warnings
 
@@ -1122,9 +1123,9 @@ def get_inferred_model(model, method="rho_max", threshold=None):
     It will use `model.rho_f` values to extract an estimated Y matrix.
 
     - *rho_max*: Assign the value of the highest probability
-    - *rho_mean*: N/A
-    - *fixed_threshold*: Check if the probability is higher than a threshold (Only for 2 categories)
-    - *heuristic_threshold*: Calculate and use the best threshold (Only for 2 categories)
+    - *rho_mean*: Expected value of the multinomial
+    - *fixed_threshold*: Check if the probability is higher than a threshold (Only for K=2)
+    - *heuristic_threshold*: Calculate and use the best threshold (Only for K=2)
 
     Parameters
     ----------
@@ -1165,10 +1166,11 @@ def get_inferred_model(model, method="rho_max", threshold=None):
         )
 
     def rho_max(model, threshold=None):
-        return (np.argmax(model.rho_f, axis=-1) > 0).astype("int")
+        return (np.argmax(model.rho_f, axis=-1)).astype("int")
 
     def rho_mean(model, threshold=None):
-        return (model.rho_f[:, :, :, 1] > 0).astype("int")
+        K = model.rho_f.shape[-1]
+        return (np.dot(model.rho_f, range(0,K))).astype("int") # It returns the rounded number
 
     def fixed_threshold(model, threshold):
         if (threshold is None) or (threshold > 1) or (threshold < 0):
