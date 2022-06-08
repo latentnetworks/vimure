@@ -63,6 +63,32 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
   return(model)
 }
 
+#' Estimate Y
+#'
+#' @details Use this function to reconstruct the Y matrix with a fitted vimure model.
+#' It will use `model$rho_f` values to extract an estimated Y matrix.
+#' \itemize{
+#'  \item{*rho_max*: }{Assign the value of the highest probability}
+#'  \item{*rho_mean*: }{N/A}
+#'  \item{*fixed_threshold*: }{Check if the probability is higher than a threshold (Only for 2 categories)}
+#'  \item{*heuristic_threshold*: }{Calculate and use the best threshold (Only for 2 categories)}
+#' }
+#'
+#'
+#' @param object A "vimure" object.
+#' @param method A character string indicating which method is to be computed.
+#' One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".
+#' @param threshold A threshold to be used when method = "fixed_threshold".
+#'
+#' @export
+get_inferred_model <- function(object, method = "rho_max", threshold = NULL){
+  if('rho_f' %in% names(model)){
+    return(vimureP$model$get_inferred_model(object, method, threshold))
+  } else {
+    stop('"object" is not a fitted vimure model')
+  }
+}
+
 #' Diagnostics metrics
 #'
 #'

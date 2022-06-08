@@ -309,17 +309,30 @@ class TestVimureModel:
 class TestInferredModel:
     @classmethod
     def setup_class(cls):
-        cls.synth_net = vm.synthetic.StandardSBM()
+        cls.synth_net = vm.synthetic.StandardSBM(K=2)
         cls.synth_net.build_X(flag_self_reporter=True)
 
         cls.model = vm.model.VimureModel()
-        cls.model.fit(cls.synth_net.X, K=cls.synth_net.K, R=cls.synth_net.R)
+        cls.model.fit(
+            cls.synth_net.X,
+            K=cls.synth_net.K,
+            R=cls.synth_net.R,
+            num_realisations=1,
+            max_iter=500,
+        )
 
         cls.model_mutuality = vm.model.VimureModel(mutuality=True)
-        cls.model_mutuality.fit(cls.synth_net.X, K=cls.synth_net.K, R=cls.synth_net.R)
+        cls.model_mutuality.fit(
+            cls.synth_net.X,
+            K=cls.synth_net.K,
+            R=cls.synth_net.R,
+            num_realisations=1,
+            max_iter=500,
+        )
 
     def check_output(self, Y, model):
         assert Y.shape == (model.L, model.N, model.N)
+        assert Y.sum() > 0
 
     def test_non_implemented_method(self):
         with pytest.raises(ValueError) as e_info:
@@ -334,7 +347,7 @@ class TestInferredModel:
             vm.model.get_inferred_model(self.model_mutuality, method="fixed_threshold")
             assert (
                 str(e_info.value)
-                == 'For type="fixed_threshold", you must set the threshold to a value in [0,1].'
+                == 'For method="fixed_threshold", you must set the threshold to a value in [0,1].'
             )
 
         with pytest.raises(ValueError) as e_info:
@@ -343,7 +356,7 @@ class TestInferredModel:
             )
             assert (
                 str(e_info.value)
-                == 'For type="fixed_threshold", you must set the threshold to a value in [0,1].'
+                == 'For method="fixed_threshold", you must set the threshold to a value in [0,1].'
             )
 
         Y = vm.model.get_inferred_model(

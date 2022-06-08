@@ -139,18 +139,3 @@ build_custom_theta <- function(synthetic, theta_ratio = 0.5,
   )
   return(custom_theta)
 }
-
-#' Extract the Y matrix
-#'
-#' @param synthetic A synthetic model
-#'
-#' @return A sptensor
-#' @export
-#'
-#' @examples
-#' random_net <- gm_Multitensor(N=100, M=100, L=1, eta=0.99)
-#' Y <- extract_Y(random_net)
-#' dim(Y)
-extract_Y <- function(synthetic){
-  py_to_r.sktensor.sptensor.sptensor(synthetic$Y)
-}

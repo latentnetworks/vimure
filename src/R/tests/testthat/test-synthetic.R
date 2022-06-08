@@ -24,7 +24,7 @@ check_default_values <- function(synth_net){
   expect_equal(synth_net$avg_degree, DEFAULT_AVG_DEGREE)
   expect_equal(unlist(synth_net$Y$shape), c(DEFAULT_L, DEFAULT_N, DEFAULT_N))
 
-  Y <- extract_Y(synth_net)
+  Y <- synth_net$Y$toarray()
   expect_gt(sum(Y), 0)
   expect_lt(max(Y), synth_net$K)
 }
@@ -73,10 +73,10 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
     sparsify=TRUE
   )
 
-  Y <- extract_Y(synth_net)
-  another_Y <- extract_Y(another_synth_net)
-  sparse_Y <- extract_Y(sparse_synth_net)
-  another_sparse_Y <- extract_Y(another_sparse_synth_net)
+  Y <- synth_net$Y$toarray()
+  another_Y <- another_synth_net$Y$toarray()
+  sparse_Y <- sparse_synth_net$Y$toarray()
+  another_sparse_Y <- another_sparse_synth_net$Y$toarray()
 
   expect_false(all(Y == another_Y))
   expect_false(all(sparse_Y == another_sparse_Y))

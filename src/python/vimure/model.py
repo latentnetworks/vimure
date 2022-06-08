@@ -14,7 +14,7 @@ from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_th
 
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.utils.validation import _deprecate_positional_args
-
+from sklearn.exceptions import NotFittedError
 
 INF = 1e10
 DEFAULT_EPS = 1e-12
@@ -1116,12 +1116,40 @@ UTIL FUNCTIONS FOR INFERENCE
 
 
 def get_inferred_model(model, method="rho_max", threshold=None):
+    """Estimate Y
+
+    Use this function to reconstruct the Y matrix with a fitted vimure model.
+    It will use `model.rho_f` values to extract an estimated Y matrix.
+
+    - *rho_max*: Assign the value of the highest probability
+    - *rho_mean*: N/A
+    - *fixed_threshold*: Check if the probability is higher than a threshold (Only for 2 categories)
+    - *heuristic_threshold*: Calculate and use the best threshold (Only for 2 categories)
+
+    Parameters
+    ----------
+    model : vm.model.VimureModel
+        A `vm.model.VimureModel` object
+    method : str
+        A character string indicating which method is to be computed.
+        One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".
+    threshold : float
+        A threshold to be used when method = "fixed_threshold".
+
+    Returns
+    -------
+    Y : ndarray
+    """
+
+    if not hasattr(model, "rho_f"):
+        NotFittedError(
+            "This VimureModel instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator"
+        )
+
     OPTIONS = ["rho_max", "rho_mean", "fixed_threshold", "heuristic_threshold"]
 
     if len(method) > 1 and type(method) == "list":
-        msg = (
-            f"'method' has length > 1 and only the first element will be used"
-        )
+        msg = f"'method' has length > 1 and only the first element will be used"
         warnings.warn(msg, UserWarning)
         method = method[0]
 
@@ -1130,8 +1158,9 @@ def get_inferred_model(model, method="rho_max", threshold=None):
     except IndexError:
         raise ValueError(
             (
-                '\'method\' should be one of "rho_max", "rho_mean", '
-                '"fixed_threshold", "heuristic_threshold".'
+                "'method' should be one of {}.".format(
+                    ", ".join(['"' + x + '"' for x in OPTIONS])
+                )
             )
         )
 
@@ -1144,11 +1173,11 @@ def get_inferred_model(model, method="rho_max", threshold=None):
     def fixed_threshold(model, threshold):
         if (threshold is None) or (threshold > 1) or (threshold < 0):
             raise ValueError(
-                'For type="fixed_threshold", '
+                'For method="fixed_threshold", '
                 "you must set the threshold to a value in [0,1]."
             )
 
-        Y = model.rho_f[:, :, :, 1]
+        Y = np.copy(model.rho_f[:, :, :, 1])
         Y[Y < threshold] = 0
         Y[Y >= threshold] = 1
 
@@ -1164,8 +1193,8 @@ def get_inferred_model(model, method="rho_max", threshold=None):
         "heuristic_threshold": heuristic_threshold,
     }
 
-    if not model.mutuality and method != "rho_max":
-        msg = ('\'method\' is incompatible with VIMuRe\'s mutuality=False. Using "rho_max" method.')
+    if (not model.mutuality or model.rho_f.shape[-1] > 2) and method != "rho_max":
+        msg = "'method' is incompatible with VIMuRe's mutuality=False or for data with more than 2 categories. Using \"rho_max\" method."
         warnings.warn(msg, UserWarning)
         method = "rho_max"
 
