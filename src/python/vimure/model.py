@@ -1,5 +1,6 @@
 """Inference model"""
 import sys
+import math
 import time
 import warnings
 
@@ -10,11 +11,11 @@ import scipy.special as sp
 from scipy.stats import poisson
 
 from .log import setup_logging
-from .utils import preprocess, get_item_array_from_subs
+from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_threshold
 
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.utils.validation import _deprecate_positional_args
-
+from sklearn.exceptions import NotFittedError
 
 INF = 1e10
 DEFAULT_EPS = 1e-12
@@ -74,7 +75,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
     def __str__(self) -> str:
         return super().__str__()
-    
+
     def __repr__(self) -> str:
         return super().__repr__()
 
@@ -107,14 +108,18 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 self.logger.warn(msg)
 
         # If the network is undirected, then do not estimate the mutuality
-        if self.undirected and not np.array_equal(X, np.transpose(X, axes=(0, 2, 1, 3))):
+        if self.undirected and not np.array_equal(
+            X, np.transpose(X, axes=(0, 2, 1, 3))
+        ):
             msg = "If undirected is True, the given network has to be symmetric wrt l and m!"
             self.logger.error(msg)
             raise ValueError(msg)
 
         # TODO: Instead of having these variables (data_T and data_T_vals),
         #       why not just use X with the appropriate (l,j,i,m) mapping?
-        if isinstance(X, np.ndarray) or isinstance(X, skt.dtensor):  # if data is dense array
+        if isinstance(X, np.ndarray) or isinstance(
+            X, skt.dtensor
+        ):  # if data is dense array
             if self.mutuality:
                 # to use mutuality
                 self.data_T = np.einsum("aijm->ajim", X)
@@ -135,11 +140,15 @@ class VimureModel(TransformerMixin, BaseEstimator):
                     subs=(layer, j, i, m), vals=self.X.vals.tolist(), shape=self.X.shape
                 )
                 # to calculate denominator of z1 (Xjim)
-                self.data_T_vals = get_item_array_from_subs(self.data_T, self.X.subs).astype(int)
+                self.data_T_vals = get_item_array_from_subs(
+                    self.data_T, self.X.subs
+                ).astype(int)
 
             else:
                 self.data_T = skt.sptensor(
-                    subs=tuple([np.array([], dtype="int8") for i in range(len(self.X.shape))]),
+                    subs=tuple(
+                        [np.array([], dtype="int8") for i in range(len(self.X.shape))]
+                    ),
                     vals=[],
                     shape=self.X.shape,
                 )
@@ -215,7 +224,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
             if self.alpha_theta.shape != (self.L, self.M):
                 msg = "alpha_theta matrix is not valid."
-                msg += " When using this parameter, make sure to inform a %d x %d matrix."
+                msg += (
+                    " When using this parameter, make sure to inform a %d x %d matrix."
+                )
                 self.logger.error(msg)
                 raise ValueError(msg % (self.L, self.M))
 
@@ -246,14 +257,24 @@ class VimureModel(TransformerMixin, BaseEstimator):
             if self.alpha_lambda.shape != (self.L, self.K):
                 msg = "alpha_lambda matrix is not valid (dimensions = %d x %d)."
                 msg += "When using this parameter, make sure to pass a %d x %d matrix."
-                msg = msg % (self.alpha_lambda.shape[0], self.alpha_lambda.shape[1], self.L, self.K,)
+                msg = msg % (
+                    self.alpha_lambda.shape[0],
+                    self.alpha_lambda.shape[1],
+                    self.L,
+                    self.K,
+                )
                 self.logger.error(msg)
                 raise ValueError(msg)
 
             if self.beta_lambda.shape != (self.L, self.K):
                 msg = "beta_lambda matrix is not valid (dimensions = %d x %d)."
                 msg += "When using this parameter, make sure to pass a %d x %d matrix."
-                msg = msg % (self.beta_lambda.shape[0], self.beta_lambda.shape[1], self.L, self.K,)
+                msg = msg % (
+                    self.beta_lambda.shape[0],
+                    self.beta_lambda.shape[1],
+                    self.L,
+                    self.K,
+                )
                 self.logger.error(msg)
                 raise ValueError(msg)
 
@@ -379,7 +400,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 )
 
                 if (iter - 1) % 10 == 0:
-                    trace.append((r, self.seed, iter - 1, elbo, runtime, reached_convergence))
+                    trace.append(
+                        (r, self.seed, iter - 1, elbo, runtime, reached_convergence)
+                    )
 
             if maxL < elbo:
                 self._update_optimal_parameters()
@@ -439,14 +462,18 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
             sub_nz = self.rho_prior.nonzero()
             for k in range(self.K):
-                pr_rho[(*sub_nz, k * np.ones(sub_nz[0].shape[0]).astype("int"))] = poisson.pmf(
-                    k, self.rho_prior[sub_nz]
-                ) + 1.0 * self.prng.rand(sub_nz[0].shape[0])
+                pr_rho[
+                    (*sub_nz, k * np.ones(sub_nz[0].shape[0]).astype("int"))
+                ] = poisson.pmf(k, self.rho_prior[sub_nz]) + 1.0 * self.prng.rand(
+                    sub_nz[0].shape[0]
+                )
 
             if self.undirected:  # impose symmetry
                 for layer in range(self.L):
                     for k in range(self.K):
-                        pr_rho[layer, :, :, k] = (pr_rho[layer, :, :, k] + pr_rho[layer, :, :, k].T) / 2.0
+                        pr_rho[layer, :, :, k] = (
+                            pr_rho[layer, :, :, k] + pr_rho[layer, :, :, k].T
+                        ) / 2.0
             norm = pr_rho[sub_nz].sum(axis=-1)
             pr_rho[sub_nz] /= norm[:, np.newaxis]
 
@@ -471,11 +498,15 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 subs_lij = R_or_X.nonzero()[0:3]
             else:
                 subs_lij = R_or_X.subs[0:3]
-            all_reported_ties = pd.DataFrame.from_dict({"l": subs_lij[0], "i": subs_lij[1], "j": subs_lij[2]})
+            all_reported_ties = pd.DataFrame.from_dict(
+                {"l": subs_lij[0], "i": subs_lij[1], "j": subs_lij[2]}
+            )
             all_reported_ties.drop_duplicates(inplace=True)
 
             # Step 3: Which of the all_possible_ties do not appear in all_reported_ties?
-            df = pd.merge(all_possible_ties, all_reported_ties, how="left", indicator=True)
+            df = pd.merge(
+                all_possible_ties, all_reported_ties, how="left", indicator=True
+            )
             relevant_set = df[df["_merge"] == "left_only"][["l", "i", "j"]]
 
             return relevant_set
@@ -514,15 +545,32 @@ class VimureModel(TransformerMixin, BaseEstimator):
         # TODO: Could these variables be made sparse?
 
         # we include some randomness
-        self.gamma_shp = self.alpha_theta * self.prng.random_sample(size=(self.L, self.M)) + self.alpha_theta
-        self.phi_shp = self.alpha_lambda * self.prng.random_sample(size=(self.L, self.K)) + self.alpha_lambda
-        self.gamma_rte = self.beta_theta * self.prng.random_sample(size=(self.L, self.M)) + self.beta_theta
-        self.phi_rte = self.beta_lambda * self.prng.random_sample(size=(self.L, self.K)) + self.beta_lambda
+        self.gamma_shp = (
+            self.alpha_theta * self.prng.random_sample(size=(self.L, self.M))
+            + self.alpha_theta
+        )
+        self.phi_shp = (
+            self.alpha_lambda * self.prng.random_sample(size=(self.L, self.K))
+            + self.alpha_lambda
+        )
+        self.gamma_rte = (
+            self.beta_theta * self.prng.random_sample(size=(self.L, self.M))
+            + self.beta_theta
+        )
+        self.phi_rte = (
+            self.beta_lambda * self.prng.random_sample(size=(self.L, self.K))
+            + self.beta_lambda
+        )
 
         self.logger.verbose("Setting priors for nu_shp, nu_rte")
         if self.mutuality:
-            self.nu_shp = self.alpha_mutuality * self.prng.random_sample(1)[0] + self.alpha_mutuality
-            self.nu_rte = self.beta_mutuality + self.sumX  # this is fixed once and for all
+            self.nu_shp = (
+                self.alpha_mutuality * self.prng.random_sample(1)[0]
+                + self.alpha_mutuality
+            )
+            self.nu_rte = (
+                self.beta_mutuality + self.sumX
+            )  # this is fixed once and for all
             self.G_exp_nu = np.exp(sp.psi(self.nu_shp) - np.log(self.nu_rte))
         else:  # not use the mutuality (eta ~ 0.)
             self.nu_shp = 0.000001
@@ -613,28 +661,38 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
             self.G_exp_nu = np.exp(sp.psi(self.nu_shp) - np.log(self.nu_rte))
             self.z1_nz = np.einsum(
-                "I,Ik->Ik", self.G_exp_theta[subs_nz[0], subs_nz[3]], self.G_exp_lambda[subs_nz[0], :],
+                "I,Ik->Ik",
+                self.G_exp_theta[subs_nz[0], subs_nz[3]],
+                self.G_exp_lambda[subs_nz[0], :],
             )  # has dim= (I,K)
             self.z2_nz = self.G_exp_nu * data_T_vals  # has dim= (I)
             self.z_den_nz = self.z1_nz + self.z2_nz[:, np.newaxis]  # has dim= (I,K)
             self.z_den_nz[self.z_den_nz == 0] = 1
             self.data_z1_nz = data.vals[:, np.newaxis] * self.z1_nz / self.z_den_nz
-            self.data_z2_nz = data.vals[:, np.newaxis] * self.z2_nz[:, np.newaxis] / self.z_den_nz
+            self.data_z2_nz = (
+                data.vals[:, np.newaxis] * self.z2_nz[:, np.newaxis] / self.z_den_nz
+            )
 
     def _update_gamma(self, subs_nz):
 
-        self.gamma_shp = self.alpha_theta + self.sp_uttkrp_theta(self.data_z1_nz, subs_nz)
+        self.gamma_shp = self.alpha_theta + self.sp_uttkrp_theta(
+            self.data_z1_nz, subs_nz
+        )
 
         E_phi_rho = np.einsum("lijk,lk->lij", self.rho, self.phi_shp / self.phi_rte)
 
         if isinstance(self.R, skt.dtensor):
-            self.gamma_rte = self.beta_theta + np.einsum("lij,lijm->lm", E_phi_rho, np.array(self.R))
+            self.gamma_rte = self.beta_theta + np.einsum(
+                "lij,lijm->lm", E_phi_rho, np.array(self.R)
+            )
         else:
 
             self.gamma_rte = self.beta_theta * np.ones(shape=(self.L, self.M))
             # sum over k, final dim=I
             tmp = E_phi_rho[self.R.subs[0], self.R.subs[1], self.R.subs[2]]
-            for c, (l, m) in enumerate(zip(*(self.R.subs[0], self.R.subs[3]))):  # sum over i,j
+            for c, (l, m) in enumerate(
+                zip(*(self.R.subs[0], self.R.subs[3]))
+            ):  # sum over i,j
                 self.gamma_rte[l, m] += tmp[c]
 
         dist_gs = np.amax(abs(self.gamma_shp - self.gamma_shp_old))
@@ -648,7 +706,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
     def _update_phi(self, subs_nz):
 
-        self.phi_shp = self.alpha_lambda + self.sp_uttkrp_lambda(self.data_z1_nz, subs_nz)
+        self.phi_shp = self.alpha_lambda + self.sp_uttkrp_lambda(
+            self.data_z1_nz, subs_nz
+        )
 
         out = np.zeros_like(self.phi_rte)
 
@@ -658,7 +718,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
             subs = self.R.subs
 
         Egamma = self.gamma_shp[subs[0], subs[3]] / self.gamma_rte[subs[0], subs[3]]
-        tmp = self.rho[subs[0], subs[1], subs[2], :] * Egamma[:, np.newaxis]  # dim is (I,K)
+        tmp = (
+            self.rho[subs[0], subs[1], subs[2], :] * Egamma[:, np.newaxis]
+        )  # dim is (I,K)
         for k in range(self.K):  # sum over i,j,m
             out[:, k] += np.bincount(subs[0], weights=tmp[:, k], minlength=self.L)
 
@@ -680,7 +742,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         # TODO: Make Exp_theta_lambda sparse
         if isinstance(self.R, skt.dtensor):
-            Exp_theta_lambda = np.einsum("lijm,lm->lij", np.array(self.R), self.gamma_shp / self.gamma_rte)
+            Exp_theta_lambda = np.einsum(
+                "lijm,lm->lij", np.array(self.R), self.gamma_shp / self.gamma_rte
+            )
         else:
 
             tmp = pd.DataFrame.from_dict(
@@ -689,22 +753,33 @@ class VimureModel(TransformerMixin, BaseEstimator):
                     "i": self.R.subs[1],
                     "j": self.R.subs[2],
                     "m": self.R.subs[3],
-                    "val": (self.gamma_shp / self.gamma_rte)[(self.R.subs[0], self.R.subs[3])] * self.R.vals,
+                    "val": (self.gamma_shp / self.gamma_rte)[
+                        (self.R.subs[0], self.R.subs[3])
+                    ]
+                    * self.R.vals,
                 }
             )
 
             tmp = tmp.groupby(["l", "i", "j"])[["val"]].sum()
             tmp.reset_index(inplace=True)
             Exp_theta_lambda = skt.sptensor(
-                subs=(tmp["l"], tmp["i"], tmp["j"]), vals=tmp["val"].tolist(), shape=(self.L, self.N, self.N)
+                subs=(tmp["l"], tmp["i"], tmp["j"]),
+                vals=tmp["val"].tolist(),
+                shape=(self.L, self.N, self.N),
             )
             Exp_theta_lambda = Exp_theta_lambda.toarray()
 
         self.logger.verbose("calculating einsum (Exp_theta_lambda vs phi_shp/phi_rte)")
-        Exp_theta_lambda = np.einsum("lij,lk->lijk", Exp_theta_lambda, self.phi_shp / self.phi_rte)
+        Exp_theta_lambda = np.einsum(
+            "lij,lk->lijk", Exp_theta_lambda, self.phi_shp / self.phi_rte
+        )
 
         self.logger.verbose("calculating log_rho")
-        log_rho = self.logpr_rho + self.sp_uttkrp_rho(self.data_z1_nz, subs_nz) - Exp_theta_lambda
+        log_rho = (
+            self.logpr_rho
+            + self.sp_uttkrp_rho(self.data_z1_nz, subs_nz)
+            - Exp_theta_lambda
+        )
 
         self.logger.verbose("finishing updating rho")
         self.rho = np.exp(log_rho)
@@ -723,7 +798,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
     def _update_nu(self, subs_nz):
 
         self.nu_shp = (
-            self.alpha_mutuality + (self.data_z2_nz * self.rho[subs_nz[0], subs_nz[1], subs_nz[2], :]).sum()
+            self.alpha_mutuality
+            + (self.data_z2_nz * self.rho[subs_nz[0], subs_nz[1], subs_nz[2], :]).sum()
         )
         dist_nu = abs(self.nu_shp - self.nu_shp_old)
 
@@ -753,7 +829,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
         out = np.zeros_like(self.gamma_shp)
 
         # sum over k, final dim=I
-        tmp = (self.rho[subs[0], subs[1], subs[2], :].astype(vals.dtype) * vals).sum(axis=1)
+        tmp = (self.rho[subs[0], subs[1], subs[2], :].astype(vals.dtype) * vals).sum(
+            axis=1
+        )
         for c, (l, m) in enumerate(zip(*(subs[0], subs[3]))):  # sum over i,j
             out[l, m] += tmp[c]
         return out
@@ -778,7 +856,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
         """
 
         out = np.zeros_like(self.phi_shp)
-        tmp = self.rho[subs[0], subs[1], subs[2], :].astype(vals.dtype) * vals  # dim is (I,K)
+        tmp = (
+            self.rho[subs[0], subs[1], subs[2], :].astype(vals.dtype) * vals
+        )  # dim is (I,K)
         for k in range(self.K):  # sum over i,j,m
             out[:, k] += np.bincount(subs[0], weights=tmp[:, k], minlength=self.L)
 
@@ -811,9 +891,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         # dim is (I,K)
         # tmp = (ExpLog_lambda[subs[0], :]).astype(vals.dtype) * vals
-        tmp = (ExpLog_theta[subs[0], subs[3]][:, np.newaxis] + ExpLog_lambda[subs[0], :]).astype(
-            vals.dtype
-        ) * vals
+        tmp = (
+            ExpLog_theta[subs[0], subs[3]][:, np.newaxis] + ExpLog_lambda[subs[0], :]
+        ).astype(vals.dtype) * vals
         # sum over m
         for c, (l, i, j) in enumerate(zip(*(subs[0], subs[1], subs[2]))):
             out[l, i, j, :] += tmp[c, :]
@@ -893,13 +973,19 @@ class VimureModel(TransformerMixin, BaseEstimator):
         elbo += (data.vals * logPoissonMean).sum()
 
         elbo += gamma_elbo_term(
-            pa=self.alpha_theta, pb=self.beta_theta, qa=self.gamma_shp, qb=self.gamma_rte
+            pa=self.alpha_theta,
+            pb=self.beta_theta,
+            qa=self.gamma_shp,
+            qb=self.gamma_rte,
         ).sum()
         elbo += gamma_elbo_term(
             pa=self.alpha_lambda, pb=self.beta_lambda, qa=self.phi_shp, qb=self.phi_rte
         ).sum()
         elbo += gamma_elbo_term(
-            pa=self.alpha_mutuality, pb=self.beta_mutuality, qa=self.nu_shp, qb=self.nu_rte
+            pa=self.alpha_mutuality,
+            pb=self.beta_mutuality,
+            qa=self.nu_shp,
+            qb=self.nu_rte,
         )
 
         elbo += categorical_elbo_term(self.rho, self.pr_rho, self.EPS).sum()
@@ -952,7 +1038,13 @@ class VimureModel(TransformerMixin, BaseEstimator):
     """
 
     def calculate_mean_poisson(
-        self, G_exp_theta=None, G_exp_lambda=None, G_exp_nu=None, rho=None, X_T=None, R=None,
+        self,
+        G_exp_theta=None,
+        G_exp_lambda=None,
+        G_exp_nu=None,
+        rho=None,
+        X_T=None,
+        R=None,
     ):
 
         if G_exp_theta is None:
@@ -982,14 +1074,29 @@ class VimureModel(TransformerMixin, BaseEstimator):
             R_subs = self.R.subs
 
         # Following Equation 2:
-        ThetaLambda = np.einsum("I,Ik->Ik", G_exp_theta[R_subs[0], R_subs[3]], G_exp_lambda[R_subs[0], :],)
+        ThetaLambda = np.einsum(
+            "I,Ik->Ik",
+            G_exp_theta[R_subs[0], R_subs[3]],
+            G_exp_lambda[R_subs[0], :],
+        )
 
         if isinstance(X_T, skt.dtensor) or isinstance(X_T, np.ndarray):
-            PoissonMean = ThetaLambda + G_exp_nu * X_T[R_subs[0], R_subs[1], R_subs[2], R_subs[3], np.newaxis]
+            PoissonMean = (
+                ThetaLambda
+                + G_exp_nu * X_T[R_subs[0], R_subs[1], R_subs[2], R_subs[3], np.newaxis]
+            )
         else:
-            R_lijm = pd.DataFrame.from_dict({"l": R_subs[0], "i": R_subs[1], "j": R_subs[2], "m": R_subs[3]})
+            R_lijm = pd.DataFrame.from_dict(
+                {"l": R_subs[0], "i": R_subs[1], "j": R_subs[2], "m": R_subs[3]}
+            )
             X_lijm = pd.DataFrame.from_dict(
-                {"l": X_T.subs[0], "i": X_T.subs[1], "j": X_T.subs[2], "m": X_T.subs[3], "val": X_T.vals}
+                {
+                    "l": X_T.subs[0],
+                    "i": X_T.subs[1],
+                    "j": X_T.subs[2],
+                    "m": X_T.subs[3],
+                    "val": X_T.vals,
+                }
             )
 
             X_T_array = pd.merge(R_lijm, X_lijm, how="left")
@@ -998,7 +1105,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
             PoissonMean = ThetaLambda + G_exp_nu * X_T_array[:, np.newaxis]
 
-        vals = np.einsum("Ik,Ik->I", rho[R_subs[0], R_subs[1], R_subs[2], :], PoissonMean)
+        vals = np.einsum(
+            "Ik,Ik->I", rho[R_subs[0], R_subs[1], R_subs[2], :], PoissonMean
+        )
         rho_PoissonMean = skt.sptensor(subs=R_subs, vals=vals)
 
         return rho_PoissonMean
@@ -1009,15 +1118,106 @@ UTIL FUNCTIONS FOR INFERENCE
 """
 
 
+def get_inferred_model(model, method="rho_max", threshold=None):
+    """Estimate Y
+
+    Use this function to reconstruct the Y matrix with a fitted vimure model.
+    It will use `model.rho_f` values to extract an estimated Y matrix.
+
+    - *rho_max*: Assign the value of the highest probability
+    - *rho_mean*: Expected value of the discrete distribution
+    - *fixed_threshold*: Check if the probability is higher than a threshold (Only for K=2)
+    - *heuristic_threshold*: Calculate and use the best threshold (Only for K=2)
+
+    Parameters
+    ----------
+    model : vm.model.VimureModel
+        A `vm.model.VimureModel` object
+    method : str
+        A character string indicating which method is to be computed.
+        One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".
+    threshold : float
+        A threshold to be used when method = "fixed_threshold".
+
+    Returns
+    -------
+    Y : ndarray
+    """
+
+    if not hasattr(model, "rho_f"):
+        NotFittedError(
+            "This VimureModel instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator"
+        )
+
+    OPTIONS = ["rho_max", "rho_mean", "fixed_threshold", "heuristic_threshold"]
+
+    if len(method) > 1 and type(method) == "list":
+        msg = f"'method' has length > 1 and only the first element will be used"
+        warnings.warn(msg, UserWarning)
+        method = method[0]
+
+    try:
+        method = match_arg(method, OPTIONS)[0]
+    except IndexError:
+        raise ValueError(
+            (
+                "'method' should be one of {}.".format(
+                    ", ".join(['"' + x + '"' for x in OPTIONS])
+                )
+            )
+        )
+
+    def rho_max(model, threshold=None):
+        return (np.argmax(model.rho_f, axis=-1)).astype("int")
+
+    def rho_mean(model, threshold=None):
+        K = model.rho_f.shape[-1]
+        return (np.dot(model.rho_f, range(0, K)))  # It returns the rounded number
+
+    def fixed_threshold(model, threshold):
+        if (threshold is None) or (threshold > 1) or (threshold < 0):
+            raise ValueError(
+                'For method="fixed_threshold", '
+                "you must set the threshold to a value in [0,1]."
+            )
+
+        Y = np.copy(model.rho_f[:, :, :, 1])
+        Y[Y < threshold] = 0
+        Y[Y >= threshold] = 1
+
+        return Y
+
+    def heuristic_threshold(model, threshold=None):
+        return apply_rho_threshold(model).astype("int")
+
+    methods = {
+        "rho_max": rho_max,
+        "rho_mean": rho_mean,
+        "fixed_threshold": fixed_threshold,
+        "heuristic_threshold": heuristic_threshold,
+    }
+
+    if (not model.mutuality and method != "rho_max") or (
+        model.rho_f.shape[-1] > 2 and "threshold" in method
+    ):
+        msg = 'threshold methods is incompatible with VIMuRe\'s mutuality=False or for data with more than 2 categories. Using "rho_max" method.'
+        warnings.warn(msg, UserWarning)
+        method = "rho_max"
+
+    return methods[method](model, threshold)
+
+
 def gamma_elbo_term(pa, pb, qa, qb):
-    return sp.gammaln(qa) - pa * np.log(qb) + (pa - qa) * sp.psi(qa) + qa * (1 - pb / qb)
+    return (
+        sp.gammaln(qa) - pa * np.log(qb) + (pa - qa) * sp.psi(qa) + qa * (1 - pb / qb)
+    )
 
 
 def categorical_elbo_term(rho, prior_rho, EPS):
     K = rho.shape[-1]
     layer = np.zeros((rho.shape[0], rho.shape[1], rho.shape[2]))
     for k in range(K):
-        layer += rho[:, :, :, k] * np.log(prior_rho[:, :, :, k] + EPS) - rho[:, :, :, k] * np.log(
-            rho[:, :, :, k] + EPS
-        )
+        layer += rho[:, :, :, k] * np.log(prior_rho[:, :, :, k] + EPS) - rho[
+            :, :, :, k
+        ] * np.log(rho[:, :, :, k] + EPS)
     return layer

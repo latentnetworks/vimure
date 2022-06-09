@@ -64,6 +64,7 @@ install_vimure <- function(method = c("auto", "virtualenv", "conda"),
            restart_session = TRUE,
            conda_python_version = NULL,
            ...,
+           force = FALSE,
            pip_ignore_installed = TRUE,
            force = FALSE,
            python_version = conda_python_version){
@@ -78,7 +79,7 @@ install_vimure <- function(method = c("auto", "virtualenv", "conda"),
     }
 
     if(force){
-      reticulate::virtualenv_remove('r-reticulate')
+      reticulate::virtualenv_remove(envname)
     }
 
     reticulate::py_install(

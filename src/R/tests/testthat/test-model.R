@@ -64,11 +64,16 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
                   num_realisations=2, max_iter=21, verbose=F
   )
 
-  Y_true <- as.vector(extract_Y(synth_net))
+  Y_true <- as.vector(synth_net$Y$toarray())
   Y_rec <- as.integer(model$rho_f[,,,2] >= 0.5)
   tab <- table(Y_true, Y_rec)
   f1_score <- (tab[2,2])/(tab[2,2] + 0.5*(tab[1,2] + tab[2,1]))
   expect_lt(abs(f1_expected-f1_score), 1e-2)
+}
+
+check_output <- function(Y, model){
+  expect_gt(sum(Y), 0)
+  expect_equal(dim(Y), c(model$L, model$N, model$N))
 }
 
 test_that("Check vimure model with standard_sbm", {
@@ -92,4 +97,21 @@ test_that("Check vimure model for invalid inputs", {
   INPUTS <- list("a", list(a="a"), mtcars, 1:10)
   for(x in INPUTS)
   expect_error(vimure(x), "invalid 'type'")
+})
+
+
+test_that("Check inferred model", {
+  synth_net <- gm_StandardSBM(N=20, M=20, sparsify = F, K=2)
+  X <- build_X(synth_net, flag_self_reporter = T, cutoff_X = T)
+
+  model <- vimure(synth_net$X, synth_net$R, num_realisations=1, max_iter=500, mutuality = T, verbose=F)
+  expect_error(get_inferred_model(model, method = "NonImplemented"), "'method' should be one of")
+  expect_error(get_inferred_model(model, method = "fixed_threshold"), 'you must set the threshold to a value')
+  expect_error(get_inferred_model(model, method = "fixed_threshold", threshold=2), 'you must set the threshold to a value')
+
+  OPTIONS <- c("rho_max", "rho_mean", "fixed_threshold", "heuristic_threshold")
+  for(method in OPTIONS){
+    Y_hat <- get_inferred_model(model, method = method, threshold = 0.5)
+    check_output(Y_hat, model)
+  }
 })

@@ -74,7 +74,6 @@ parse_graph_from_edgelist <- function(
       stop("non-numeric values in ", paste(vars_to_convert, collapse = ", "))
     }
   }
-
   vimureP$io$parse_graph_from_edgelist(
     edges, nodes, reporters, is_undirected=!directed, is_weighted=weighted,
     ego=ego, alter=alter, weight=weight, reporter=reporter, layer=layer, ...

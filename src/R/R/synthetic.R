@@ -21,7 +21,7 @@
 #'
 #' @examples
 #' random_net <- gm_StandardSBM(N=100, M=100, L=1)
-#' Y <- extract_Y(random_net)
+#' Y <- random_net$Y$toarray()
 #' dim(Y)
 gm_StandardSBM <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, sparsify=TRUE, overlapping=0, seed=10){
   INT_ARGS <- c(N=N, M=M, K=K, L=L, C=C, avg_degree=avg_degree, seed=seed)
@@ -58,7 +58,7 @@ gm_StandardSBM <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, sparsify=
 #'
 #' @examples
 #' random_net <- gm_DegreeCorrectedSBM(exp_in = 2, exp_out = 2.5)
-#' Y <- extract_Y(random_net)
+#' Y <- random_net$Y$toarray()
 #' dim(Y)
 gm_DegreeCorrectedSBM <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, exp_in=2, exp_out=2.5, sparsify=TRUE, seed=10){
   INT_ARGS <- c(N=N, M=M, K=K, C=C, L=L, seed=seed)
@@ -95,7 +95,7 @@ gm_DegreeCorrectedSBM <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, ex
 #'
 #' @examples
 #' random_net <- gm_Multitensor(N=100, M=100, L=1, eta=0.5)
-#' Y <- extract_Y(random_net)
+#' Y <- random_net$Y$toarray()
 #' dim(Y)
 gm_Multitensor <- function(N=100, M=100, K=2, L=1, C=2, avg_degree=10, sparsify=TRUE, eta=0.99, seed=10){
   INT_ARGS <- c(N=N, M=M, K=K, L=L, C=C, avg_degree=avg_degree, seed=seed)
@@ -138,19 +138,4 @@ build_custom_theta <- function(synthetic, theta_ratio = 0.5,
     seed = as.integer(seed)
   )
   return(custom_theta)
-}
-
-#' Extract the Y matrix
-#'
-#' @param synthetic A synthetic model
-#'
-#' @return A sptensor
-#' @export
-#'
-#' @examples
-#' random_net <- gm_Multitensor(N=100, M=100, L=1, eta=0.99)
-#' Y <- extract_Y(random_net)
-#' dim(Y)
-extract_Y <- function(synthetic){
-  py_to_r.sktensor.sptensor.sptensor(synthetic$Y)
 }

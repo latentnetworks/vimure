@@ -12,6 +12,7 @@ install_vimure(
   restart_session = TRUE,
   conda_python_version = NULL,
   ...,
+  force = FALSE,
   pip_ignore_installed = TRUE,
   force = FALSE,
   python_version = conda_python_version
@@ -46,6 +47,9 @@ only occur within RStudio).}
 
 \item{...}{other arguments passed to \code{\link[reticulate:conda-tools]{reticulate::conda_install()}} or
 \code{\link[reticulate:virtualenv-tools]{reticulate::virtualenv_install()}}, depending on the \code{method} used.}
+
+\item{force}{Whether pip should recreate 'r-reticulate' virtualenv.
+This defaults to \code{FALSE}.}
 
 \item{pip_ignore_installed}{Whether pip should ignore installed python
 packages and reinstall all already installed python packages. This defaults
