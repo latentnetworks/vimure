@@ -2,6 +2,8 @@ VENV           = venv
 SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
 PYTHON         = $(or $(wildcard venv/bin/python), $(SYSTEM_PYTHON))
 
+.PHONY: docs
+
 venv-build: venv-create
 	$(PYTHON) -m pip install -r src/python/requirements.txt
 	$(PYTHON) -m pip install -e src/python/.
@@ -16,7 +18,7 @@ venv-up:
 test:
 	$(PYTHON) -m pytest -s -vv --pyargs vimure
 
-doc:
-	$(PYTHON) -m pdoc --html --force -o . vimure
-	mv vimure/ docs/
-	rm -rf vimure
+docs: 
+	Rscript -e 'vimure::install_vimure(version="src/python/");setwd("src/R");pkgdown::build_site()'
+	git add docs && git commit -m "Initial dist subtree commit"
+	git subtree push --prefix docs origin gh-pages

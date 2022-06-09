@@ -66,7 +66,6 @@ install_vimure <- function(method = c("auto", "virtualenv", "conda"),
            ...,
            force = FALSE,
            pip_ignore_installed = TRUE,
-           force = FALSE,
            python_version = conda_python_version){
 
     method <- match.arg(method)

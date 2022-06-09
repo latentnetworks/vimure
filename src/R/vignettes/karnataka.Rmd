@@ -64,7 +64,7 @@ graph <- igraph::graph_from_data_frame(edges)
 
 graph <- set_graph_attr(graph, "layout", layout_with_fr(graph, niter=600))
 plot(graph,
-     vertex.size=5,
+     vertex.size=2,
      vertex.label=NA,
      edge.width=0.5,
      edge.arrow.size=0.5, 
@@ -86,7 +86,7 @@ Run the model:
 
 ```{r}
 # Graph input
-model <- vimure(graph, num_realisations=1L, max_iter=100L, seed=5)
+model <- vimure(graph, num_realisations=1L, max_iter=100L, seed=5, mutuality = T)
 ```
 
 
@@ -101,7 +101,7 @@ vm_graph <- parse_graph_from_edgelist(df_edges, ego="i", alter="j", reporter="re
 
 And run the model:
 ```{r}
-model <- vimure(vm_graph$X, vm_graph$R, num_realisations=1L, max_iter=100L)
+model <- vimure(vm_graph$X, vm_graph$R, num_realisations=1L, max_iter=100L, seed=5, mutuality = T)
 ```
 
 # Diagnostics
@@ -122,7 +122,7 @@ ggplot2::ggplot(df_elbo, ggplot2::aes(x=iter, y=elbo, group=realisation, color=f
   ggplot2::labs(x = "Iter", y="ELBO", color="Realisation")
 ```
 
-## Estimated realibility
+## Estimated reliability
 
 ```{r}
 plot_df <- reshape2::melt(diag$reliability, id = "node")
@@ -133,3 +133,18 @@ ggplot2::ggplot(plot_df, aes(x = reorder(factor(node), -value), y=value)) +
   ggplot2::labs(x = "Nodes sorted from over-to under- reporting", y = "Realibility values") +
   ggplot2::theme(axis.text.x=element_blank())
 ```
+## Reconstruct Y matrix 
+
+```{r}
+Y_hat <- get_inferred_model(model)
+
+graph <- graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed") 
+graph <- set_graph_attr(graph, "layout", layout_with_fr(graph, niter=600))
+plot(graph,
+     vertex.size=2,
+     vertex.label=NA,
+     edge.width=0.5,
+     edge.arrow.size=0.5, 
+     edge.arrow.width=0.5)
+```
+

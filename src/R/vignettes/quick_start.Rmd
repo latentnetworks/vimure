@@ -27,10 +27,10 @@ library(ggcorrplot)
 First create an object with the desired synthetic network class:
 
 ```{r}
-net <- gm_Multitensor(N=100, M=50, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.2)
+net <- gm_Multitensor(N=100, M=100, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.5)
 
 # Ground Truth Network
-Y <- extract_Y(net)
+Y <- net$Y$toarray()
 layer <- 1 # Change to plot others layers for multiply-layers networks
 
 graph <- graph_from_adjacency_matrix(Y[layer, , ], mode = "directed") 
@@ -55,11 +55,13 @@ Use the function `class` to check if a object is stored in Python.
 class(net)
 ```
 
-`net` is stored as a Python object. You can access its attributes using the dollar sign `$` or using our `extract_*` functions which always will return a R object.
+`net` is stored as a Python object. You can access its attributes using the dollar sign `$`.
 
 ```{r}
 net$Y # still a python object because it is a sptensor
-Y <- extract_Y(net) # extract_Y convert to array
+
+Y <- net$Y$toarray() # Convert to array
+class(Y)
 ```
 
 Calculate some network statistics from the adjacency matrix:
@@ -101,7 +103,7 @@ See more info about arguments in `help(vimure)`.
 In R, the `vimure` takes as data input an adjancency matrix or an igraph object.
 
 ```{r}
-model <- vimure(X, net$R, mutuality=F, K=2, num_realisations=1, max_iter=150)
+model <- vimure(net$X, net$R, mutuality=T, K=2, num_realisations=5, max_iter=1000)
 ```
 
 > Note: Run model without mutuality is not particularly useful since we know this network has some level of reciprocity and mutuality. We are doing this for testing purposes only.
@@ -114,4 +116,15 @@ Open an issue in our [repository](https://github.com/latentnetworks/vimure/issue
 ```{r}
 diag <- summary(model)
 ```
+## Inferred model
+
+Use `get_inferred_model()` and `sample_inferred_model()` to reconstruct the Y matrix using the distribution of rho_f. 
+
+```{r}
+Y_hat <- get_inferred_model(model)
+
+# Compared Y_hat to ground truth Y
+table(Y_hat,Y)
+```
+
 
