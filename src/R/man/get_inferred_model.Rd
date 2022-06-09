@@ -22,7 +22,7 @@ Use this function to reconstruct the Y matrix with a fitted vimure model.
 It will use \code{model$rho_f} values to extract an estimated Y matrix.
 \itemize{
 \item{\emph{rho_max}: }{Assign the value of the highest probability}
-\item{\emph{rho_mean}: }{Expected value of the multinomial}
+\item{\emph{rho_mean}: }{Expected value of the discrete distribution}
 \item{\emph{fixed_threshold}: }{Check if the probability is higher than a threshold (Only for 2 categories)}
 \item{\emph{heuristic_threshold}: }{Calculate and use the best threshold (Only for 2 categories)}
 }
