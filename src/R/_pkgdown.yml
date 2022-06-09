@@ -1,0 +1,9 @@
+navbar:
+  structure:
+    left:  [intro, reference, articles]
+    right: [github]
+destination: ../../docs/.
+url: ~
+template:
+  bootstrap: 5
+

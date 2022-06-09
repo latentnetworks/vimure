@@ -25,6 +25,16 @@ DEFAULT_NUM_REALISATIONS = 20
 
 
 class VimureModel(TransformerMixin, BaseEstimator):
+    """
+    **ViMuRe**
+
+    Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
+    reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
+    network (rho). The inference is performed with a Variational Inference approach.
+    
+    .. note::This closely follows the scikit-learn structure of classes:
+        https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py
+    """
     @_deprecate_positional_args
     def __init__(
         self,
@@ -35,18 +45,14 @@ class VimureModel(TransformerMixin, BaseEstimator):
         verbose: bool = True,
     ):
         """
-
-        This closely follows the scikit-learn structure of classes:
-        https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py
-
         Parameters
         ----------
         undirected : boolean
-                     If True, the given and the estimate networks are undirected.
-        mutuality: boolean
-                     If this is false, then do not estimate mutuality (network cond. independent)
+            Whether the network is undirected.
+        mutuality : boolean
+            Whether to use the mutuality parameter.
         convergence_tol : float
-                    Controls when to stop the optimisation algorithm (CAVI)
+            Controls when to stop the optimisation algorithm (CAVI)
         """
 
         self.undirected = undirected
@@ -309,10 +315,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
         **extra_params,
     ):
         """
-        Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
-        reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
-        network (rho). The inference is performed with a Variational Inference approach.
-
         Parameters
         ----------
         X : ndarray

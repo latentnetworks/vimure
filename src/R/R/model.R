@@ -4,6 +4,8 @@
 #' reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
 #' network (rho). The inference is performed with a Variational Inference approach.
 #'
+#' @family vimure
+#'
 #' @param x An adjancency matrix with dimensions L x N x N x N or a igraph object.
 #' @param R Reporters mask (TRUE/FALSE) indicating whether a node _CAN_ report on a particular tie, with dimensions L x N x N x N.
 #' If reporters mask was not informed, the model will assume that every reporter can report on any tie.
@@ -65,6 +67,8 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
 
 #' Estimate Y
 #'
+#' @family vimure
+#'
 #' @details Use this function to reconstruct the Y matrix with a fitted vimure model.
 #' It will use `model$rho_f` values to extract an estimated Y matrix.
 #' \itemize{
@@ -78,7 +82,7 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
 #' @param object A "vimure" object.
 #' @param method A character string indicating which method is to be computed.
 #' One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".
-  #' @param threshold A threshold to be used when method = "fixed_threshold".
+#' @param threshold A threshold to be used when method = "fixed_threshold".
 #'
 #' @export
 get_inferred_model <- function(object, method = "rho_max", threshold = NULL){
@@ -90,7 +94,7 @@ get_inferred_model <- function(object, method = "rho_max", threshold = NULL){
 }
 
 #' Diagnostics metrics
-#'
+#' @family vimure
 #'
 #' @param object A "vimure" object.
 #' @param net A vm.io.baseNetwork object.
@@ -139,7 +143,7 @@ vimure_training_history <- function(diag){
     posteriors$rho_f <- diag$model$rho_f
   }
 
-  # Realibility dataframe
+  # Reliability dataframe
   lambda <- posteriors$G_exp_lambda_f[,2]
   theta_matrix <- t(posteriors$G_exp_theta_f)
   reliability <- theta_matrix*lambda

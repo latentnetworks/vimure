@@ -27,3 +27,9 @@ It will use \code{model$rho_f} values to extract an estimated Y matrix.
 \item{\emph{heuristic_threshold}: }{Calculate and use the best threshold (Only for 2 categories)}
 }
 }
+\seealso{
+Other vimure: 
+\code{\link{summary.vimure.model.VimureModel}()},
+\code{\link{vimure}()}
+}
+\concept{vimure}

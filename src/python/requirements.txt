@@ -16,3 +16,5 @@ jupyterlab_execute_time==2.0.5
 ipywidgets==7.6.5
 tqdm==4.62.0
 wget==3.2
+
+pdoc3 #dev

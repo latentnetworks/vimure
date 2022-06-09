@@ -28,22 +28,17 @@ DEFAULT_EXP_OUT = 2.5
 DEFAULT_ETA = 0.5
 DEFAULT_AVG_DEGREE = 2
 
-
 module_logger = setup_logging("vm.synthetic")
-
-
-"""
-GENERATIVE MODELS FOR GROUND TRUTH Y
-"""
-
 
 def transpose_ij(M):
     """
     Compute the transpose of a matrix.
+
     Parameters
     ----------
-    M : ndarray
+    M : numpy.array
         Numpy matrix.
+
     Returns
     -------
     Transpose of the matrix.
@@ -54,23 +49,8 @@ def transpose_ij(M):
 
 class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
     """
-    A base abstract class for generation and management of synthetic networks.
-
+    A base abstract class for generation and management of synthetic networks. 
     Suitable for representing any type of synthetic network (whether SBM or not).
-
-    Parameters
-    ----------
-    N : int
-        Number of nodes.
-    M : int
-        Number of reporters.
-    L : int
-        Number of layers (it has only been tested for L=1).
-    K : int
-        Maximum edge weight in the adjacency matrix.
-        When K=2 (default), the adjacency matrix will contain some Y(ij)=0 and Y(ij)=1.
-    seed : int
-        Pseudo random generator seed to use
     """
     def __init__(
         self,
@@ -105,8 +85,6 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         verbose: bool = True,
     ):
         """
-        Generate Observed Networks - X.
-
         Any object inhereted from BaseSyntheticNetwork will have a ground truth network Y.
         Given that Y, generate the observed network X.
         
@@ -114,27 +92,29 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         ----------
 
         mutuality : float
-            The mutuality parameter (from 0 to 1)
+            The mutuality parameter from 0 to 1.
         sh_theta : float
-            Shape of gamma distribution from which to draw theta. The 'reliability' of nodes is represented by the parameter $theta_{lm}$ and by default are modelled as a gamma function with shape `sh_theta` and scale `sc_theta`.
+            Shape of gamma distribution from which to draw theta. 
+            The 'reliability' of nodes is represented by the parameter `theta_{lm}`
+            and by default are modelled as a gamma function with shape `sh_theta` and scale `sc_theta`.
         sc_theta : float
             Scale of gamma distribution from which to draw theta.
         flag_self_reporter : bool
-            Indicates whether a node can only report about their own ties (default is true).
+            Indicates whether a node can only report about their own ties.
         Q : int
-            Maximum value of X entries. If None, it will use the network's K parameter
+            Maximum value of X entries. If None, it will use the network's K parameter.
         cutoff_X : bool
-            Whether to set X as a binary
+            Whether to set X as a binary.
         lambda_diff : float
-            The difference between each subsequent K
+            The difference between each subsequent K.
         seed : int
-            Pseudo random generator seed to use
+            Pseudo random generator seed to use.
         verbose : bool
-            Provides additional details
+            Provides additional details.
 
         Returns
         -------
-        X : ndarray
+        X : sktensor
             Observed network.
         """
 
@@ -391,33 +371,11 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
 class StandardSBM(BaseSyntheticNetwork):
     """
-    Creates a standard stochastic block-model synthetic network
+    **Creates a standard stochastic block-model synthetic network.**
 
     A generative graph model which assumes the probability of connecting two nodes in a graph is determined entirely by their block assignments.
     For more information about this model, see Holland, P. W., Laskey, K. B., & Leinhardt, S. (1983). _Stochastic blockmodels: First steps. Social networks_, 5(2), 109-137.
     [DOI:10.1016/0378-8733(83)90021-7](https://www.sciencedirect.com/science/article/abs/pii/0378873383900217)
-    
-    Parameters
-    ----------
-    N : int
-        Number of nodes.
-    M : int
-        Number of reporters.
-    L : int
-        Number of layers (it has only been tested for L=1).
-    C : int
-        Number of communities
-    K : int
-        Maximum edge weight in the adjacency matrix.
-        When K=2 (default), the adjacency matrix will contain some Y(ij)=0 and Y(ij)=1.
-    avg_degree : float
-        Desired average degree for the network. It is not guaranteed that the ultimate network will have that exact average degree value. Try tweaking this parameter if you want to increase or decrease the density of the network.
-    sparsify : bool
-        If True (default), enforce sparsity.
-    overlapping : float
-        Fraction of nodes with mixed membership. It has to be in [0, 1).
-    seed : int
-        Pseudo random generator seed to use
     """
 
     # TODO: Document overlapping communities separately as it involves setting several other parameters
@@ -431,6 +389,26 @@ class StandardSBM(BaseSyntheticNetwork):
         overlapping: float = DEFAULT_OVERLAPPING,
         **kwargs,
     ):
+        """
+        Parameters
+        ----------
+        C : int
+            Number of communities
+        structure: str
+            Structures for the affinity tensor `w`. It can be 'assortative' or 'disassortative'. 
+            It can be a list to map structure for each layer in a multilayer graph.
+        avg_degree : float
+            Desired average degree for the network. It is not guaranteed that the 
+            ultimate network will have that exact average degree value. 
+            Try tweaking this parameter if you want to increase or decrease the 
+            density of the network.
+        sparsify : bool
+            If True (default), enforce sparsity.
+        overlapping : float
+            Fraction of nodes with mixed membership. It has to be in `[0, 1)`.
+        kwargs : 
+            Additional arguments of `vimure.synthetic.StandardSBM` 
+        """
         self.init_sbm_params(
             C=C,
             structure=structure,
@@ -673,18 +651,14 @@ class StandardSBM(BaseSyntheticNetwork):
         """
         Compute the CxC affinity matrix w with probabilities between and within groups.
 
-        INPUT
+        Parameters
         ----------
         structure : string
-                    Structure of the network.
-        N : int
-            Number of nodes.
-        C : int
-            Number of communities.
+            Structure of the network.
         a : float
             Parameter for secondary probabilities.
 
-        OUTPUT
+        Returns
         -------
         p : Numpy array
             Array with probabilities between and within groups. Element (k,h)
@@ -749,35 +723,25 @@ class StandardSBM(BaseSyntheticNetwork):
 
 class DegreeCorrectedSBM(StandardSBM):
     """
-    Degree-corrected stochastic blockmodel.
+    **Degree-corrected stochastic blockmodel.**
 
     A generative model that incorporates heterogeneous vertex degrees into stochastic blockmodels, improving the performance of the models for statistical inference of group structure.
     For more information about this model, see Karrer, B., & Newman, M. E. (2011). _Stochastic blockmodels and community structure in networks_. Physical review E, 83(1), 016107.
-    [DOI:10.1103/PhysRevE.83.016107](https://arxiv.org/pdf/1008.3926.pdf)
-
-    Parameters
-    ----------
-    N : int
-        Number of nodes.
-    M : int
-        Number of reporters.
-    L : int
-        Number of layers (it has only been tested for L=1).
-    C : int
-        Number of communities
-    K : int
-        Maximum edge weight in the adjacency matrix.
-        When K=2 (default), the adjacency matrix will contain some Y(ij)=0 and Y(ij)=1.
-    exp_in : float
-        Exponent power law of in-degree distribution
-    exp_out : float
-        Exponent power law of out-degree distribution
-    seed : int
-        Pseudo random generator seed to use
+    [DOI:10.1103/PhysRevE.83.016107](https://arxiv.org/pdf/1008.3926.pdf).
     """
-    def __init__(self, exp_in: float = DEFAULT_EXP_IN, exp_out: float = DEFAULT_EXP_OUT, **kwargs):
+    def __init__(
+            self, exp_in: float = DEFAULT_EXP_IN,
+            exp_out: float = DEFAULT_EXP_OUT,
+            **kwargs):
         """
-        Set Up Degree Distribution first
+        Parameters
+        ----------
+        exp_in : float
+            Exponent power law of in-degree distribution.
+        exp_out : float
+            Exponent power law of out-degree distribution.
+        kwargs : 
+            Additional arguments of `vimure.synthetic.StandardSBM` 
         """
 
         self.exp_in = exp_in  # exponent power law distribution in degree
@@ -825,51 +789,34 @@ class DegreeCorrectedSBM(StandardSBM):
 
 class Multitensor(StandardSBM):
     """
-    A generative model with reciprocity.
+    **A generative model with reciprocity**
 
     A mathematically principled generative model for capturing both community and reciprocity patterns in directed networks.
     Adapted from Safdari H., Contisciani M. & De Bacco C. (2021). Generative model for reciprocity and community detection in networks, Phys. Rev. Research 3, 023209.
     [DOI:10.1103/PhysRevResearch.3.023209](https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.3.023209).
-    Open Source code available at https://github.com/mcontisc/CRep and modified in accordance with its license, reproduced below:
+    
+    Generate a directed, possibly weighted network by using the reciprocity generative model.
+    Can be used to generate benchmarks for networks with reciprocity.
+    Steps:
+        1. Generate the latent variables.
+        2. Extract `A_{ij}` entries (network edges) from a Poisson distribution; its mean depends on the latent variables.
+        
+    .. note:: Open Source code available at https://github.com/mcontisc/CRep and modified in accordance with its [license](https://github.com/mcontisc/CRep/blob/master/LICENSE).
 
     -------------------------------------------------------------------------------
     Copyright (c) 2020 Hadiseh Safdari, Martina Contisciani and Caterina De Bacco.
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-    -------------------------------------------------------------------------------
-
-    Parameters
-    ----------
-    N : int
-        Number of nodes.
-    M : int
-        Number of reporters.
-    L : int
-        Number of layers (it has only been tested for L=1).
-    C : int
-        Number of communities
-    K : int
-        Maximum edge weight in the adjacency matrix.
-        When K=2 (default), the adjacency matrix will contain some Y(ij)=0 and Y(ij)=1.
-    eta : float
-         Initial value for the reciprocity coefficient. Eta has to be in [0, 1).
-    seed : int
-        Pseudo random generator seed to use
-
     """
 
     def __init__(self, eta=DEFAULT_ETA, ExpM=None, **kwargs):
-        """
-        Generate a directed, possibly weighted network by using the reciprocity generative model.
-        Can be used to generate benchmarks for networks with reciprocity.
-        Steps:
-            1. Generate the latent variables.
-            2. Extract A_ij entries (network edges) from a Poisson distribution;
-               its mean depends on the latent variables.
+        """       
+        Parameters
+        ----------
+        eta : float
+            Initial value for the reciprocity coefficient. Eta has to be in [0, 1).
+        ExpM : int
+            Expected number of edges
+        kwargs : 
+            Additional arguments of `vimure.synthetic.StandardSBM` 
         """
         super().init_sbm_params(**kwargs)
 
@@ -888,18 +835,20 @@ class Multitensor(StandardSBM):
     def Exp_ija_matrix(self, u, v, w):
         """
         Compute the mean lambda0_ij for all entries.
+
         Parameters
         ----------
-        u : ndarray
+        u : numpy.array
             Out-going membership matrix.
-        v : ndarray
+        v : numpy.array
             In-coming membership matrix.
-        w : ndarray
+        w : numpy.array
             Affinity matrix.
+            
         Returns
         -------
-        M : ndarray
-            Mean lambda0_ij for all entries.
+        M : numpy.array
+            Mean `\lambda^{0}_{ij}` for all entries.
         """
 
         M = np.einsum("ik,jq->ijkq", u, v)
@@ -909,8 +858,8 @@ class Multitensor(StandardSBM):
 
     def build_Y(self):
         """
-        Generate network layers G (and adjacency matrix A) using the latent variables,
-        with the generative model (A_ij,A_ji) ~ P(A_ij|u,v,w,eta) P(A_ji|A_ij,u,v,w,eta)
+        Generate network layers G and adjacency matrix A using the latent variables,
+        with the generative model `(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A_{ij},u,v,w,eta)`
         """
 
         self.Y = np.zeros((self.L, self.N, self.N))
@@ -1031,9 +980,15 @@ FUNCTIONS TO GENERATE X (OBSERVED NETWORK) FROM A GENERATED GROUND TRUTH NETWORK
 def build_self_reporter_mask(gt_network):
     """
     Build the reporters' mask in a way such that:
-    - a reporter m can report ties in which she is ego:   m --> i
-    - a reporter m can report ties in which she is alter: i --> m
-    - a reporter m CANNOT report ties she is not involved, that is i --> j where i != m and j != m
+
+    - A reporter `m` can report ties in which she is ego:   `m --> i`
+    - A reporter `m` can report ties in which she is alter: `i --> m`
+    - A reporter `m` **cannot** report ties she is not involved, that is `i --> j` where `i != m` and `j != m`
+    
+    Parameters
+    ----------
+    gt_network : vimure.synthetic.BaseSyntheticNetwork
+        Generative ground truth model.
     """
 
     # TODO: Use sparse matrices instead
@@ -1052,21 +1007,24 @@ def build_custom_theta(
     seed: int = None,
 ):
     """
-    Instead of the regular generative model for theta (theta ~ Gamma(sh,sc)),
-        create a more extreme scenario where some percentage of reporters are exaggerating.
+    Instead of the regular generative model for `theta ~ Gamma(sh,sc)`,
+    create a more extreme scenario where some percentage of reporters are exaggerating.
 
-    Parameters:
-        gt_network: vimure.synthetic.BaseSyntheticNetwork or subclasses
-            Generative ground truth model
-        theta_ratio: float
-            Percentage of reporters who exaggerate
-        exaggeration_type: str
-            "over" or "under"
-        seed: int (optional)
-            if not set, use gt_network.prng instead
+    Parameters
+    ----------
+    gt_network : vimure.synthetic.BaseSyntheticNetwork
+        Generative ground truth model.
+    theta_ratio : float
+        Percentage of reporters who exaggerate.
+    exaggeration_type : str
+        ("over", "under")
+    seed : int
+        If not set, use gt_network.prng instead.
 
-    Returns:
-        A L x M matrix for theta
+    Returns
+    ----------
+    theta : numpy.array
+        A L x M matrix for theta.
 
     """
 

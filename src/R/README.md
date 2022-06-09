@@ -1,27 +1,27 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# R Setup
+# vimure
 
-The VIMuRe R package wraps the
-[VIMuRe](https://github.com/latentnetworks/vimure/tree/develop/src/python) Python package. We use the [`reticulate`](https://rstudio.github.io/reticulate/) package to embeds a Python session within your R session, enabling seamless, high-performance interoperability.
+![Github Badge](https://github.com/latentnetworks/vimure/workflows/test/badge.svg)
+[![codecov](https://codecov.io/gh/latentnetworks/vimure/branch/main/graph/badge.svg?token=NAZP90D12J)](https://codecov.io/gh/latentnetworks/vimure)
 
-## Requirements
+Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data.
 
-VIMuRe R package depends on R \>= 3.3.0 and it is expect to work fine in all OS.
+> De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D, Power EA. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396).
 
-# Installation
+VIMuRe package is available in R and Python. 
 
-First, install the vimure R package from GitHub as follows:
+## Installation
 
-``` r
+```r
 install.packages("devtools")
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
-Then, use the `install_vimure()` function to install VIMuRe. 
+## Feedback
 
-Note that if reticulate did not find a non-system installation of python you may be prompted if you want it to download and install miniconda. Miniconda is the recommended installation method for most users, as it ensures that the R python installation is isolated from other python installations. If you initially declined the miniconda installation prompt, you can later manually install miniconda by running `reticulate::install_miniconda()`
+Report a bug and give a general feedback about the library:
 
 ``` r
 library(vimure)

@@ -51,8 +51,7 @@
 #'   to `TRUE`, to ensure that Vimure dependencies like NumPy are compatible
 #'   with the prebuilt Vimure binaries.
 #'
-#' @param force Whether pip should recreate 'r-reticulate' virtualenv.
-#'   This defaults to `FALSE`.
+#' @param force Whether pip should recreate 'r-reticulate' virtualenv. This defaults to `FALSE`.
 #'
 #' @param ... other arguments passed to [`reticulate::conda_install()`] or
 #'   [`reticulate::virtualenv_install()`], depending on the `method` used.
