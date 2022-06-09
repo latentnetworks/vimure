@@ -5,6 +5,8 @@ import sktensor as skt
 
 from sktensor.sptensor import fromarray
 
+def match_arg(x, lst):
+    return [el for el in lst if x == el]
 
 def calculate_average_over_reporter_mask(X, R):
     if not isinstance(R, np.ndarray):
@@ -179,6 +181,9 @@ UTIL functions related to VimureModel
 
 
 def get_optimal_threshold(model):
+    """
+    https://arxiv.org/pdf/2112.11396.pdf pg 8
+    """
     return 0.54 * model.G_exp_nu - 0.01
 
 

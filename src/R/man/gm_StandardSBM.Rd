@@ -45,7 +45,7 @@ For more information about this model, see Holland, P. W., Laskey, K. B., & Lein
 }
 \examples{
 random_net <- gm_StandardSBM(N=100, M=100, L=1)
-Y <- extract_Y(random_net)
+Y <- random_net$Y$toarray()
 dim(Y)
 }
 \seealso{

@@ -304,3 +304,85 @@ class TestVimureModel:
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
 
         assert np.allclose(f1_score(Y_true, Y_rec), 0.97, atol=1e-2)
+
+
+class TestInferredModel:
+    @classmethod
+    def setup_class(cls):
+        cls.synth_net = vm.synthetic.StandardSBM(K=2)
+        cls.synth_net.build_X(flag_self_reporter=True)
+
+        cls.model = vm.model.VimureModel()
+        cls.model.fit(
+            cls.synth_net.X,
+            K=cls.synth_net.K,
+            R=cls.synth_net.R,
+            num_realisations=1,
+            max_iter=500,
+        )
+
+        cls.model_mutuality = vm.model.VimureModel(mutuality=True)
+        cls.model_mutuality.fit(
+            cls.synth_net.X,
+            K=cls.synth_net.K,
+            R=cls.synth_net.R,
+            num_realisations=1,
+            max_iter=500,
+        )
+
+    def check_output(self, Y, model):
+        assert Y.shape == (model.L, model.N, model.N)
+        assert Y.sum() > 0
+
+    def test_non_implemented_method(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.model.get_inferred_model(self.model, method="NotImplemented")
+            assert (
+                str(e_info.value)
+                == '\'method\' should be one of "rho_max", "rho_mean","fixed_threshold", "heuristic_threshold".'
+            )
+
+    def test_fixed_threshold(self):
+        with pytest.raises(ValueError) as e_info:
+            vm.model.get_inferred_model(self.model_mutuality, method="fixed_threshold")
+            assert (
+                str(e_info.value)
+                == 'For method="fixed_threshold", you must set the threshold to a value in [0,1].'
+            )
+
+        with pytest.raises(ValueError) as e_info:
+            vm.model.get_inferred_model(
+                self.model_mutuality, method="fixed_threshold", threshold=2
+            )
+            assert (
+                str(e_info.value)
+                == 'For method="fixed_threshold", you must set the threshold to a value in [0,1].'
+            )
+
+        Y = vm.model.get_inferred_model(
+            self.model_mutuality, method="fixed_threshold", threshold=0.5
+        )
+        self.check_output(Y, self.model_mutuality)
+
+    def test_rho_max(self):
+        Y = vm.model.get_inferred_model(self.model_mutuality, method="rho_max")
+        self.check_output(Y, self.model_mutuality)
+
+        Y = vm.model.get_inferred_model(self.model, method="rho_max")
+        self.check_output(Y, self.model)
+
+    def test_rho_mean(self):
+        Y = vm.model.get_inferred_model(self.model_mutuality, method="rho_mean")
+        self.check_output(Y, self.model_mutuality)
+
+        Y = vm.model.get_inferred_model(self.model, method="rho_mean")
+        self.check_output(Y, self.model)
+
+    def test_heuristic_threshold(self):
+        Y = vm.model.get_inferred_model(
+            self.model_mutuality, method="heuristic_threshold"
+        )
+        self.check_output(Y, self.model_mutuality)
+
+        Y = vm.model.get_inferred_model(self.model, method="heuristic_threshold")
+        self.check_output(Y, self.model)

@@ -48,7 +48,7 @@ For more information about this model, see Karrer, B., & Newman, M. E. (2011). \
 }
 \examples{
 random_net <- gm_DegreeCorrectedSBM(exp_in = 2, exp_out = 2.5)
-Y <- extract_Y(random_net)
+Y <- random_net$Y$toarray()
 dim(Y)
 }
 \seealso{
