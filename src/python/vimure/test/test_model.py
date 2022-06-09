@@ -336,7 +336,7 @@ class TestInferredModel:
 
     def test_non_implemented_method(self):
         with pytest.raises(ValueError) as e_info:
-            vm.model.get_inferred_model(self.model, method="NotImplemented")
+            self.model.get_inferred_model(method="NotImplemented")
             assert (
                 str(e_info.value)
                 == '\'method\' should be one of "rho_max", "rho_mean","fixed_threshold", "heuristic_threshold".'
@@ -344,45 +344,50 @@ class TestInferredModel:
 
     def test_fixed_threshold(self):
         with pytest.raises(ValueError) as e_info:
-            vm.model.get_inferred_model(self.model_mutuality, method="fixed_threshold")
+            self.model.get_inferred_model(method="fixed_threshold")
             assert (
                 str(e_info.value)
                 == 'For method="fixed_threshold", you must set the threshold to a value in [0,1].'
             )
 
         with pytest.raises(ValueError) as e_info:
-            vm.model.get_inferred_model(
-                self.model_mutuality, method="fixed_threshold", threshold=2
-            )
+            self.model.get_inferred_model(method="fixed_threshold", threshold=2)
             assert (
                 str(e_info.value)
                 == 'For method="fixed_threshold", you must set the threshold to a value in [0,1].'
             )
 
-        Y = vm.model.get_inferred_model(
-            self.model_mutuality, method="fixed_threshold", threshold=0.5
-        )
+        Y = self.model.get_inferred_model(method="fixed_threshold", threshold=0.5)
         self.check_output(Y, self.model_mutuality)
 
     def test_rho_max(self):
-        Y = vm.model.get_inferred_model(self.model_mutuality, method="rho_max")
+        Y = self.model_mutuality.get_inferred_model(method="rho_max")
         self.check_output(Y, self.model_mutuality)
 
-        Y = vm.model.get_inferred_model(self.model, method="rho_max")
+        Y = self.model.get_inferred_model(method="rho_max")
         self.check_output(Y, self.model)
 
     def test_rho_mean(self):
-        Y = vm.model.get_inferred_model(self.model_mutuality, method="rho_mean")
+        Y = self.model_mutuality.get_inferred_model(method="rho_mean")
         self.check_output(Y, self.model_mutuality)
 
-        Y = vm.model.get_inferred_model(self.model, method="rho_mean")
+        Y = self.model.get_inferred_model(method="rho_mean")
         self.check_output(Y, self.model)
 
     def test_heuristic_threshold(self):
-        Y = vm.model.get_inferred_model(
-            self.model_mutuality, method="heuristic_threshold"
+        Y = self.model_mutuality.get_inferred_model(
+            method="heuristic_threshold"
         )
         self.check_output(Y, self.model_mutuality)
 
-        Y = vm.model.get_inferred_model(self.model, method="heuristic_threshold")
+        Y = self.model.get_inferred_model(method="heuristic_threshold")
         self.check_output(Y, self.model)
+    
+    def test_sample_Y(self):
+        N = 10
+        Y = self.model.sample_inferred_model(N=N)
+        
+        assert len(Y) == N
+        
+        for y in Y:
+            self.check_output(y, self.model_mutuality)
