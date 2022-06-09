@@ -31,7 +31,7 @@ Simply create an object with the desired synthetic network class (more info abou
 ```{r}
 random_net <- gm_Multitensor(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)
 
-Y <- extract_Y(random_net)
+Y <- random_net$Y$toarray()
 
 ggcorrplot(Y[1, ,]) + 
    ggplot2::scale_fill_gradient(low="white",high="#003396")

@@ -16,3 +16,9 @@
 \description{
 Diagnostics metrics
 }
+\seealso{
+Other vimure: 
+\code{\link{get_inferred_model}()},
+\code{\link{vimure}()}
+}
+\concept{vimure}

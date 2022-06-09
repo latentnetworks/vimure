@@ -56,3 +56,9 @@ Fit a probabilistic generative model to double sampled networks. It returns reli
 reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
 network (rho). The inference is performed with a Variational Inference approach.
 }
+\seealso{
+Other vimure: 
+\code{\link{get_inferred_model}()},
+\code{\link{summary.vimure.model.VimureModel}()}
+}
+\concept{vimure}
