@@ -20,5 +20,5 @@ test:
 
 docs: 
 	Rscript -e 'vimure::install_vimure(version="src/python/");setwd("src/R");pkgdown::build_site()'
-	git add docs && git commit -m "Initial dist subtree commit"
-	git subtree push --prefix docs origin gh-pages
+	git add docs && git commit -m "Update docs"
+	git push origin `git subtree split --prefix docs develop`:gh-pages --force
