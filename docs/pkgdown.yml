@@ -1,0 +1,10 @@
+pandoc: '2.12'
+pkgdown: 2.0.3
+pkgdown_sha: ~
+articles:
+  karnataka: karnataka.html
+  quick_start: quick_start.html
+  synthetic: synthetic.html
+  vimure: vimure.html
+last_built: 2022-06-10T07:44Z
+
