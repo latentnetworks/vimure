@@ -87,7 +87,26 @@ vimure <- function(x, R=NULL, mutuality=T, undirected=F, theta_prior=c(0.1, 0.1)
 #' @export
 get_inferred_model <- function(object, method = "rho_max", threshold = NULL){
   if('rho_f' %in% names(object)){
-    return(vimureP$model$get_inferred_model(object, method, threshold))
+    return(object$get_inferred_model(method, threshold))
+  } else {
+    stop('"object" is not a fitted vimure model')
+  }
+}
+
+#' Sample Y trials from rho distribution
+
+#' Use this function to sample Y trials with a fitted vimure model.
+#' It will use `model.rho_f` as the probabilities of a discrete distribution.
+#'
+#' @param object A "vimure" object.
+#' @param N Number of trials.
+#' @param seed A pseudo generator seed.
+#'
+#' @export
+sample_inferred_model <- function(object, N=1, seed=NULL){
+  N <- as.integer(N)
+  if('rho_f' %in% names(object)){
+    return(object$sample_inferred_model(N=N, seed=seed))
   } else {
     stop('"object" is not a fitted vimure model')
   }

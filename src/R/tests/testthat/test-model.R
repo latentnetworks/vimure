@@ -114,4 +114,12 @@ test_that("Check inferred model", {
     Y_hat <- get_inferred_model(model, method = method, threshold = 0.5)
     check_output(Y_hat, model)
   }
+
+  N <- 10L
+  Y_hat <- sample_inferred_model(model, N=N)
+  expect_equal(length(Y_hat), N)
+
+  for(y in Y_hat){
+    check_output(y, model)
+  }
 })

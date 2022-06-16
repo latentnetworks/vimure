@@ -1032,6 +1032,135 @@ class VimureModel(TransformerMixin, BaseEstimator):
         iter += 1
 
         return iter, elbo, coincide, reached_convergence
+    
+    """
+    INFERRED MODEL
+    """
+
+    def sample_inferred_model(self, N=1, seed = None):
+        """Sample Y trials from rho distribution
+
+        Use this function to sample Y trials with a fitted vimure model.
+        It will use `model.rho_f` as the probabilities of a discrete distribution.
+
+        Parameters
+        ----------
+        model : vm.model.VimureModel
+            A `vm.model.VimureModel` object
+        N : int
+            Number of trials
+        seed : int
+            A pseudo generator seed 
+
+        Returns
+        -------
+        Y : List[ndarray]
+            A list of trials
+        """
+        if seed is None:
+            seed = self.seed
+            
+        def sampleY(seed):
+            pnrg = np.random.default_rng(seed)
+            
+            Y = pnrg.multinomial(
+                n=N, pvals=self.rho_f, size = (self.L, self.N, self.N)
+            )
+
+            return Y.argmax(axis=-1)
+
+        Y = [sampleY(seed + i) for i in range(0, N)]
+        
+        return Y
+
+
+    def get_inferred_model(self, method="rho_max", threshold=None):
+        """Estimate Y
+
+        Use this function to reconstruct the Y matrix with a fitted vimure model.
+        It will use `model.rho_f` values to extract an estimated Y matrix.
+
+        - *rho_max*: Assign the value of the highest probability
+        - *rho_mean*: Expected value of the discrete distribution
+        - *fixed_threshold*: Check if the probability is higher than a threshold (Only for K=2)
+        - *heuristic_threshold*: Calculate and use the best threshold (Only for K=2)
+
+        Parameters
+        ----------
+        model : vm.model.VimureModel
+            A `vm.model.VimureModel` object
+        method : str
+            A character string indicating which method is to be computed.
+            One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".
+        threshold : float
+            A threshold to be used when method = "fixed_threshold".
+
+        Returns
+        -------
+        Y : ndarray
+        """
+
+        if not hasattr(self, "rho_f"):
+            NotFittedError(
+                "This VimureModel instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator"
+            )
+
+        OPTIONS = ["rho_max", "rho_mean", "fixed_threshold", "heuristic_threshold"]
+
+        if len(method) > 1 and type(method) == "list":
+            msg = f"'method' has length > 1 and only the first element will be used"
+            warnings.warn(msg, UserWarning)
+            method = method[0]
+
+        try:
+            method = match_arg(method, OPTIONS)[0]
+        except IndexError:
+            raise ValueError(
+                (
+                    "'method' should be one of {}.".format(
+                        ", ".join(['"' + x + '"' for x in OPTIONS])
+                    )
+                )
+            )
+
+        def rho_max(model, threshold=None):
+            return (np.argmax(model.rho_f, axis=-1)).astype("int")
+
+        def rho_mean(model, threshold=None):
+            K = model.rho_f.shape[-1]
+            return (np.dot(model.rho_f, range(0, K)))  # It returns the rounded number
+
+        def fixed_threshold(model, threshold):
+            if (threshold is None) or (threshold > 1) or (threshold < 0):
+                raise ValueError(
+                    'For method="fixed_threshold", '
+                    "you must set the threshold to a value in [0,1]."
+                )
+
+            Y = np.copy(model.rho_f[:, :, :, 1])
+            Y[Y < threshold] = 0
+            Y[Y >= threshold] = 1
+
+            return Y
+
+        def heuristic_threshold(model, threshold=None):
+            return apply_rho_threshold(model).astype("int")
+
+        methods = {
+            "rho_max": rho_max,
+            "rho_mean": rho_mean,
+            "fixed_threshold": fixed_threshold,
+            "heuristic_threshold": heuristic_threshold,
+        }
+
+        if (not self.mutuality and method != "rho_max") or (
+            self.rho_f.shape[-1] > 2 and "threshold" in method
+        ):
+            msg = 'threshold methods is incompatible with VIMuRe\'s mutuality=False or for data with more than 2 categories. Using "rho_max" method.'
+            warnings.warn(msg, UserWarning)
+            method = "rho_max"
+
+        return methods[method](self, threshold)
 
     """
     UTILS
@@ -1116,96 +1245,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
 """
 UTIL FUNCTIONS FOR INFERENCE
 """
-
-
-def get_inferred_model(model, method="rho_max", threshold=None):
-    """Estimate Y
-
-    Use this function to reconstruct the Y matrix with a fitted vimure model.
-    It will use `model.rho_f` values to extract an estimated Y matrix.
-
-    - *rho_max*: Assign the value of the highest probability
-    - *rho_mean*: Expected value of the discrete distribution
-    - *fixed_threshold*: Check if the probability is higher than a threshold (Only for K=2)
-    - *heuristic_threshold*: Calculate and use the best threshold (Only for K=2)
-
-    Parameters
-    ----------
-    model : vm.model.VimureModel
-        A `vm.model.VimureModel` object
-    method : str
-        A character string indicating which method is to be computed.
-        One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".
-    threshold : float
-        A threshold to be used when method = "fixed_threshold".
-
-    Returns
-    -------
-    Y : ndarray
-    """
-
-    if not hasattr(model, "rho_f"):
-        NotFittedError(
-            "This VimureModel instance is not fitted yet. Call 'fit' with appropriate arguments before using this estimator"
-        )
-
-    OPTIONS = ["rho_max", "rho_mean", "fixed_threshold", "heuristic_threshold"]
-
-    if len(method) > 1 and type(method) == "list":
-        msg = f"'method' has length > 1 and only the first element will be used"
-        warnings.warn(msg, UserWarning)
-        method = method[0]
-
-    try:
-        method = match_arg(method, OPTIONS)[0]
-    except IndexError:
-        raise ValueError(
-            (
-                "'method' should be one of {}.".format(
-                    ", ".join(['"' + x + '"' for x in OPTIONS])
-                )
-            )
-        )
-
-    def rho_max(model, threshold=None):
-        return (np.argmax(model.rho_f, axis=-1)).astype("int")
-
-    def rho_mean(model, threshold=None):
-        K = model.rho_f.shape[-1]
-        return (np.dot(model.rho_f, range(0, K)))  # It returns the rounded number
-
-    def fixed_threshold(model, threshold):
-        if (threshold is None) or (threshold > 1) or (threshold < 0):
-            raise ValueError(
-                'For method="fixed_threshold", '
-                "you must set the threshold to a value in [0,1]."
-            )
-
-        Y = np.copy(model.rho_f[:, :, :, 1])
-        Y[Y < threshold] = 0
-        Y[Y >= threshold] = 1
-
-        return Y
-
-    def heuristic_threshold(model, threshold=None):
-        return apply_rho_threshold(model).astype("int")
-
-    methods = {
-        "rho_max": rho_max,
-        "rho_mean": rho_mean,
-        "fixed_threshold": fixed_threshold,
-        "heuristic_threshold": heuristic_threshold,
-    }
-
-    if (not model.mutuality and method != "rho_max") or (
-        model.rho_f.shape[-1] > 2 and "threshold" in method
-    ):
-        msg = 'threshold methods is incompatible with VIMuRe\'s mutuality=False or for data with more than 2 categories. Using "rho_max" method.'
-        warnings.warn(msg, UserWarning)
-        method = "rho_max"
-
-    return methods[method](model, threshold)
-
 
 def gamma_elbo_term(pa, pb, qa, qb):
     return (
