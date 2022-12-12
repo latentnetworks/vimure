@@ -1,0 +1,42 @@
+project:
+  title: "VIMuRe"
+  type: "website"
+  render:
+    - "index.qmd"
+    - "people.qmd"
+
+website:
+  title: "VIMuRe"
+  repo-url: latentnetworks.github.io/vimure/
+  page-navigation: true
+  reader-mode: true
+  search:
+    location: navbar
+    type: overlay
+  sidebar:
+    
+    style: "docked"
+    contents:
+      - href: index.qmd
+        text: "🏠 Home"
+      - href: people.qmd
+        text: "📟 Contact"
+
+format:
+  html:
+    html-q-tag: true
+    subtitle: "Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data"
+    email-obfuscation: javascript
+    link-external-newwindow: true
+    link-external-icon: true
+    link-external-filter: ^(?:http:|https:)\/\/(?:latentnetworks\.github\.io\/|localhost)
+    date-format: "DD MMMM YYYY"
+    theme:
+      light: cosmo
+      dark:  cyborg
+    toc: true
+
+bibliography: references/references.bib
+csl: references/chicago-author-date.csl
+
+

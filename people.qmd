@@ -1,0 +1,94 @@
+---
+title: "VIMuRe"
+date: "12/12/2022"
+---
+
+# Who we are
+
+::: columns
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/cdebacco.png" alt="Photo of Caterina De Bacco" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.cdebacco.com/" target="_blank" class="external">Caterina De Bacco</a></span></strong> 
+        <br>
+        CyberValley Research Group Leader
+        <br>MPI for Intelligent Systems
+    </figcaption>
+
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/martina.jpeg" alt="Photo of Martina Contisciani" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong><span><a href="https://is.mpg.de/person/mcontisciani" target="_blank" class="external">Martina Contisciani</a></span></strong> 
+        <br>Ph.D. Student
+        <br>MPI for Intelligent Systems<br>
+    </figcaption>
+
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/jon.jpg" alt="Photo of Jon Cardoso-Silva" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.lse.ac.uk/DSI/People/Jonathan-Cardoso-Silva" target="_blank" class="external">Jon Cardoso-Silva</a></span></strong> 
+        <br/>Assist. Prof. Lecturer
+        <br/>LSE Data Science Institute<br/>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+
+<figure>
+    <img src="/figures/hadiseh.jpeg" alt="Photo of Hadiseh Safdari" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://is.mpg.de/person/hsafdari" target="_blank" class="external">Hadiseh Safdari</a></span></strong> 
+        <br/>Postdoctoral Researcher
+        <br>MPI for Intelligent Systems
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/diego.jpg" alt="Photo of Diego Baptista Theuerkauf" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong><span><a href="https://is.mpg.de/person/dtheuerkauf" target="_blank" class="external">Diego Baptista Theuerkauf</a></span></strong> 
+        <br/>Ph.D. Student
+        <br>MPI for Intelligent Systems<br><br>
+    </figcaption>
+</figure>
+
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/gabi.jpg" alt="Photo of Gabriela Lima Borges" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong><span><a href="https://github.com/gabiborges1" target="_blank" class="external">Gabriela Lima Borges</a></span></strong> 
+        <br/>Data Scientist / Guest Researcher
+        <br>MPI for Evolutionary Anthropology<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/tracy.jpg" alt="Photo of Tracy Sweet" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://education.umd.edu/directory/tracy-sweet" target="_blank" class="external">Tracy Sweet</a></span></strong> 
+        <br/>Associate Professor
+        <br>UMD College of Education<br><br>
+    </figcaption>
+</figure>
+:::
+
+
+:::
+

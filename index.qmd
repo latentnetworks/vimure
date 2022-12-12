@@ -1,0 +1,19 @@
+---
+title: "VIMuRe"
+subtitle: "Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data"
+---
+
+_(🚧 This is a work in progress. 🚧)_
+
+# 📑 Is this package for me?
+
+**VIMuRe** is a package for fitting latent network models to multiply-sampled social network data.  ^[<mark class="todo">**\#TODO**</mark>: Explain what multiply-sampled social network data is.]
+
+📦 There is one implementation in R and one in Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.
+
+Here is what you can expect from this package:
+
+- **Input:** multiply-sampled social network data as a list of adjacency matrices or igraph objects. ^[<mark class="todo">**\#TODO**</mark>: Illustrate what this means.]
+
+- **Output:** a fitted latent network model that can be used to obtain samples or a point-estimate network (an igraph object) from the posterior distribution of the fitted model. ^[<mark class="todo">**\#TODO**</mark>: Illustrate what this means.]
+
