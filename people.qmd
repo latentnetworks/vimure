@@ -5,6 +5,8 @@ date: "12/12/2022"
 
 # Who we are
 
+The people behind the conception, development, and maintenance of VIMuRe are listed below. 
+
 ::: columns
 
 ::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
@@ -85,6 +87,72 @@ date: "12/12/2022"
         <strong>Dr.&nbsp;<span><a href="https://education.umd.edu/directory/tracy-sweet" target="_blank" class="external">Tracy Sweet</a></span></strong> 
         <br/>Associate Professor
         <br>UMD College of Education<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/jgyoung.png" alt="Photo of Jean-Gabriel Young" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.jgyoung.ca/" target="_blank" class="external">Jean-Gabriel Young</a></span></strong> 
+        <br/>Assistant Professor
+        <br>The University of Vermont<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/jeremy.jpg" alt="Photo of Jeremy Koster" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://researchdirectory.uc.edu/p/kosterjy" target="_blank" class="external">Jeremy Koster</a></span></strong> 
+        <br/>Professor
+        <br>University of Cincinnati<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/codyross.jpg" alt="Photo of Cody T. Ross" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/cody-ross/" target="_blank" class="external">Cody T. Ross</a></span></strong> 
+        <br/>Post-Doctoral Fellow
+        <br>MPI for Evolutionary Anthropology<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/richard.jpg" alt="Photo of Richard McElreath" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/richard-mcelreath/" target="_blank" class="external">Richard McElreath</a></span></strong> 
+        <br/>Professor
+        <br>MPI for Evolutionary Anthropology<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/dan.jpg" alt="Photo of Daniel Redhead" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/daniel-redhead/" target="_blank" class="external">Daniel Redhead</a></span></strong> 
+        <br/>Research Scientist
+        <br>MPI for Evolutionary Anthropology<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:300px;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/elly.jpg" alt="Photo of Eleanor A. Power" max-width="400" max-height="400" role="presentation" style="width:5em" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.lse.ac.uk/Methodology/People/Academic-Staff/Eleanor-Power/Eleanor-Power" target="_blank" class="external">Eleanor A. Power</a></span></strong> 
+        <br/>Assistant Professor
+        <br>LSE Department of Methodology<br><br>
     </figcaption>
 </figure>
 :::
