@@ -75,7 +75,7 @@
 
     
     
-<p>The goal of vimure is to make available latent network models to account for noisy, multiply-reported social network Data.</p>
+<p>The goal of vimure is to make available latent network models to account for noisy, multiply-reported social network data.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">vimure</span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://igraph.org" class="external-link">igraph</a></span><span class="op">)</span>
@@ -111,9 +111,9 @@
      edge.arrow.width<span class="op">=</span><span class="fl">0.5</span><span class="op">)</span></code></pre></div>
 <p><img src="quick_start_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
 <div class="section level3">
-<h3 id="python-interface">Python interface<a class="anchor" aria-label="anchor" href="#python-interface"></a>
+<h3 id="python-interface">Using Python in R<a class="anchor" aria-label="anchor" href="#python-interface"></a>
 </h3>
-<p><code>vimure</code> is a R binding of a Python package. Many Python basic objects are quickly converted to R automatically. Custom Python objects that can not be converted automatically are stored in R as a <code>python.builtin.object</code>. As a <code>python.builtin.object</code>, you can access all object’s attributes as it is in Python using the dollar sign <code>$</code>.</p>
+<p><code>vimure</code> is an R binding of a Python package. Many Python basic objects are quickly converted to R automatically. Custom Python objects that cannot be converted automatically are stored in R as a <code>python.builtin.object</code>. As a <code>python.builtin.object</code>, you can access all of an object’s attributes as it is in Python using the dollar sign <code>$</code>.</p>
 <p>Use the function <code>class</code> to check if a object is stored in Python.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">net</span><span class="op">)</span>
@@ -163,17 +163,17 @@
 <div class="section level2">
 <h2 id="run-model">Run model<a class="anchor" aria-label="anchor" href="#run-model"></a>
 </h2>
-<p>In R we can construct and fit the vimure model by using the <code>vimure</code> function. The <code>vimure</code> function inherit all arguments from the original <code>VimudeModel</code> class and <code>VimureModel.fit()</code>. See more info about arguments in <code><a href="../reference/vimure.html">help(vimure)</a></code>.</p>
-<p>In R, the <code>vimure</code> takes as data input an adjancency matrix or an igraph object.</p>
+<p>In R we can construct and fit the vimure model by using the <code>vimure</code> function. The <code>vimure</code> function inherits all arguments from the original <code>VimureModel</code> class and <code>VimureModel.fit()</code>. See more info about arguments in <code><a href="../reference/vimure.html">help(vimure)</a></code>.</p>
+<p>In R, <code>vimure</code> takes as data input an adjancency matrix or an igraph object.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/vimure.html">vimure</a></span><span class="op">(</span><span class="va">net</span><span class="op">$</span><span class="va">X</span>, <span class="va">net</span><span class="op">$</span><span class="va">R</span>, mutuality<span class="op">=</span><span class="cn">T</span>, K<span class="op">=</span><span class="fl">2</span>, num_realisations<span class="op">=</span><span class="fl">5</span>, max_iter<span class="op">=</span><span class="fl">1000</span><span class="op">)</span></code></pre></div>
 <blockquote>
-<p>Note: Run model without mutuality is not particularly useful since we know this network has some level of reciprocity and mutuality. We are doing this for testing purposes only.</p>
+<p>Note: Running the model without mutuality is not particularly useful, since we know this network has some level of reciprocity and mutuality. We are doing this for testing purposes only.</p>
 </blockquote>
 <div class="section level3">
 <h3 id="diagnostics">Diagnostics<a class="anchor" aria-label="anchor" href="#diagnostics"></a>
 </h3>
-<p>Use <code>summary</code> to produce result summaries of the results of the model. The output of <code>summary</code> is a R list that contains vimure’s priors and posteriors and more. You can access the results to plot and analyse the final model. Open an issue in our <a href="https://github.com/latentnetworks/vimure/issues/new" class="external-link">repository</a> to make request new metrics in <code>summary</code>.</p>
+<p>Use <code>summary</code> to produce summaries of the results of the model. The output of <code>summary</code> is an R list that contains vimure’s priors and posteriors and more. You can access the results to plot and analyse the final model. Open an issue in our <a href="https://github.com/latentnetworks/vimure/issues/new" class="external-link">repository</a> to request new metrics in <code>summary</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">diag</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
 <span class="co">#&gt; ---------------</span>
