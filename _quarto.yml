@@ -2,8 +2,8 @@ project:
   title: "VIMuRe"
   type: "website"
   render:
-    - "index.qmd"
-    - "people.qmd"
+    - "*.qmd"
+    - "docs/latest/**.qmd"
 
 website:
   title: "VIMuRe"
@@ -19,8 +19,12 @@ website:
     contents:
       - href: index.qmd
         text: "🏠 Home"
-      - href: people.qmd
+      - href: docs/latest/people.qmd
         text: "📟 Contact"
+      - href: docs/latest/install.qmd
+        text: "📦 Installation"
+      - href: docs/latest/quick-start.qmd
+        text: "💻 Quick Start"
 
 format:
   html:

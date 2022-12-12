@@ -11,41 +11,10 @@ Suppose you want to find out the "true" network of social ties between $n$ indiv
 
 Suppose, also, that you ask them questions in both directions: _"Who **comes** to person $i$ to borrow money? But also, who does person $i$ **goes to** when borrowing money?"_ As it is very unlikely that the responses given by the reporters will match perfectly, you will almost surely end up with varying perspectives of the same social network. The question then is, how do you make sense of this data in face of noisy reports and potentially unreliable reporters?
 
-The model contained in the **VIMuRe** package is our proposed solution to this problem. It fits latent network model from multiply-sampled social network data using Bayesian inference, returning a posterior distribution that can lately be used to obtain samples or a point-estimate network from the posterior distribution of the fitted model. The package is written in Python and R and is available on GitHub.
+The model contained in the **VIMuRe** package is our proposed solution to this problem. It fits latent network model from multiply-sampled social network data using Bayesian inference, returning a posterior distribution that can lately be used to obtain samples or a point-estimate network (as an igraph object). The package is written in Python and R and is available on GitHub.
 
 ## 📝 In brief
 
 - **Input:** multiply-sampled social network data as a list of adjacency matrices or igraph objects. ^[<mark class="todo">**\#TODO**</mark>: Illustrate what this means.]
 
 - **Output:** a fitted latent network model that can be used to obtain samples or a point-estimate network (an igraph object) from the posterior distribution of the fitted model. ^[<mark class="todo">**\#TODO**</mark>: Illustrate what this means.]
-
-# 📦 How to install it
-
-VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.
-
-::: panel-tabset
-
-## R
-
-Install `vimure==0.1` with the following command:
-
-```r
-require(devtools)
-
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
-```
-
-
-## Python
-
-Install `vimure==0.1` with the following command:
-
-```bash
-pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
-```
-
-This Python package was tested on Python >= 3.6 and it is expect to work fine in all OSes.
-
-See more about Python set up for development [here](https://github.com/latentnetworks/vimure/blob/develop/src/python/README.md).
-
-:::

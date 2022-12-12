@@ -1,0 +1,74 @@
+---
+title: "📦 Installation"
+subtitle: "VIMuRe v0.1.0 (latest)"
+---
+
+VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.
+
+::: panel-tabset
+
+## R
+
+**Step 01:** install `reticulate` with the following command:
+
+```r
+install.packages("reticulate")
+```
+
+::: {.callout-note collapse="true"}
+## Click here to learn more about `reticulate`
+
+- Our core code is written in python, so we use `reticulate` to integrate our model in R. This package allows you to use Python within your R session in a seamless, high-performance interoperable way. 
+
+- `reticulate` will look for python installed in your computer. If, for some reason, it cannot find it, you may be prompted to download and install miniconda. 
+
+    - Miniconda is the recommended installation method for most users, as it is easier to ensure that the newly installed python is isolated from other python installs you have in your system. 
+    - If you initially declined the miniconda installation prompt, you can later manually install miniconda by running `reticulate::install_miniconda()`.
+
+:::
+
+**Step 02:** install `vimure==0.1` with the following command:
+
+```r
+require(devtools)
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+```
+
+
+**Step 03**: Finally, you must install the Python package as well. This is because the R package is a wrapper around the Python package. To install the Python package, follow the instructions below.
+
+```r
+require(vimure)
+vimure::install_vimure()
+```
+
+If you are not using RStudio, i.e. you are using R in the terminal, you may need to restart your R session after installing the Python package.
+
+**Step 04**: To confirm that the installation was successful, run the following command:
+
+```r
+library(vimure)
+vimure::vm_config()
+```
+
+You should see something like the following:
+
+```r
+#> Loaded vimure version
+#> Vimure v (...)
+#> Python v3.x (...)
+```
+
+## Python
+
+Install `vimure==0.1` with the following command:
+
+```bash
+pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
+```
+
+This Python package was tested on Python >= 3.6 and it is expect to work fine in all OSes.
+
+Read more about the Python set up for development [here](https://github.com/latentnetworks/vimure/blob/develop/src/python/README.md).
+
+:::

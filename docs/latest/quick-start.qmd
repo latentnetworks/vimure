@@ -1,0 +1,25 @@
+---
+title: "💻 Quick Start"
+subtitle: "VIMuRe v0.1.0 (latest)"
+---
+
+## Import required libraries
+
+```{r, message=FALSE, warning=FALSE}
+library(vimure)
+library(tidyverse)
+```
+
+## Load the data
+
+```{r, message=FALSE, warning=FALSE}
+village <- "12" # change this parameter to run in other village
+
+
+URL <- paste0("https://raw.githubusercontent.com",
+              "/latentnetworks/vimure/develop",
+              "/data/input/india_microfinance/formatted/",
+              paste0("vil", village, "_edges.csv"))
+df_edges <- read_csv(URL)
+head(df_edges)
+```

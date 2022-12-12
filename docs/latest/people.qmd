@@ -1,0 +1,166 @@
+---
+title: "People"
+subtitle: "VIMuRe v0.1.0"
+date: "12/12/2022"
+---
+
+# Who we are
+
+The people behind the conception, development, and maintenance of VIMuRe are listed below. 
+
+::: columns
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/cdebacco.png" alt="Photo of Caterina De Bacco" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.cdebacco.com/" target="_blank" class="external">Caterina De Bacco</a></span></strong> 
+        <br>CyberValley Research Group Leader
+        <br>MPI for Intelligent Systems
+        <br><span style="display: inline-block;padding: 0 7px;font-size: 12px;font-weight: var(--base-text-weight-medium, 500);line-height: 18px;white-space: nowrap;border: 1px solid transparent;border-radius: 2em;background-color:#5C4AFE;color: #fcfcfc">🧑‍💻 core package developer</span>
+    </figcaption>
+
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/martina.jpeg" alt="Photo of Martina Contisciani" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong><span><a href="https://is.mpg.de/person/mcontisciani" target="_blank" class="external">Martina Contisciani</a></span></strong> 
+        <br>Ph.D. Student
+        <br>MPI for Intelligent Systems
+        <br><span style="display: inline-block;padding: 0 7px;font-size: 12px;font-weight: var(--base-text-weight-medium, 500);line-height: 18px;white-space: nowrap;border: 1px solid transparent;border-radius: 2em;background-color:#5C4AFE;color: #fcfcfc">🧑‍💻 core package developer</span>
+    </figcaption>
+
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/jon.jpg" alt="Photo of Jon Cardoso-Silva" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.lse.ac.uk/DSI/People/Jonathan-Cardoso-Silva" target="_blank" class="external">Jon Cardoso-Silva</a></span></strong> 
+        <br/>Assist. Prof. Lecturer
+        <br/>LSE Data Science Institute
+        <br><span style="display: inline-block;padding: 0 7px;font-size: 12px;font-weight: var(--base-text-weight-medium, 500);line-height: 18px;white-space: nowrap;border: 1px solid transparent;border-radius: 2em;background-color:#5C4AFE;color: #fcfcfc">🧑‍💻 core package developer</span>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+
+<figure>
+    <img src="/figures/hadiseh.jpeg" alt="Photo of Hadiseh Safdari" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://is.mpg.de/person/hsafdari" target="_blank" class="external">Hadiseh Safdari</a></span></strong> 
+        <br/>Postdoctoral Researcher
+        <br>MPI for Intelligent Systems
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/diego.jpg" alt="Photo of Diego Baptista Theuerkauf" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong><span><a href="https://is.mpg.de/person/dtheuerkauf" target="_blank" class="external">Diego Baptista Theuerkauf</a></span></strong> 
+        <br/>Ph.D. Student
+        <br>MPI for Intelligent Systems<br><br>
+    </figcaption>
+</figure>
+
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/gabi.jpg" alt="Photo of Gabriela Lima Borges" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong><span><a href="https://github.com/gabiborges1" target="_blank" class="external">Gabriela Lima Borges</a></span></strong> 
+        <br/>Data Scientist / Guest Researcher
+        <br>MPI for Evolutionary Anthropology
+        <br><span style="display: inline-block;padding: 0 7px;font-size: 12px;font-weight: var(--base-text-weight-medium, 500);line-height: 18px;white-space: nowrap;border: 1px solid transparent;border-radius: 2em;background-color:#5C4AFE;color: #fcfcfc">🧑‍💻 core package developer</span>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/tracy.jpg" alt="Photo of Tracy Sweet" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://education.umd.edu/directory/tracy-sweet" target="_blank" class="external">Tracy Sweet</a></span></strong> 
+        <br/>Associate Professor
+        <br>UMD College of Education<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/jgyoung.png" alt="Photo of Jean-Gabriel Young" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.jgyoung.ca/" target="_blank" class="external">Jean-Gabriel Young</a></span></strong> 
+        <br/>Assistant Professor
+        <br>The University of Vermont<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/jeremy.jpg" alt="Photo of Jeremy Koster" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://researchdirectory.uc.edu/p/kosterjy" target="_blank" class="external">Jeremy Koster</a></span></strong> 
+        <br/>Professor
+        <br>University of Cincinnati<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/codyross.jpg" alt="Photo of Cody T. Ross" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/cody-ross/" target="_blank" class="external">Cody T. Ross</a></span></strong> 
+        <br/>Post-Doctoral Fellow
+        <br>MPI for Evolutionary Anthropology<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/richard.jpg" alt="Photo of Richard McElreath" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/richard-mcelreath/" target="_blank" class="external">Richard McElreath</a></span></strong> 
+        <br/>Professor
+        <br>MPI for Evolutionary Anthropology<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/dan.jpg" alt="Photo of Daniel Redhead" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/daniel-redhead/" target="_blank" class="external">Daniel Redhead</a></span></strong> 
+        <br/>Research Scientist
+        <br>MPI for Evolutionary Anthropology<br><br>
+    </figcaption>
+</figure>
+:::
+
+::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
+<figure>
+    <img src="/figures/elly.jpg" alt="Photo of Eleanor A. Power" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <figcaption>
+        <strong>Dr.&nbsp;<span><a href="https://www.lse.ac.uk/Methodology/People/Academic-Staff/Eleanor-Power/Eleanor-Power" target="_blank" class="external">Eleanor A. Power</a></span></strong> 
+        <br/>Assistant Professor
+        <br>LSE Department of Methodology<br><br>
+    </figcaption>
+</figure>
+:::
+
+
+:::
+
