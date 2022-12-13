@@ -122,7 +122,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
     <img src="/figures/codyross.jpg" alt="Photo of Cody T. Ross" max-width="400" max-height="400" role="presentation" style="width:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/cody-ross/" target="_blank" class="external">Cody T. Ross</a></span></strong> 
-        <br/>Post-Doctoral Fellow
+        <br/>Research Scientist
         <br>MPI for Evolutionary Anthropology<br><br>
     </figcaption>
 </figure>
