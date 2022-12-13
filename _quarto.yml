@@ -23,8 +23,12 @@ website:
         text: "📟 Contact"
       - href: docs/latest/install.qmd
         text: "📦 Installation"
-      - href: docs/latest/quick-start.qmd
-        text: "💻 Quick Start"
+      - section: "💻 Tutorials"
+        contents:
+        # - href: docs/latest/quick-start.qmd
+        #   text: "💻 Quick Start"
+        - href: docs/latest/First_Tutorial.qmd
+          text: "Start Here"
 
 format:
   html:
