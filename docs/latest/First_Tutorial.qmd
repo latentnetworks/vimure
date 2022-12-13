@@ -1,0 +1,175 @@
+---
+title: "VIMuRe Tutorial"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Karnataka Data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(vimure)
+library(igraph)
+library(reshape2)
+library(ggplot2)
+```
+
+Here, we'll use `vimure` to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance ([Banerjee et al, *Science*](https://doi.org/10.1126/science.1236498)). The data files we use here are derived from those openly-available on [the Harvard Dataverse page](https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:1902.1/21538). 
+
+
+# Load the data
+
+We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. Our interest here is on relationships that were "double-sampled" in the original survey, meaning that they were elicited through two different prompts. For example, respondents were asked both "If you needed to borrow kerosene or rice, to whom would you go?" as well as "Who would come to you if he/she needed to borrow kerosene or rice?" These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $i$ if they **go** to $j$ for help, and also asking $j$ if $i$ **comes** to them for help). 
+
+Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will focus just on one tie type: the "visiting" relationship (based on two prompts: "In your free time, whose house do you visit?" and "Who visits your house in his or her free time?"). 
+
+After our preprocessing, the input data takes the form of the dataset given below. 
+- *i* = the "ego", generally the requester (so here, the person going to visit)
+- *j* = the "alter", generally the giver (so here, the person being visited)
+- *m* = the "reporter", the person reporting on the tie (in this dataset, that is always going to be either i or j)
+- *prompt_type* = the prompt type that was given (here, either "visitgo" or "visitcome") -- this is not directly needed, but can be helpful to keep things straight!
+ - *layer* = the tie type (here, "visit") -- again, not directly needed here as we're considering only one tie type
+ <!-- - *weight* = the weight of the edge, in this case there is no distinction in edge weight, so all are 1 -->
+
+
+```{r, echo = FALSE}
+URL <- "https://raw.githubusercontent.com/latentnetworks/vimure/develop/data/input/india_microfinance/formatted/"
+village <- "12" # change this parameter to run in other village
+PATH <- paste0(URL, paste0("vil", village, "_edges.csv"))
+df_edges <- read.csv(PATH, stringsAsFactors = F)
+head(df_edges)
+```
+Then, run the code below to preprocess the data, removing self-loops and re-labeling layers names.
+
+```{r, echo = FALSE}
+df_edges$layer <- factor(df_edges$type, 
+  levels=c(
+    "borrowmoney","receivemoney", "receiveadvice", "helpdecision",
+    "keroricego", "keroricecome", "visitgo", "visitcome"
+    ), labels=c("money", "money", "advice", "advice", "kerorice", "kerorice", "visit", "visit"))
+layer <- "visit" # Change this to run for a different layer
+df_edges <- df_edges[df_edges$layer %in% layer, ]
+df_edges <- df_edges[df_edges$i != df_edges$j, ]
+
+edges <- df_edges[c(2, 3, 1, 4, 6, 5)] # Reorder columns
+names(edges) <- c("ego", "alter", "reporter", "prompt_type", "layer", "weight") # Rename
+head(edges)
+```
+
+Let's first create network (here, an `igraph` graph object) as might often be done: by taking the union of these two prompts (i.e., assuming that whether the tie is reported by $i$ or $j$, it exists -- the implication is that if one person didn't report a relationship that the other did, they simply forgot!). Note that the `graph_from_data_frame` function assumes that the first two columns in the data frame comprise the edgelist (i.e., the $i$ and $j$ columns, and treats all subsequent columns as edge attributes). 
+
+```{r}
+graph <- igraph::graph_from_data_frame(edges)
+plot(graph,
+     vertex.size = 2,
+     vertex.label = NA,
+     edge.width = 0.5,
+     edge.arrow.size = 0.5, 
+     edge.arrow.width = 0.5,
+     layout = layout_with_fr)
+```
+
+We can calculate some network statistics from the adjacency matrix to get a sense of the resulting network:
+
+```{r}
+message(
+  "Nodes: ", length(V(graph)),
+  " | Edges: ", gsize(graph),
+  " | Avg. degree: ", mean(degree(graph)), #directed graph,
+  " | Reciprocity: ", reciprocity(graph)
+)
+```
+
+
+## Running VIMuRe models
+
+Now let's turn our attention to Vimure. The main `vimure` function can take a few different types of input. First is an igraph object, as long as it has a particular set of edge attributes. Note that because vimure expects a set of attributes with specific names, it is essential that you have edge attributes named as: _layer_, _reporter_ and _weight_, if you have such attributes (e.g., here, we don't have a weight column -- vimure by default therefore assumes all edges are equally weighted). 
+
+We can use our graph object as formulated above with the `vimure` function:
+
+```{r}
+# Graph input
+model <- vimure(graph, num_realisations=1L, max_iter=100L, seed=5, mutuality = T)
+```
+
+You can alternatively bypass `igraph` and instead use the `parse_graph_from_edgelist` function to create an XXXXX object. This expects a dataframe with two required columns (_Ego_ and _Alter_) and three optional columns ( _layer_, _reporter_ and _weight_). 
+
+```{r}
+vm_graph <- parse_graph_from_edgelist(df_edges, ego="i", alter="j", reporter="respondent")
+```
+
+And run the model:
+```{r}
+model <- vimure(vm_graph$X, vm_graph$R, num_realisations=1L, max_iter=100L, seed=5, mutuality = T)
+```
+NOTE HERE SOMETHING ABOUT DEFAULTS (e.g., priors? parameters?)
+
+
+# Model Diagnostics
+
+We can now examine the model results. The `summary` function gives basic model statistics. DESCRIBE WHAT THESE ARE.
+
+The priors here take the default values...
+eta, theta, lambda
+rho represents ...
+
+The posteriors ....
+
+```{r}
+diag <- summary(model)
+```
+
+We can also look at the ELBO values to ...
+
+```{r}
+df_elbo <- diag$trace
+ggplot2::ggplot(df_elbo, ggplot2::aes(x=iter, y=elbo, group=realisation, color=factor(realisation))) +
+  ggplot2::geom_point() +
+  ggplot2::geom_line(size=1.2) +
+  ggplot2::theme_bw() +
+  ggplot2::labs(x = "Iter", y="ELBO", color="Realisation")
+```
+
+# Model Results
+
+There are a variety of elements that result from a VIMuRe model that may be of interest. 
+
+## Estimated reliability
+
+Let's first consider the resulting estimates of the "reliability" of each reporter. While interpretation isn't always perfectly straightforward, we can get a general sense of the extent to which particular reporters seem to be "over-" or "under-" reporting their ties. Those with 
+
+```{r}
+plot_df <- reshape2::melt(diag$reliability, id = "node")
+ggplot2::ggplot(plot_df, aes(x = reorder(factor(node), -value), y=value)) +
+  ggplot2::geom_point(alpha = 0.4, size=2, color = "#c45241") +
+  ggplot2::theme_bw() +
+  ggplot2::labs(x = "Nodes sorted from over-to under- reporting", y = "Realibility values") +
+  ggplot2::theme(axis.text.x=element_blank())
+```
+
+## Mutuality?? Reciprocity??
+
+One pattern that we seek to capture in VIMuRe is the tendency of reporters to report balanced, reciprocal relationships. We call this propensity "mutuality" ... 
+
+
+
+## Reconstruct Y matrix 
+
+```{r}
+Y_hat <- get_inferred_model(model)
+graph <- graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed") 
+graph <- set_graph_attr(graph, "layout", layout_with_fr(graph, niter=600))
+plot(graph,
+     vertex.size=2,
+     vertex.label=NA,
+     edge.width=0.5,
+     edge.arrow.size=0.5, 
+     edge.arrow.width=0.5)
+```
