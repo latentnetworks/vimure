@@ -20,11 +20,21 @@ jobs:
 
       - uses: r-lib/actions/setup-renv@v2
 
-      - name: Install packages
-        run: devtools::install_version("dplyr", version = "1.0.9"); devtools::install_version("ggplot2", version="3.4.0"); devtools::install_version("igraph", version="1.3.5")
+      - name: Install devtools
+        run: install.packages("devtools")
         shell: Rscript {0}
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install a specific versions of dplyr
+        run: devtools::install_version("dplyr", version = "1.0.9"); 
+        shell: Rscript {0}
+        
+      - name: Install a specific version of ggplot2
+        run: devtools::install_version("ggplot2", version = "3.4.0"); 
+        shell: Rscript {0}
+        
+      - name: Install a specific version of igraph
+        run: devtools::install_version("igraph", version = "1.3.5"); 
+        shell: Rscript {0}
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
