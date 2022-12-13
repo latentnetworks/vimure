@@ -24,8 +24,8 @@ jobs:
         run: install.packages("devtools")
         shell: Rscript {0}
 
-      - name: Install a specific versions of dplyr
-        run: devtools::install_version("dplyr", version = "1.0.9"); 
+      - name: Install a specific versions of dplyr and readr
+        run: devtools::install_version("dplyr", version = "1.0.9"); devtools::install_version("readr", version = "2.1.2");
         shell: Rscript {0}
         
       - name: Install a specific version of ggplot2
