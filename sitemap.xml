@@ -1,81 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://github.com/latentnetworks/vimure/docs/latest/install.html</loc>
+    <lastmod>2022-12-13T10:58:56.933Z</lastmod>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://github.com/latentnetworks/vimure/docs/latest/people.html</loc>
+    <lastmod>2022-12-13T10:58:59.350Z</lastmod>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://github.com/latentnetworks/vimure/docs/latest/quick-start.html</loc>
+    <lastmod>2022-12-13T10:59:04.070Z</lastmod>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/karnataka.html</loc>
-  </url>
-  <url>
-    <loc>/articles/quick_start.html</loc>
-  </url>
-  <url>
-    <loc>/articles/synthetic.html</loc>
-  </url>
-  <url>
-    <loc>/articles/vimure.html</loc>
-  </url>
-  <url>
-    <loc>/authors.html</loc>
-  </url>
-  <url>
-    <loc>/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/build_X.html</loc>
-  </url>
-  <url>
-    <loc>/reference/build_custom_theta.html</loc>
-  </url>
-  <url>
-    <loc>/reference/extract_Xavg.html</loc>
-  </url>
-  <url>
-    <loc>/reference/get_inferred_model.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gm_DegreeCorrectedSBM.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gm_Multitensor.html</loc>
-  </url>
-  <url>
-    <loc>/reference/gm_StandardSBM.html</loc>
-  </url>
-  <url>
-    <loc>/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>/reference/install_vimure.html</loc>
-  </url>
-  <url>
-    <loc>/reference/overall_reciprocity.html</loc>
-  </url>
-  <url>
-    <loc>/reference/parse_graph_from_csv.html</loc>
-  </url>
-  <url>
-    <loc>/reference/parse_graph_from_edgelist.html</loc>
-  </url>
-  <url>
-    <loc>/reference/parse_graph_from_igraph.html</loc>
-  </url>
-  <url>
-    <loc>/reference/summary.vimure.model.VimureModel.html</loc>
-  </url>
-  <url>
-    <loc>/reference/vimure.html</loc>
-  </url>
-  <url>
-    <loc>/reference/vm_config.html</loc>
+    <loc>https://github.com/latentnetworks/vimure/index.html</loc>
+    <lastmod>2022-12-13T10:59:04.502Z</lastmod>
   </url>
 </urlset>
