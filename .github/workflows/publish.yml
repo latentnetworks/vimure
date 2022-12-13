@@ -39,6 +39,8 @@ jobs:
       - name: Install vimure
         run: devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop");vimure::install_vimure()
         shell: Rscript {0}
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
