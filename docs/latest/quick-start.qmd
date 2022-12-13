@@ -13,7 +13,7 @@ The code below will preprocess the data, removing self-loops and creating new la
 
 ```{r, message=FALSE, warning=FALSE}
 library(vimure)
-library(tidyverse)
+library(dplyr)
 ```
 
 ## Load the data
