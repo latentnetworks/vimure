@@ -3,6 +3,12 @@ title: "💻 Quick Start"
 subtitle: "VIMuRe v0.1.0 (latest)"
 ---
 
+Here, we'll illustrate how to use Vimure to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance ([Banerjee et al 2013](https://doi.org/10.1126/science.1236498)). The data files we use here are derived from those openly-available on the Harvard Dataverse page. 
+
+We have selected a particular village and read in its edgelist. This contains information on multiple different types of relationships. Our interest here is on relationships that were "double-sampled" in the original survey, i.e. elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ Four different relationship types (or "layers") were double-sampled in this way (i.e., were elicited with two prompt types).
+
+The code below will preprocess the data, removing self-loops and creating new labels to represent the four relationship type or "layers" joining together the two prompt types. Here, we'll select one of these layers to consider (the "visit" layer resulting from the "visitgo" and "visitcome" prompts).
+
 ## Import required libraries
 
 ```{r, message=FALSE, warning=FALSE}
@@ -13,13 +19,14 @@ library(tidyverse)
 ## Load the data
 
 ```{r, message=FALSE, warning=FALSE}
+#| code-fold: true
 village <- "12" # change this parameter to run in other village
 
-
-URL <- paste0("https://raw.githubusercontent.com",
-              "/latentnetworks/vimure/develop",
+URL <- paste0("https://raw.githubusercontent.com/latentnetworks/vimure/develop",
               "/data/input/india_microfinance/formatted/",
               paste0("vil", village, "_edges.csv"))
 df_edges <- read_csv(URL)
 head(df_edges)
 ```
+
+<mark class="todo">_(🚧 This is a work in progress. 🚧)_</mark>
