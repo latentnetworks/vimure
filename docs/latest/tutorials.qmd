@@ -1,0 +1,14 @@
+---
+title: 💻 Tutorials
+listing:
+  contents: tutorials/*.qmd
+  sort: "title"
+  type: grid
+  categories: true
+  sort-ui: true
+  filter-ui: true
+  fields: [categories, title, date, reading-time, description]
+  feed: false
+page-layout: full
+title-block-banner: false
+---

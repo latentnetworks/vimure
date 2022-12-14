@@ -1,0 +1,8 @@
+---
+title: "💻 **Tutorial 01**: How to prepare your data for VIMuRe"
+subtitle: "VIMuRe v0.1.0 (latest)"
+categories: [basics]
+description: "This tutorial will show you how to prepare your data for VIMuRe. <mark>(Under development)</mark>"
+---
+
+<mark>_( Wip: this page is still under construction )_</mark>

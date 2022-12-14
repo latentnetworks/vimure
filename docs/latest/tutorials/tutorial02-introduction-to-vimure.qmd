@@ -1,6 +1,12 @@
 ---
-title: "💻 VIMuRe Tutorial"
+title: "💻 **Tutorial 02**: Introduction to VIMuRe"
 subtitle: "VIMuRe v0.1.0 (latest)"
+categories: [basics]
+tags: 
+  - basics
+  - tutorial
+  - R
+description: "See how `vimure` works in this tutorial, the format of the data input expected by the package and how to interpret the output of the model. <mark>(Under development)</mark>"
 ---
 
 # ⚙️ Setup
@@ -20,7 +26,7 @@ library(ggplot2)
 
 # 📥 Load the data
 
-Here, we'll use the `vimure` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance ([Banerjee et al, *Science*](https://doi.org/10.1126/science.1236498)). The data files we use here are derived from those openly-available on [the Harvard Dataverse page](https://dataverse.harvard.edu/dataset.xhtml?persistentId=hdl:1902.1/21538). 
+Here, we'll use the `vimure` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013-1]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013].
 
 We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. Our interest here is on relationships that were "double-sampled" in the original survey, meaning that they were elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $i$ if they **go** to $j$ for help, and also asking $j$ if $i$ **comes** to them for help). 
 
@@ -47,7 +53,7 @@ head(df_edges, 10)
 
 ```{r, echo = FALSE}
 URL <- "https://raw.githubusercontent.com/latentnetworks/vimure/develop/data/input/india_microfinance/formatted/"
-village <- "12" # change this parameter to run in other village
+village <- "30" # change this parameter to run in other village
 PATH <- paste0(URL, paste0("vil", village, "_edges.csv"))
 df_edges <- read.csv(PATH, stringsAsFactors = F)
 
@@ -65,6 +71,13 @@ df_edges <-
   rename(m=respondent, prompt_type=`type`) %>% 
   select(i, j, m, prompt_type, layer, weight) 
   
+df_edges$prompt_type <- factor(df_edges$prompt_type, levels=c("visitgo", "visitcome"))
+
+all_reporters <- unique(df_edges$m)
+
+# We restrict to the nodes that had the chance to report on a tie
+df_edges <- df_edges %>% filter(i %in% all_reporters & j %in% all_reporters)
+
 df_edges %>% 
   head(10) %>% 
   knitr::kable(row.names=FALSE, align = "cccccc", caption = "A typical data input for VIMuRe", full_width = FALSE)
@@ -83,20 +96,20 @@ Alternatively, you might have your data in the form of a **directed** `igraph` o
 <!-- Let's first create a network (here, an `igraph` graph object) as might often be done: by taking the union of these two prompts (i.e., assuming that whether the tie is reported by $i$ or $j$, it exists -- the implication is that if one person didn't report a relationship that the other did, they simply forgot!). Note that the `graph_from_data_frame` function assumes that the first two columns in the data frame comprise the edgelist (i.e., the $i$ and $j$ columns, and treats all subsequent columns as edge attributes). 
  -->
 ```{r, echo = FALSE}
-graph <- igraph::graph_from_data_frame(df_edges)
+G <- igraph::graph_from_data_frame(df_edges)
 ```
 
-Suppose our village's data is in the form of an `igraph` object `graph`:
+Suppose our village's data is in the form of an `igraph` object `G`:
 
 ```{r}
-graph
+G
 ```
 
 :::
 
 ## 📊 Summary statistics
 
-**Number of nodes**
+### Number of nodes
 
 ::: panel-tabset
 
@@ -109,13 +122,13 @@ dplyr::union(df_edges$i, df_edges$j) %>% n_distinct()
 ## `igraph` object
 
 ```{r}
-igraph::vcount(graph)
+igraph::vcount(G)
 ```
 
 :::
 
 
-**Number of reporters**
+### Number of reporters
 
 ::: panel-tabset
 
@@ -128,12 +141,12 @@ df_edges$m %>% n_distinct()
 ## `igraph` object
 
 ```{r}
-igraph::get.edge.attribute(graph, "m") %>% unique() %>% length()
+igraph::get.edge.attribute(G, "m") %>% unique() %>% length()
 ```
 
 :::
 
-**Average number of ties per reporter**
+### Average number of ties per reporter
 
 There are a couple of things to note about this dataset: the maximum number of name generators is 4 and reporters can only report on ties that they are a part of (e.g., if a reporter is not a part of a tie, they cannot report on it). Because we are modelling double-sampled questions, each reporter can report a maximum of 8 ties.
 
@@ -143,58 +156,153 @@ There are a couple of things to note about this dataset: the maximum number of n
 ## data.frame
 
 ```{r, fig.width=6, fig.height=4}
-df_edges %>% 
+plot_df <- 
+  df_edges %>% 
   group_by(m) %>% 
-  summarise(n = n()) %>% 
-  ggplot(aes(x = n)) +
+  summarise(n = n())
+
+g <- 
+(
+  ggplot(plot_df, aes(x = n)) +
   geom_histogram(bins = 30) +
   theme_bw() +
   labs(x = "Number of ties per reporter", y = "Number of reporters")
+)
+g
 ```
 
 ## `igraph` object
 
 ```{r, fig.width=6, fig.height=4}
-igraph::get.edge.attribute(graph, "m") %>% 
+plot_df <- igraph::get.edge.attribute(G, "m") %>% 
   table() %>% 
-  as.data.frame() %>% 
-  ggplot(aes(x = Freq)) +
-  geom_histogram(bins = 30) +
-  theme_bw() +
-  labs(x = "Number of ties per reporter", y = "Number of reporters")
+  as.data.frame()
+
+g <- 
+(
+    ggplot(plot_df, aes(x = Freq)) +
+    geom_histogram(bins = 30) +
+    theme_bw() +
+    labs(x = "Number of ties per reporter", y = "Number of reporters")
+)
+g
 ```
 
 :::
 
-**Concordance**
+### Concordance
 
-_(🚧 This is a work in progress. 🚧)_
+Concordance is the proportion of the ties in the network that are reported by both reporters. It is a measure of the extent to which the two reporters agree on the network [@ready_measuring_2021]. It is calculated as follows:
 
-```r
-  #concordance
-  summats <- get.adjacency(incoming)+get.adjacency(outgoing)
-  present <- sum(summats==2) #ties reported by both
-  null <- sum(summats==0)-vcount(incoming) #reported by no one, subtract the diagonal
-  net1 <- sum(get.adjacency(incoming)-get.adjacency(network_intersections[[counter]]))
-  net2 <- sum(get.adjacency(outgoing)-get.adjacency(network_intersections[[counter]]))
-  concord_prop <- present/(present+net1+net2)
-  net1_concord_prop <- present/(present+net1) ## proportion of net1 edges that have agreement
-  net2_concord_prop <- present/(present+net2) ## proportion of net2 edges that have agreement
-  net1_prop <- net1/(present+net1+net2) ## proportion of all edges that are only reported in net1
-  net2_prop <- net2/(present+net1+net2) ## proportion of all edges that are only reported in net2
-  net1_mut <- dyad.census(incoming)$mut
-  net2_mut <- dyad.census(outgoing)$mut
-  union_mut <- dyad.census(network_unions[[counter]])$mut
-```
+
+$$
+\text{Concordance} = \frac{\text{\# of ties reported by both reporters}}{\text{\# number of unique ties reported}} = \frac{\text{intersection of ties}}{\text{union of ties}}
+$$
+
 
 ::: panel-tabset
 
 ## data.frame
 
+First, let's calculate the intersection and union of the two prompt types. The intersection is the number of ties reported by both reporters, and the union is the total number of distinct ties reported by either reporter.
+
+```{r, message=FALSE}
+# Take the intersection: keep only records where 
+# both reporters report on the same tie in both prompt_types
+df_intersection <- 
+  df_edges %>% 
+  group_by(i, j, .drop=FALSE) %>% 
+  filter(n() == 2) %>% 
+  select(i, j) %>%
+  distinct()
+
+# Take the union: keep all ties reported 
+# irrespective of prompt_type and how many times they were reported
+df_union <- df_edges %>% select(i, j) %>% distinct()
+```
+
 
 
 ## `igraph` object
 
+```{r}
 
+
+
+```
 
 :::
+
+
+# 📦 Use `vimure` package to run the model
+
+(🚧 This is a work in progress. 🚧)
+
+::: panel-tabset
+
+## data.frame
+
+When working directly with data frames that represent an edgelist, we need to use the `parse_graph_from_edgelist()` function to parse the edgelist into a `vimure` object. We need to specify the ego, alter and reporter variables.
+
+```{r, message=FALSE}
+library(vimure)
+
+#TODO: rename name of parameters in the parse_graph_from_edgelist 
+#      from ego to i, alter to j, reporter to m
+vm_graph <- parse_graph_from_edgelist(df_edges, ego="i", alter="j", reporter="m")
+
+vm_graph
+```
+
+::: {.callout-important}
+
+Note that `M = 336` contrasts with the `M = 193` we saw in the [Summary Statistics section](#summary-statistics) above. This is because by default `vimure` assumes that all nodes in the network were interviewed and that they _could_ report on each ego-alter pair, even if they are not actually reported on.
+
+If this was not the actual setup of the survey, we would need to specify the `R` parameter in the `parse_graph_from_edgelist()` function. Read more about this on the [Handling different survey setups](#) tutorial.
+
+:::
+
+## `igraph` object
+
+```{r, message=FALSE}
+
+```
+
+:::
+
+
+## Mutuality
+
+<mark>TODO</mark>
+
+## Over-reporting & under-reporting
+
+<mark>TODO</mark>
+
+# 🕸️ Extracting an inferred network
+
+(🚧 This is a work in progress. 🚧)
+
+## Point estimates
+
+<mark>TODO</mark>
+
+## Sampling from the posterior
+
+<mark>TODO</mark>
+
+# 📈 Advanced: Optimisation Diagnostic
+
+(🚧 This is a work in progress. 🚧)
+
+## Convergence
+
+<mark>TODO</mark>
+
+## Changing parameters
+
+<mark>TODO</mark>
+
+## Changing priors
+
+<mark>TODO</mark>
