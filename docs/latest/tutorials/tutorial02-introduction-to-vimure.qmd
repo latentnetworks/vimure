@@ -391,7 +391,7 @@ If you want to look at $\rho$ directly, you can simply invoke `model$rho` but no
 model$rho %>% dim()
 ```
 
-In other words, $\rho_{l, i, j, k}$ is the probability that a tie degree $k-1$ exists between nodes $i$ and $j$ in layer $l$.
+In other words, $\rho_{lijk}$ is the probability that a tie degree $k-1$ exists between nodes $i$ and $j$ in layer $l$.
 
 (The last dimension is also related to the parameter $\lambda_k$. You can read more about it on the paper [@de_bacco_latent_2022] as well as on the [Advanced: Optimisation Diagnostics](#advanced-optimisation-diagnostic) section below).
 
@@ -399,7 +399,7 @@ Because it might be tricky to interpret the $\rho$ array directly, we recommend 
 
 ::: panel-tabset
 
-## Method: $\rho_\text{mean}$
+## Method: $\rho_\text{max}$
 
 ```{r}
 # Y_hat has dimensions (num_layers, num_nodes, num_nodes)
@@ -408,52 +408,164 @@ Y_hat <- get_inferred_model(model, method="rho_max")
 # Since our network only has one layer, 
 #  we can just simply extract the first layer into an adjacency list
 # and create an igraph object from it
-G_inferred <- igraph::graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed") 
-```
+G_rho_max <- igraph::graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed") 
 
-Now let's look at our inferred network:
-
-```{r fig.height=3.75, fig.width=10}
-# make an absolutely gorgeous looking awesome impressive plot of G_inferred using customised igraph plot
-
-plot(G_inferred, 
-     vertex.label = NA, 
-     vertex.size = 5, 
-     vertex.color = "#60A1C4",
-     edge.color = "#08326E",
-     edge.arrow.size = 0.5,
-     edge.width=2,
-     connectionstyle='arc3,rad=0.2', 
-     alpha=0.45)
-
+summary(G_rho_max)
 ```
 
 
-## Method: $\rho_\text{max}$
+## Method: $\rho_\text{mean}$
 
 ```{r}
+# Y_hat has dimensions (num_layers, num_nodes, num_nodes)
+Y_hat <- get_inferred_model(model, method="rho_mean") 
+
+# This version produces a fully connected weighted network.
+G_rho_mean <- igraph::graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed", weighted=TRUE) 
 ```
 
+This method, however, leads to a fully connected representation of the network, which is not ideal for visualisation. We might need to threshold the network to make it more readable. 
+
+```{r}
+cat(
+  "Nodes: ", vcount(G_rho_mean),
+  " | Edges: ", ecount(G_rho_mean),
+  " | Avg. degree: ", mean(degree(G_rho_mean)), #directed graph,
+  "\nAvg. strength (weighted degree): ", mean(strength(G_rho_mean)), #directed graph,
+  " | Reciprocity: ", reciprocity(G_rho_mean)
+)
+```
+
+How are the weights distributed? Let's plot the distribution of the weights:
+
+```{r fig.height=3, fig.width=8}
+plot_df <- data.frame(weights = E(G_rho_mean)$weight)
+
+g = (
+  ggplot(plot_df, aes(x=weights)) +
+  geom_histogram(bins=40) +
+
+  scale_x_reverse() +
+  coord_flip() +
+
+  theme_bw() +
+  labs(x="Weights", y="Frequency", 
+       title="The majority of weights are close to 0, as expected")
+
+)
+
+g
+```
+
+Check the next tab for an example of how to threshold the network.
+
+## Fixed threshold
+
+Pass `method="fixed_threshold"` to `get_inferred_model()` to threshold the network at a fixed value.
+
+**Threshold == 0.1?**
+
+Judging by the plot in the previous tab, one could say we should threshold the network at 0.1
+
+```{r}
+Y_hat <- get_inferred_model(model, method="fixed_threshold", threshold=0.1) 
+
+G_threshold_0_1 <- igraph::graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed") 
+
+summary(G_threshold_0_1)
+```
+
+**What about threshold == 0.5?**
+
+But maybe you disagree and think that the network should be thresholded at 0.5:
+
+```{r}
+Y_hat <- get_inferred_model(model, method="fixed_threshold", threshold=0.5) 
+
+G_threshold_0_5 <- igraph::graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed") 
+
+summary(G_threshold_0_5)
+```
+
+It is difficult to say which threshold is better, you could try different thresholds and see which one makes more sense for your data. We provide a heuristic to help you choose the threshold in the next tab.
+
+## Heuristic threshold
+
+Pass `method="heuristic_threshold"` to `get_inferred_model()` to threshold the network using the heuristic of the optimal threshold ($t^*$) for reciprocity proposed in [@de_bacco_latent_2022]. Note that this threshold has implicit assumptions about the network that might not hold for your data.
+
+```{r}
+Y_hat <- get_inferred_model(model, method="heuristic_threshold")[1,,]
+row.names(Y_hat) <- names(V(G_union))
+names(Y_hat) <- names(V(G_union))
+
+
+G_heuristic <- igraph::graph_from_adjacency_matrix(Y_hat, mode = "directed", add.rownames = NULL, add.colnames = NULL)
+
+summary(G_heuristic)
+```
 
 :::
+
+### Visualising the inferred networks
+
+First, let us calculate a set of coordinates and set some igraph options to standardise the visualisation of the networks:
+
+```{r}
+# Set some igraph options
+igraph::igraph_options(vertex.label = NA, 
+                       vertex.size = 8, 
+                       vertex.color = "#60A1C4",
+                       edge.arrow.size = 0.15,
+                       edge.color = adjustcolor("#08326E", alpha.f = 0.5),
+                       edge.width=2,
+                       edge.curved = 0.3)
+
+set.seed(2)
+# Use the G_union as a reference to layout the networks
+pos <- layout_nicely(G_union, dim=2)
+```
+
+Now, let's visualise the inferred networks:
+
+```{r fig.height=6, fig.width=9, dpi=130}
+#| code-fold: true
+
+# Plot the inferred networks
+par(mfrow=c(3, 2), mar=c(1, 1, 1, 1))
+plot(G_union, layout=pos, main="Union")
+
+plot(G_intersection, layout=pos, main="Intersection")
+
+# plot(G_rho_max, layout=pos, 
+    #  main=expression(paste("Inferred network (", hat(rho)[max], ")")))
+
+# plot(G_threshold_0_1, layout=pos, 
+#      main=expression(paste("Inferred network (", hat(rho), "|threshold=0.1)")))
+
+# plot(G_threshold_0_5, 
+#      layout=pos, main=expression(paste("Inferred network (", hat(rho), "|threshold=0.5)")))
+
+# plot(G_heuristic, layout=pos,
+#      main=expression(paste("Inferred network (", hat(rho), "|heuristic)")))
+```
 
 
 ## Sampling from the posterior
 
-<mark>TODO</mark>
+(🚧 This section is a work in progress. 🚧)
 
 # 📈 Advanced: Optimisation Diagnostic
 
-(🚧 This is a work in progress. 🚧)
+(🚧 This section is a work in progress. 🚧)
 
 ## Convergence
 
-<mark>TODO</mark>
+(🚧 This section is a work in progress. 🚧)
 
 ## Changing parameters
 
-<mark>TODO</mark>
+(🚧 This section is a work in progress. 🚧)
 
 ## Changing priors
 
-<mark>TODO</mark>
+(🚧 This section is a work in progress. 🚧)
