@@ -1,8 +1,12 @@
 ---
-title: "💻 **Tutorial 03**: Handling multiple survey setups"
-subtitle: "VIMuRe v0.1.0 (latest)"
+title: "💻 **Tutorial XX**: Introduction to VIMuRe"
+subtitle: "VIMuRe v0.X.X (latest)"
 categories: [basics]
-description: "Handling multiple survey setups. <mark>_( Wip: this page is still under construction )_</mark>"
+tags: 
+  - basics
+  - tutorial
+  - R
+description: "..."
 ---
 
 <div style="display:inline-block;border-radius: 0.25rem;border: solid 1px #dee2e6;margin:1%;padding:1.5%;background-color:$popover-bg">
@@ -13,4 +17,11 @@ If you use `vimure` in your research, please cite the following paper:
 
 </div>
 
-<mark>_( Wip: this page is still under construction )_</mark>
+
+# ⚙️ Setup
+
+...
+
+# 📥 Load the data
+
+...

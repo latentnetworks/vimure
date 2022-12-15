@@ -5,4 +5,12 @@ categories: [basics]
 description: "This tutorial will show you how to prepare your data for VIMuRe. <mark>(Under development)</mark>"
 ---
 
+<div style="display:inline-block;border-radius: 0.25rem;border: solid 1px #dee2e6;margin:1%;padding:1.5%;background-color:$popover-bg">
+
+If you use `vimure` in your research, please cite the following paper:
+
+> De Bacco, Caterina, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Diego Baptista, Gabriela L. Borges, Tracy Sweet, et al. 'Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data'. arXiv, 12 December 2022. doi:[10.48550/arXiv.2112.11396](https://arxiv.org/abs/2112.11396). [@de_bacco_latent_2022]
+
+</div>
+
 <mark>_( Wip: this page is still under construction )_</mark>
