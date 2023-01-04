@@ -399,7 +399,24 @@ In other words, $\rho_{lijk}$ is the probability that a tie degree $k-1$ exists 
 
 Because it might be tricky to interpret the $\rho$ array directly, we recommend using the `get_inferred_model()` function to parse the $\rho$ values into an adjacency matrix. This function allows several ways to obtain the inferred network, and its usage depends on the interpretation you want to give to the $\rho$ values.
 
+(🚧 This section is a work in progress. 🚧)
+
+<mark style="color:red">Do not revise beyond this point. The plots of inferred networks do not look like I expected, and I am trying to figure out why.</mark>
+
 ::: panel-tabset
+
+## Looking at the probabilities
+
+```{r}
+Y_hat <- model$rho[1, , , 1]
+
+G_rho <- igraph::graph_from_adjacency_matrix(Y_hat, mode = "directed", weighted=TRUE) 
+
+c_scale <- colorRamp(c('#ffffff', '#b4c1d3'))
+
+E(G_rho)$color = apply(c_scale(E(G_rho)$weight), 1, function(x) rgb(x[1]/255,x[2]/255,x[3]/255) )
+
+```
 
 ## Method: $\rho_\text{max}$
 
@@ -410,8 +427,10 @@ Y_hat <- get_inferred_model(model, method="rho_max")
 # Since our network only has one layer, 
 #  we can just simply extract the first layer into an adjacency list
 # and create an igraph object from it
-G_rho_max <- igraph::graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed") 
+G_rho_max <- igraph::graph_from_adjacency_matrix(Y_hat[1, , ], mode = "directed", weighted=TRUE) 
+```
 
+```{r}
 summary(G_rho_max)
 ```
 
@@ -518,16 +537,12 @@ igraph::igraph_options(vertex.label = NA,
                        vertex.size = 8, 
                        vertex.color = "#60A1C4",
                        edge.arrow.size = 0.15,
-                       edge.color = adjustcolor("#08326E", alpha.f = 0.5),
                        edge.width=2,
                        edge.curved = 0.3)
 
-# Set edge.color according to the weights
-E(G_heuristic)$color <- adjustcolor("#08326E", alpha.f = E(G_heuristic)$weight)
-
 set.seed(2)
 # Use the G_union as a reference to layout the networks
-pos <- layout_nicely(G_union, dim=2)
+pos <- layout_with_fr(G_union, niter=200)
 ```
 
 Now, let's visualise the inferred networks:
@@ -536,10 +551,12 @@ Now, let's visualise the inferred networks:
 #| code-fold: true
 
 # Plot the inferred networks
-par(mfrow=c(3, 2), mar=c(1, 1, 1, 1))
+par(mfcol=c(3, 2), mar=c(1, 1, 1, 1))
 plot(G_union, layout=pos, main="Union")
 
 plot(G_intersection, layout=pos, main="Intersection")
+
+# plot(G_rho, layout=pos, main=expression(paste("Inferred network (", hat(rho), ")")))
 
 plot(G_rho_max, layout=pos, 
      main=expression(paste("Inferred network (", hat(rho)[max], ")")))
