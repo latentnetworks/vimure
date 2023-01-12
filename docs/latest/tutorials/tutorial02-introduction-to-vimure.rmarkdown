@@ -1,0 +1,455 @@
+---
+title: "💻 **Introduction to VIMuRe**"
+subtitle: "VIMuRe v0.1.0 (latest)."
+categories: [basics]
+tags: 
+  - basics
+  - tutorial
+  - R
+description: "Read to understand the data input format expected by the <code>vimure</code>, and how to run and  interpret the output of the model."
+---
+
+
+<div style="display:inline-block;border-radius: 0.25rem;border: solid 1px #dee2e6;margin:1%;padding:1.5%;background-color:$popover-bg">
+
+If you use `vimure` in your research, please cite the following paper:
+
+> De Bacco, Caterina, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Diego Baptista, Gabriela L. Borges, Tracy Sweet, et al. 'Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data'. arXiv, 12 December 2022. doi:[10.48550/arXiv.2112.11396](https://arxiv.org/abs/2112.11396). [@de_bacco_latent_2022]
+
+</div>
+
+
+(🚧 This entire tutorial is a work in progress. 🚧)
+
+# ⚙️ Setup
+
+**Import packages**
+
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+library(knitr)
+```
+
+```{r setup, warning=FALSE, message=FALSE}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+library(igraph)
+library(vimure)
+```
+
+
+# 📥 Load the data
+
+Here, we'll use the `vimure` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1].
+
+We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $i$ if they **go** to $j$ for help, and also asking $j$ if $i$ **comes** to them for help). 
+
+Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will focus just on one tie type: the "visiting" relationship (based on two prompts: _"In your free time, whose house do you visit?" and "Who visits your house in his or her free time?"_). 
+
+::: panel-tabset
+
+## Load data.frame
+
+After our preprocessing, the input data takes the form of the dataset given below. 
+
+- `ego`: generally the requester, also referred to as $i$ in [@de_bacco_latent_2022] (required ✔️)
+- `alter`: generally the giver, also referred to as $j$ in [@de_bacco_latent_2022] (required ✔️)
+- `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2022] (required ✔️)
+- `prompt_type`: the prompt type that was given (optional)
+- `layer`: the tie type (optional)
+- `weight`: the weight of the edge (optional)
+
+Suppose we have a data frame `df_edges` of our village's data that looks like this:
+
+```r
+head(df_edges, 10)
+```
+
+
+```{r, echo = FALSE}
+URL <- "https://raw.githubusercontent.com/latentnetworks/vimure/develop/data/input/india_microfinance/formatted/"
+village <- "30" # change this parameter to run in another village
+
+df_metadata <- read.csv(paste0(URL, paste0("vil", village, "_meta.csv")))
+df_edges <- read.csv(paste0(URL, paste0("vil", village, "_edges.csv")), stringsAsFactors = F)
+
+df_edges$layer <- factor(df_edges$type, 
+  levels=c(
+    "borrowmoney","receivemoney", "receiveadvice", "helpdecision",
+    "keroricego", "keroricecome", "visitgo", "visitcome"
+    ), labels=c("money", "money", "advice", "advice", "kerorice", "kerorice", "visit", "visit"))
+layer <- "visit" # Change this to run for a different layer
+df_edges <- df_edges[df_edges$layer %in% layer, ]
+df_edges <- df_edges[df_edges$i != df_edges$j, ]
+
+df_edges <- 
+  df_edges %>% 
+  rename(m=respondent, prompt_type=`type`) %>% 
+  select(i, j, m, prompt_type, layer, weight) 
+  
+df_edges$prompt_type <- factor(df_edges$prompt_type, levels=c("visitgo", "visitcome"))
+
+# Only keep reports made by those who were MARKED as respondents in metadata CSV
+respondents <- df_metadata %>% filter(didsurv == 1) %>% pull(pid)
+df_edges <- df_edges %>% filter(i %in% respondents & j %in% respondents) %>% ungroup()
+
+df_edges <- df_edges %>% rename(ego=i, alter=j, reporter=m)
+
+df_edges %>% 
+  head(10) %>% 
+  knitr::kable(row.names=FALSE, align = "cccccc", caption = "A typical data input for VIMuRe", full_width = FALSE)
+
+```
+
+
+## Load `igraph` object
+
+Alternatively, you might have your data as a **directed** `igraph` object. In this case, you must ensure that the `igraph` object has the following attributes:
+
+- `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2022] (required ✔️)
+- `prompt_type`: the prompt type that was given (optional)
+- `layer`: the tie type (optional)
+- `weight`: the weight of the edge (optional)
+
+Note that the `graph_from_data_frame` function assumes that the first two columns in the data frame comprise the edgelist (i.e., the $ego$ and $alter$ columns and treats all subsequent columns as edge attributes). 
+
+
+```{r, echo = FALSE}
+G <- igraph::graph_from_data_frame(df_edges, directed=TRUE)
+```
+
+
+Suppose our village's data is in the form of an `igraph` object `G`:
+
+
+```{r}
+G
+```
+
+
+:::
+
+## 📊 Summary statistics
+
+### Number of nodes
+
+::: panel-tabset
+
+## data.frame
+
+
+```{r}
+dplyr::union(df_edges$ego, df_edges$alter) %>% n_distinct()
+```
+
+
+## `igraph` object
+
+
+```{r}
+igraph::vcount(G)
+```
+
+
+:::
+
+
+### Number of reporters
+
+::: panel-tabset
+
+## data.frame
+
+
+```{r}
+df_edges$reporter %>% n_distinct()
+```
+
+
+## `igraph` object
+
+
+```{r}
+igraph::get.edge.attribute(G, "reporter") %>% unique() %>% length()
+```
+
+
+:::
+
+### Average number of ties per reporter
+
+There are a couple of things to note about this dataset: the maximum number of name generators is four, and reporters can only report on ties that they are a part of (e.g., if a reporter is not a part of a tie, they cannot report on it). Because we are modeling double-sampled questions, each reporter can report a maximum of 8 ties.
+
+
+::: panel-tabset
+
+## data.frame
+
+
+```{r, fig.width=8, fig.height=4}
+plot_df <- 
+  df_edges %>% 
+  group_by(prompt_type, reporter) %>% 
+  summarise(n = n(), .groups="keep")
+
+# Sort n in descending order
+plot_df$n <- factor(plot_df$n, levels=sort(unique(plot_df$n), decreasing=TRUE))
+
+
+g <- 
+(
+  ggplot(plot_df, aes(x = n, fill=prompt_type)) +
+  geom_bar() +
+
+  scale_fill_manual(values = c("visitgo" = "#1f77b4", "visitcome" = "#ff7f0e"),
+                    labels = c("visitgo" = "Whose house do you visit?", 
+                               "visitcome" = "Who visits your house?")) +
+  coord_flip() +
+
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x = "Number of ties per reporter", 
+       y = "Number of reporters",
+       fill = "Prompt type")
+)
+g
+```
+
+
+## `igraph` object
+
+
+```{r, fig.width=8, fig.height=4}
+plot_df <- 
+  bind_cols(reporter=E(G)$reporter, prompt_type=E(G)$prompt_type) %>%
+  group_by(prompt_type, reporter) %>% 
+  summarise(n = n(), .groups="keep")
+
+# Sort n in descending order
+plot_df$n <- factor(plot_df$n, levels=sort(unique(plot_df$n), decreasing=TRUE))
+
+g <- 
+(
+  ggplot(plot_df, aes(x = n, fill=prompt_type)) +
+  geom_bar() +
+
+  scale_fill_manual(values = c("visitgo" = "#1f77b4", "visitcome" = "#ff7f0e"),
+                    labels = c("visitgo" = "Whose house do you visit?", 
+                               "visitcome" = "Who visits your house?")) +
+  coord_flip() +
+
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x = "Number of ties per reporter", 
+       y = "Number of reporters",
+       fill = "Prompt type")
+)
+g
+```
+
+
+:::
+
+### Union vs. Intersection and the concept of Concordance
+
+Concordance is the proportion of the ties in the network that both reporters report. It measures the extent to which the two reporters agree about the network [@ready_measuring_2021]. It is calculated as follows:
+
+
+
+$$
+\text{Concordance} = \frac{\text{\# of ties reported by both reporters}}{\text{\# number of unique ties reported}} 
+$$
+
+
+
+::: panel-tabset
+
+## data.frame
+
+
+```{r, message=FALSE}
+# Take the intersection: keep only records where 
+# both reporters report on the same tie in both prompt_types
+df_intersection <- 
+  df_edges %>% 
+  group_by(ego, alter, .drop=FALSE) %>% 
+  filter(n() == 2) %>% 
+  select(ego, alter) %>%
+  distinct()
+
+# Take the union: keep all ties reported 
+# irrespective of prompt_type and how many times they were reported
+df_union <- df_edges %>% select(ego, alter) %>% distinct()
+
+# Concordance
+cat(paste0("Concordance is: ", nrow(df_intersection) / nrow(df_union)))
+```
+
+
+
+## `igraph` object
+
+
+```{r}
+# Take the intersection: keep only records where
+# both reporters report on the same tie in both prompt_types
+which_edges_intersection <- E(G)[count_multiple(G, E(G)) == 2]
+
+G_intersection <- 
+  igraph::subgraph.edges(G, which_edges_intersection) %>%
+  igraph::simplify()
+
+# Take the union: keep all ties reported
+# irrespective of prompt_type and how many times they were reported
+
+G_union <- igraph::simplify(G)
+
+# Concordance
+cat(
+  paste0(
+    "Concordance is: ", 
+    igraph::ecount(G_intersection) / igraph::ecount(G_union)
+  )
+)
+```
+
+:::
+
+
+# 📦 Use `vimure` package to run the model
+
+::: panel-tabset
+
+## data.frame
+
+**Convert the data.frame to a `vimure` graph object**
+
+When working directly with data frames representing an edgelist, we first need to use the `parse_graph_from_edgelist()` function to parse the edgelist into a `vimure` object. It is a good practice to specify the name of the columns representing the ego, alter, and reporter, especially if the column names are not the default ones expected by the package.
+
+
+
+```{r, message=FALSE}
+library(vimure)
+
+vm_graph <- parse_graph_from_edgelist(df_edges, ego="ego", alter="alter", reporter="reporter")
+
+vm_graph
+```
+
+
+::: {.callout-important}
+
+Note that `M = 159` contrasts with the `M = 150` we saw in the [Summary Statistics section](#summary-statistics) above. This is because, by default, `vimure` assumes that all nodes in the network were interviewed and that they _could_ report on each ego-alter pair, even if they have not reported any ties.
+
+If we had a different survey setup, we would need to specify the `R` parameter in the `parse_graph_from_edgelist()` function. We are adding a tutorial in the future to discuss how to handle other survey setups.
+:::
+
+**Now we can run the model**
+
+
+```{r, message=FALSE}
+#TODO: refactor `vimure` function to accept a `BaseNetwork` object directly 
+# (no need to pass the `x` attribute here)
+model <- vimure(vm_graph$X, num_realisations=5, max_iter=100, seed=1, mutuality = TRUE)
+```
+
+
+## `igraph` object
+
+As long as your graph `G` has the edge attributes `E(G)$reporter` and `E(G)$prompt_type`, you can run the model directly on the `igraph` object:
+
+
+```{r, message=FALSE}
+model <- vimure(G, num_realisations=5, max_iter=100, seed=1, mutuality = TRUE)
+```
+
+
+:::
+
+The parameters `num_realisations` and `max_iter` control the number of iterations of the Variational Inference algorithm. The `seed` parameter sets the seed for the random number generator. The `mutuality` parameter specifies whether the model should assume that ties are mutual, as described in [@de_bacco_latent_2022].
+
+## Model Summary
+
+Various elements from the VIMuRe model's output may be of interest:
+
+
+```{r}
+model_summary <- summary(model)
+model_summary
+```
+
+
+The summary above shows the model parameters' priors, posteriors, and estimates. For now, let's just focus on a few elements that result from this model summary:
+
+
+```{r}
+names(model_summary)
+```
+
+
+To better understand this summary, refer to the [Advanced: Optimisation Diagnostics](#advanced-optimisation-diagnostic) section below.
+
+## Estimated reliability
+
+Let's first consider the resulting estimates of the "reliability" of each reporter from a data frame available at `model_summary$reliability`. Reliability is represented as $\theta$ in the model [@de_bacco_latent_2022] and is the probability that a reporter will report a tie between two nodes. The model estimates the reliability values and are not directly observed in the data.
+
+While interpretation isn't always straightforward, we can get a general sense of the extent to which particular reporters seem to be "over-" or "under-" reporting their ties. Roughly speaking, nodes with reliability values close to 0 are likely to be under-reporting, while nodes with large reliability values are likely to be over-reporting. 
+
+
+```{r fig.height=3.75, fig.width=10}
+#TODO: Rename `layer` to `theta_value` in the reliability data frame
+plot_df <- model_summary$reliability %>% rename(theta_value = layer)
+
+ggplot(plot_df, aes(x = reorder(factor(node), -theta_value), y=theta_value)) +
+  geom_point(alpha = 0.4, size=4, color = "#c45241") +
+  theme_bw() +
+  labs(x = "Nodes sorted from over-to under- reporting", 
+       y = "Realibility values") +
+  theme(axis.text.x=element_blank())
+```
+
+
+## Mutuality
+
+Another central concept of our model is mutuality, the tendency to report ties in both directions involving the same alter, represented by the parameter $\eta$ in the model. In the paper [@de_bacco_latent_2022], we argue that mutuality is a fundamental property of social ties and that it is important to model it in a latent network model.  We can extract the geometric expectation of $\eta$ from the fitted model object as follows:
+
+
+```{r}
+model$G_exp_nu
+```
+
+
+A mutuality of $\eta \approx 0.78$ is high, which means the model estimates that the average person is _very_ likely to nominate the same alter when prompted in both directions of the tie. They will likely answer the same set of people to the following questions: _"Whose house do you visit?"_ as well as _"Who visits your house?"_. 
+
+
+# 🕸️ Extracting an inferred network
+
+## Point estimates
+
+After running the model, we can extract the point estimates of the network from the model. This can be done by parsing the $\rho$ values inferred by the model, which can be interpreted as the probability that a tie exists between two nodes. 
+
+If you want to look at $\rho$ directly, you can invoke `model$rho` but notice you will still have to parse the $\rho$ values to get a network object. This is because the $\rho$ values are stored in a 4-dimensional array, where the first dimension is the layer, the second and third dimensions are the nodes ($i\rightarrow j$), and the fourth dimension reflects the expected degree of that tie (up to degree $K$):
+
+
+```{r}
+model$rho %>% dim()
+```
+
+
+In other words, $\rho_{lijk}$ is the probability that a tie degree $k-1$ exists between nodes $i$ and $j$ in layer $l$.
+
+(The last dimension is also related to the parameter $\lambda_k$. You can read more about it on the paper [@de_bacco_latent_2022] as well as on the [Advanced: Optimisation Diagnostics](#advanced-optimisation-diagnostic) section below).
+
+Because it might be tricky to interpret the $\rho$ array directly, we recommend using the `get_inferred_model()` function to parse the $\rho$ values into an adjacency matrix. This function allows several ways to obtain the inferred network, and its usage depends on the interpretation you want to give to the $\rho$ values.
+
+## Sampling from the posterior
+
+(🚧 This section is a work in progress. 🚧)
+
+# 📈 Advanced: Optimisation Diagnostic
+
+(🚧 This section is a work in progress. 🚧)
+
+---------------------------

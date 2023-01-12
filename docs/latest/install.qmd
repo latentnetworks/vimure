@@ -42,7 +42,7 @@ require(vimure)
 vimure::install_vimure()
 ```
 
-If you are not using RStudio, i.e. you are using R in the terminal, you may need to restart your R session after installing the Python package.
+If you are not using RStudio, i.e., you are using R in the terminal, you may need to restart your R session after installing the Python package.
 
 **Step 04**: To confirm that the installation was successful, run the following command:
 
@@ -67,8 +67,8 @@ Install `vimure==0.1` with the following command:
 pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
 ```
 
-This Python package was tested on Python >= 3.6 and it is expect to work fine in all OSes.
+This Python package was tested on Python >= 3.6, and it is expected to work fine in all OSes.
 
-Read more about the Python set up for development [here](https://github.com/latentnetworks/vimure/blob/develop/src/python/README.md).
+Read more about the Python setup for development [here](https://github.com/latentnetworks/vimure/blob/develop/src/python/README.md).
 
 :::
