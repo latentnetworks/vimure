@@ -39,6 +39,9 @@ jobs:
         run: devtools::install_version("igraph", version = "1.3.5"); 
         shell: Rscript {0}
 
+      - name: Install vimure's python version
+        run: pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
+
       - name: Install vimure
         run: devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop");vimure::install_vimure()
         shell: Rscript {0}
