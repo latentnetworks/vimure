@@ -1,5 +1,6 @@
 # VIMuRe
-[GitHub Badge](https://github.com/latentnetworks/vimure/workflows/test/badge.svg)
+![GitHub Badge](https://github.com/latentnetworks/vimure/workflows/test/badge.svg)
+
 [![codecov](https://codecov.io/gh/latentnetworks/vimure/branch/main/graph/badge.svg?token=NAZP90D12J)](https://codecov.io/gh/latentnetworks/vimure)
 
 Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data.
