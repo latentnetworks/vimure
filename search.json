@@ -1,40 +1,5 @@
 [
   {
-    "objectID": "docs/latest/install.html",
-    "href": "docs/latest/install.html",
-    "title": "📦 Installation",
-    "section": "",
-    "text": "VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.\n\nRPython\n\n\nStep 01: install reticulate with the following command:\ninstall.packages(\"reticulate\")\n\n\n\n\n\n\nClick here to learn more about reticulate\n\n\n\n\n\n\nOur core code is written in python, so we use reticulate to integrate our model in R. This package allows you to use Python within your R session in a seamless, high-performance interoperable way.\nreticulate will look for python installed in your computer. If, for some reason, it cannot find it, you may be prompted to download and install miniconda.\n\nMiniconda is the recommended installation method for most users, as it is easier to ensure that the newly installed python is isolated from other python installs you have in your system.\nIf you initially declined the miniconda installation prompt, you can later manually install miniconda by running reticulate::install_miniconda().\n\n\n\n\n\nStep 02: install vimure==0.1 with the following command:\nrequire(devtools)\ndevtools::install_github(\"latentnetworks/vimure\", subdir=\"src/R\", ref=\"develop\")\nStep 03: Finally, you must install the Python package as well. This is because the R package is a wrapper around the Python package. To install the Python package, follow the instructions below.\nrequire(vimure)\nvimure::install_vimure()\nIf you are not using RStudio, i.e. you are using R in the terminal, you may need to restart your R session after installing the Python package.\nStep 04: To confirm that the installation was successful, run the following command:\nlibrary(vimure)\nvimure::vm_config()\nYou should see something like the following:\n#> Loaded vimure version\n#> Vimure v (...)\n#> Python v3.x (...)\n\n\nInstall vimure==0.1 with the following command:\npip install \"git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/\"\nThis Python package was tested on Python >= 3.6 and it is expect to work fine in all OSes.\nRead more about the Python set up for development here."
-  },
-  {
-    "objectID": "docs/latest/people.html",
-    "href": "docs/latest/people.html",
-    "title": "People",
-    "section": "",
-    "text": "Who we are\nThe people behind the conception, development, and maintenance of VIMuRe are listed below.\n\n\n\n\n\nDr. Caterina De Bacco CyberValley Research Group Leader MPI for Intelligent Systems 🧑‍💻 core package developer\n\n\n\n\n\n\nMartina Contisciani Ph.D. Student MPI for Intelligent Systems 🧑‍💻 core package developer\n\n\n\n\n\n\nDr. Jon Cardoso-Silva Assist. Prof. Lecturer LSE Data Science Institute 🧑‍💻 core package developer\n\n\n\n\n\n\nDr. Hadiseh Safdari Postdoctoral Researcher MPI for Intelligent Systems\n\n\n\n\n\n\nDiego Baptista Theuerkauf Ph.D. Student MPI for Intelligent Systems\n\n\n\n\n\n\nGabriela Lima Borges Data Scientist / Guest Researcher MPI for Evolutionary Anthropology 🧑‍💻 core package developer\n\n\n\n\n\n\nDr. Tracy Sweet Associate Professor UMD College of Education\n\n\n\n\n\n\nDr. Jean-Gabriel Young Assistant Professor The University of Vermont\n\n\n\n\n\n\nDr. Jeremy Koster Professor University of Cincinnati\n\n\n\n\n\n\nDr. Cody T. Ross Post-Doctoral Fellow MPI for Evolutionary Anthropology\n\n\n\n\n\n\nDr. Richard McElreath Professor MPI for Evolutionary Anthropology\n\n\n\n\n\n\nDr. Daniel Redhead Research Scientist MPI for Evolutionary Anthropology\n\n\n\n\n\n\nDr. Eleanor A. Power Assistant Professor LSE Department of Methodology"
-  },
-  {
-    "objectID": "docs/latest/quick-start.html",
-    "href": "docs/latest/quick-start.html",
-    "title": "💻 Quick Start",
-    "section": "",
-    "text": "Here, we’ll illustrate how to use Vimure to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance (Banerjee et al 2013). The data files we use here are derived from those openly-available on the Harvard Dataverse page.\nWe have selected a particular village and read in its edgelist. This contains information on multiple different types of relationships. Our interest here is on relationships that were “double-sampled” in the original survey, i.e. elicited through two different prompts. For example, respondents were asked both “If you needed to borrow kerosene or rice, to whom would you go?” as well as “Who would come to you if he/she needed to borrow kerosene or rice?” Four different relationship types (or “layers”) were double-sampled in this way (i.e., were elicited with two prompt types).\nThe code below will preprocess the data, removing self-loops and creating new labels to represent the four relationship type or “layers” joining together the two prompt types. Here, we’ll select one of these layers to consider (the “visit” layer resulting from the “visitgo” and “visitcome” prompts)."
-  },
-  {
-    "objectID": "docs/latest/quick-start.html#import-required-libraries",
-    "href": "docs/latest/quick-start.html#import-required-libraries",
-    "title": "💻 Quick Start",
-    "section": "Import required libraries",
-    "text": "Import required libraries\n\nlibrary(vimure)\nlibrary(dplyr)\nlibrary(readr)"
-  },
-  {
-    "objectID": "docs/latest/quick-start.html#load-the-data",
-    "href": "docs/latest/quick-start.html#load-the-data",
-    "title": "💻 Quick Start",
-    "section": "Load the data",
-    "text": "Load the data\n\n\nCode\nvillage <- \"12\" # change this parameter to run in other village\n\nURL <- paste0(\"https://raw.githubusercontent.com/latentnetworks/vimure/develop\",\n              \"/data/input/india_microfinance/formatted/\",\n              paste0(\"vil\", village, \"_edges.csv\"))\ndf_edges <- read_csv(URL)\nhead(df_edges)\n\n\n# A tibble: 6 × 5\n  respondent       i       j type        weight\n       <dbl>   <dbl>   <dbl> <chr>        <dbl>\n1    1200101 1200101 1202101 borrowmoney      1\n2    1200102 1200102 1200402 borrowmoney      1\n3    1200201 1200201 1207901 borrowmoney      1\n4    1200202 1200202 1216002 borrowmoney      1\n5    1200801 1200801 1200601 borrowmoney      1\n6    1200802 1200802 1200901 borrowmoney      1\n\n\n(🚧 This is a work in progress. 🚧)"
-  },
-  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "VIMuRe",
@@ -46,6 +11,27 @@
     "href": "index.html#in-brief",
     "title": "VIMuRe",
     "section": "📝 In brief",
-    "text": "📝 In brief\n\nInput: multiply-sampled social network data as a list of adjacency matrices or igraph objects. 1\nOutput: a fitted latent network model that can be used to obtain samples or a point-estimate network (an igraph object) from the posterior distribution of the fitted model. 2"
+    "text": "📝 In brief\n\nInput: multiply-sampled social network data as a list of adjacency matrices or igraph objects.\nOutput: a fitted latent network model that can be used to obtain samples or a point-estimate network (an igraph object) from the posterior distribution of the fitted model."
+  },
+  {
+    "objectID": "latest/install.html",
+    "href": "latest/install.html",
+    "title": "📦 Installation",
+    "section": "",
+    "text": "VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.\n\nRPython\n\n\nStep 01: install reticulate with the following command:\ninstall.packages(\"reticulate\")\n\n\n\n\n\n\nClick here to learn more about reticulate\n\n\n\n\n\n\nOur core code is written in python, so we use reticulate to integrate our model in R. This package allows you to use Python within your R session in a seamless, high-performance interoperable way.\nreticulate will look for python installed in your computer. If, for some reason, it cannot find it, you may be prompted to download and install miniconda.\n\nMiniconda is the recommended installation method for most users, as it is easier to ensure that the newly installed python is isolated from other python installs you have in your system.\nIf you initially declined the miniconda installation prompt, you can later manually install miniconda by running reticulate::install_miniconda().\n\n\n\n\n\nStep 02: install vimure==0.1 with the following command:\nrequire(devtools)\ndevtools::install_github(\"latentnetworks/vimure\", subdir=\"src/R\", ref=\"develop\")\nStep 03: Finally, you must install the Python package as well. This is because the R package is a wrapper around the Python package. To install the Python package, follow the instructions below.\nrequire(vimure)\nvimure::install_vimure()\nIf you are not using RStudio, i.e., you are using R in the terminal, you may need to restart your R session after installing the Python package.\nStep 04: To confirm that the installation was successful, run the following command:\nlibrary(vimure)\nvimure::vm_config()\nYou should see something like the following:\n#> Loaded vimure version\n#> Vimure v (...)\n#> Python v3.x (...)\n\n\nInstall vimure==0.1 with the following command:\npip install \"git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/\"\nThis Python package was tested on Python >= 3.6, and it is expected to work fine in all OSes.\nRead more about the Python setup for development here."
+  },
+  {
+    "objectID": "latest/people.html",
+    "href": "latest/people.html",
+    "title": "People",
+    "section": "",
+    "text": "Who we are\nThe people behind the conception, development, and maintenance of VIMuRe are listed below.\n\n\n\n\n\nDr. Caterina De Bacco CyberValley Research Group Leader MPI for Intelligent Systems 🧑‍💻 core package developer\n\n\n\n\n\n\nMartina Contisciani Ph.D. Student MPI for Intelligent Systems 🧑‍💻 core package developer\n\n\n\n\n\n\nDr. Jon Cardoso-Silva Assist. Prof. Lecturer LSE Data Science Institute 🧑‍💻 core package developer\n\n\n\n\n\n\nDr. Hadiseh Safdari Postdoctoral Researcher MPI for Intelligent Systems\n\n\n\n\n\n\nDiego Baptista Theuerkauf Ph.D. Student MPI for Intelligent Systems\n\n\n\n\n\n\nGabriela Lima Borges Data Scientist / Guest Researcher MPI for Evolutionary Anthropology 🧑‍💻 core package developer\n\n\n\n\n\n\nDr. Tracy Sweet Associate Professor UMD College of Education\n\n\n\n\n\n\nDr. Jean-Gabriel Young Assistant Professor The University of Vermont\n\n\n\n\n\n\nDr. Jeremy Koster Professor University of Cincinnati\n\n\n\n\n\n\nDr. Cody T. Ross Research Scientist MPI for Evolutionary Anthropology\n\n\n\n\n\n\nDr. Richard McElreath Professor MPI for Evolutionary Anthropology\n\n\n\n\n\n\nDr. Daniel Redhead Research Scientist MPI for Evolutionary Anthropology\n\n\n\n\n\n\nDr. Eleanor A. Power Assistant Professor LSE Department of Methodology"
+  },
+  {
+    "objectID": "latest/tutorials.html",
+    "href": "latest/tutorials.html",
+    "title": "💻 Tutorials",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\nNo matching items"
   }
 ]
