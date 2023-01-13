@@ -14,12 +14,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: HTTPS
-        run: sudo apt update && sudo apt install -y apt-transport-https
-
       - uses: r-lib/actions/setup-r@v2
         with:
-          use-public-rspm: false
+          use-public-rspm: true
 
       - uses: r-lib/actions/setup-renv@v2
 
