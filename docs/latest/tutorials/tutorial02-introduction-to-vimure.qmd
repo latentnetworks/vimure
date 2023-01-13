@@ -24,6 +24,10 @@ If you use `vimure` in your research, please cite the following paper:
 
 **Import packages**
 
+```{r, eval=TRUE, echo=FALSE, message=FALSE, echo=FALSE}
+vimure::install_vimure()
+```
+
 ```{r warning=FALSE, message=FALSE, echo=FALSE}
 library(knitr)
 ```
