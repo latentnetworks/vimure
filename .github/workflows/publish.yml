@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up apt sources
-        run: sudo sed -i 's/azure\./uk\./' /etc/apt/sources.list
+        run: sudo sed -i 's/azure\./nl\./' /etc/apt/sources.list
 
       - uses: r-lib/actions/setup-r@v2
         with:
