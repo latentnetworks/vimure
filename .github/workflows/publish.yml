@@ -14,6 +14,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
+      - name: Set up apt sources
+        run: sudo sed -i 's/azure\./uk\./' /etc/apt/sources.list
+
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
