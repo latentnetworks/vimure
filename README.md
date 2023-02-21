@@ -12,6 +12,10 @@ If you use this code, please cite this article (preprint).
 
 VIMuRe package is available in R and Python. 
 
+## Do you want to contribute to this project?
+
+Please take a look at the [contributing guidelines](CONTRIBUTING.md). You will find there information about how to contribute to the project, and how to set up your development environment.
+
 ## Feedback
 
 Report a bug and give general feedback about the library:
@@ -26,8 +30,7 @@ Install `vimure==0.1` with the following command:
 pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
 ```
 
-Vimure Python package depends on Python = 3.6, and it is expected to work fine in
-all OS.
+Vimure Python package depends on Python > 3.6, and it is expected to work fine in all major OSes.
 
 See more about Python setup [here](src/python/README.md)
 
@@ -52,7 +55,7 @@ install.packages("devtools")
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
-Vimure R package depends on R = 3.3.0, and it is expected to work fine in all OSes.
+Vimure R package depends on R >= 3.3.0, and it is expected to work fine in all OSes.
 
 See more about R setup and quick start [here](https://latentnetworks.github.io/vimure/)
 
