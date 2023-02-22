@@ -41,9 +41,9 @@ However, you should not be working directly on `develop`. **Instead, you should 
 
 Read on if you want a fuller setup to work on the documentation. This will allow you to run the documentation locally and also to make changes to the website structure.
 
-### 🔨 (Simpler) How to run the documentation locally
+### 🔨 Use this if you just want to build the documentation locally
 
-#### The R setup
+#### 📊 The R setup
 
 1. Clone this repository to your computer.
 2. Open a terminal and navigate to the root of this repository.
@@ -65,6 +65,33 @@ install.packages("renv")
     This will read the instructions from `_quarto.yml` and render the website locally.
 5. Open your browser and navigate to `http://localhost:<port>/`. That's it!
 
+
+### 🔨 Use this if you want to make changes to the core Python package
+#### 🐍 The Python setup
+
+1. Install [Python 3.9](python.org) or higher on your computer.
+2. Install [anaconda](https://www.anaconda.com/products/individual) or [miniconda](https://docs.conda.io/en/latest/miniconda.html) on your computer.
+3. Create a new conda environment:
+
+    ```bash
+    conda create -y -n=venv-vimure python=3.10.8
+    ```
+4. Activate the environment and make sure you have `pip` installed inside that environment:
+
+  ```console
+  conda activate venv-vimure # the exact `activate` command will vary depending on your OS
+  ```
+
+💡 Remember to activate this particular `conda` environment whenever you reopen VSCode/the terminal.
+
+10. Install required libraries
+
+  ```console
+  pip install -r src/python/requirements.txt
+  ```
+
+Now, whenever you open a Jupyter Notebook, you should see the `venv-vimure` kernel available.
+
 ### ⚒️ (Advanced) Jon's full setup
 
 ⚠️ Proceed at your own risk ⚠️
@@ -76,10 +103,14 @@ I, [@jonjoncardoso](github.com/jonjoncardoso), like to use R on VSCode (WSL Ubun
 3. Install the [WSL extension on VSCode](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) (if you are on Windows)
 4. Open VSCode and open a new WSL window (Type `Ctrl+Shift+P` and type `WSL: New Window`). If on Mac, just open a new window.
 6. Open the terminal on VSCode and install [R](https://cloud.r-project.org/)
+**When doing R**
 7. Install the [R extension on VSCode](https://marketplace.visualstudio.com/items?itemName=Ikuyadeu.r)
 8. Install [Quarto](https://quarto.org/docs/getting-started/installation.html)
 9. Install the [Quarto extension on VSCode](https://marketplace.visualstudio.com/items?itemName=quarto-dev.quarto-vscode)
-10. When running R notebooks (either `.Rmd` or `.qmd`) manually, you will see that some plots do not render with adequate size. To fix this, follow [these instructions](https://stackoverflow.com/a/70817205/843365).
+10. When running R notebooks (either `.Rmd` or `.qmd`) manually, you will see that some plots do not render with the adequate size. To fix this, follow [these instructions](https://stackoverflow.com/a/70817205/843365).
+**When doing Python**
+11. Install the [Python extension on VSCode](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+12. Install the [Jupyter extension on VSCode](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter)
 
 I also use the following VSCode Extensions:
 
