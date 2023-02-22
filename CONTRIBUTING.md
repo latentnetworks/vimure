@@ -103,11 +103,13 @@ I, [@jonjoncardoso](github.com/jonjoncardoso), like to use R on VSCode (WSL Ubun
 3. Install the [WSL extension on VSCode](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) (if you are on Windows)
 4. Open VSCode and open a new WSL window (Type `Ctrl+Shift+P` and type `WSL: New Window`). If on Mac, just open a new window.
 6. Open the terminal on VSCode and install [R](https://cloud.r-project.org/)
+
 **When doing R**
 7. Install the [R extension on VSCode](https://marketplace.visualstudio.com/items?itemName=Ikuyadeu.r)
 8. Install [Quarto](https://quarto.org/docs/getting-started/installation.html)
 9. Install the [Quarto extension on VSCode](https://marketplace.visualstudio.com/items?itemName=quarto-dev.quarto-vscode)
 10. When running R notebooks (either `.Rmd` or `.qmd`) manually, you will see that some plots do not render with the adequate size. To fix this, follow [these instructions](https://stackoverflow.com/a/70817205/843365).
+
 **When doing Python**
 11. Install the [Python extension on VSCode](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 12. Install the [Jupyter extension on VSCode](https://marketplace.visualstudio.com/items?itemName=ms-toolsai.jupyter)
