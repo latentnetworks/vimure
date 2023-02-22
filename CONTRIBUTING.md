@@ -37,8 +37,6 @@ However, you should not be working directly on `develop`. **Instead, you should 
 💡 Not familiar with Git branches? Check out [this tutorial](https://www.atlassian.com/git/tutorials/using-branches), or [this one](https://www.youtube.com/watch?v=JTE2Fn_sCZs), and keep a bookmark for [this cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet), or, perhaps the [Pro](https://git-scm.com/book/en/v2) Git book](https://git-scm.com/book/en/v2).
 
 
-
-
 ## 🧰 Dev Setup
 
 Read on if you want a fuller setup to work on the documentation. This will allow you to run the documentation locally and also to make changes to the website structure.
@@ -75,7 +73,7 @@ I, [@jonjoncardoso](github.com/jonjoncardoso), like to use R on VSCode (WSL Ubun
 
 1. Install [VSCode](https://code.visualstudio.com/Download)
 2. Install [WSL on Windows](https://learn.microsoft.com/en-us/windows/wsl/install) (or on your Mac)
-3. Install [WSL extension on VSCode](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) (if you are on Windows)
+3. Install the [WSL extension on VSCode](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-wsl) (if you are on Windows)
 4. Open VSCode and open a new WSL window (Type `Ctrl+Shift+P` and type `WSL: New Window`). If on Mac, just open a new window.
 6. Open the terminal on VSCode and install [R](https://cloud.r-project.org/)
 7. Install the [R extension on VSCode](https://marketplace.visualstudio.com/items?itemName=Ikuyadeu.r)
