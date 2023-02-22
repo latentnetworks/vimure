@@ -57,6 +57,8 @@ require(devtools)
 devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 ```
 
+Check out [devtools](https://devtools.r-lib.org/) package documentation if you are not familiar with it.
+
 <p style="margin-bottom: 2rem;"></p>
 
 </details>
@@ -65,7 +67,7 @@ devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
 
 ## Step 03: Install the Python package 
 
-You **must** install the python package before using the R package. This is because the R package is a wrapper around the Python package. To install the Python package, follow the instructions below.
+You **must** install the python package before using the R package. This is because the R package is a wrapper around the Python package. You can do this without leaving R, though. Just type the following command in your R console:
 
 ```r
 require(vimure)
