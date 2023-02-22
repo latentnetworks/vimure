@@ -26,6 +26,9 @@ jobs:
 
       - run: pip install -r src/python/requirements.txt
         if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+        
+      - run: pip install pytest
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
   build_and_test:
     needs: create-virtualenv
