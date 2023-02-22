@@ -11,12 +11,12 @@ setup(
     author="Caterina de Baco",
     keywords=[""],
     install_requires=[
-        "numpy < 1.20",
-        "scipy < 1.7",
-        "pandas < 1.2.1",
-        "scikit-learn < 1.0",
+        "numpy <= 1.24.2",
+        "scipy <= 1.10.1",
+        "pandas < 2.0.0",
+        "scikit-learn <= 1.2.1",
         "scikit-tensor-py3 @ https://github.com/jonjoncardoso/scikit-tensor-py3/archive/master.zip",
-        "networkx >= 2.0.0"
+        "networkx < 3.0.0"
     ],
     packages=find_packages(),
     python_requires=">=3",

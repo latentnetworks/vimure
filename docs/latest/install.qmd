@@ -35,7 +35,7 @@ Choose your language:
     reticulate::py_config()
     ```
 
-    You should see something like the following if you have a valid Python installation:
+    You should see something like the following if you have a valid Python installation identified by `reticulate`:
 
     ```r
     python:         ...path..to.../python/r-reticulate/bin/python
