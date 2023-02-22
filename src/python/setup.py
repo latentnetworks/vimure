@@ -13,7 +13,7 @@ setup(
     install_requires=[
         "numpy < 1.20",
         "scipy < 1.7",
-        "pandas < 1.3",
+        "pandas < 1.2.1",
         "scikit-learn < 1.0",
         "scikit-tensor-py3 @ https://github.com/jonjoncardoso/scikit-tensor-py3/archive/master.zip",
         "networkx >= 2.0.0"
