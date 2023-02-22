@@ -3,6 +3,16 @@ title: "People"
 subtitle: "VIMuRe v0.1 (latest)"
 ---
 
+# How to reach us
+
+📦 Do you have a suggestion for a new feature? Do you want to contribute to the development of VIMuRe? 
+
+- Open a new [discussion](https://github.com/latentnetworks/vimure/discussions) on our GitHub repository.
+
+🐛 Do you have a bug to report? 
+
+- Open a new [issue](https://github.com/latentnetworks/vimure/issues) on our GitHub repository.
+
 # Who we are
 
 The people behind the conception, development, and maintenance of VIMuRe are listed below. 

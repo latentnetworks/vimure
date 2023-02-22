@@ -1,5 +1,5 @@
-numpy>=1.23.5
-scipy>=1.7.1
+numpy<1.20
+scipy<1.7
 scikit-learn==0.24.2
 scikit-tensor-py3 @ https://github.com/jonjoncardoso/scikit-tensor-py3/archive/master.zip
 networkx==2.8

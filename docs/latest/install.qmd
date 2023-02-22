@@ -23,11 +23,41 @@ Choose your language:
 
 ## Step 01: Install `reticulate`
 
-Open your R console and type the following command:
+1. Open your R console and type the following command:
 
-```r
-install.packages("reticulate")
-```
+    ```r
+    install.packages("reticulate")
+    ```
+
+2. Check if `reticulate` has a valid Python installation by running the following command:
+
+    ```r
+    reticulate::py_config()
+    ```
+
+    You should see something like the following if you have a valid Python installation:
+
+    ```r
+    python:         ...path..to.../python/r-reticulate/bin/python
+    libpython:      ...path..to.../r-reticulate/lib/libpython3.8.so
+    pythonhome:     ...path..to.../r-reticulate:/home/jonathan/Workspace/vimure/renv/python/r-reticulate
+    version:        3.8.16 | packaged by conda-forge | (default, Feb  1 2023, 16:01:55)  [GCC 11.3.0]
+    numpy:          ...path..to.../python/r-reticulate/lib/python3.8/site-packages/numpy
+    numpy_version:  1.24.2
+    ```
+
+    If instead, you see something like the following, type `Y` and press enter to install [miniconda](https://docs.conda.io/en/latest/miniconda.html):
+
+    ```r
+    No non-system installation of Python could be found.
+    Would you like to download and install Miniconda?
+    Miniconda is an open source environment management system for Python.
+    See https://docs.conda.io/en/latest/miniconda.html for more details.
+
+    Would you like to install Miniconda? [Y/n]: Y
+    ```
+
+3. Close the R session and open it again to make sure the changes take effect.
 
 ::: {.callout-note collapse="true"}
 ## Why do I need this package?
