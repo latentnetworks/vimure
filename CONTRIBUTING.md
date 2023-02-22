@@ -58,9 +58,9 @@ install.packages("renv")
 #### The Quarto setup
 
 1. Install [Quarto](https://quarto.org/docs/getting-started/installation.html) on your computer.
-2. Run the following command to start the website locally:
+2. On the terminal, run the following command to start the website locally:
     ```bash
-    quarto preview . --render all --no-browser
+    quarto preview docs/ --render all --no-browser
     ```
     This will read the instructions from `_quarto.yml` and render the website locally.
 5. Open your browser and navigate to `http://localhost:<port>/`. That's it!

@@ -20,12 +20,12 @@ website:
     contents:
       - href: index.qmd
         text: "🏠 Home"
-      - href: latest/people.qmd
-        text: "📟 Contact"
       - href: latest/install.qmd
         text: "📦 Installation"
       - href: latest/tutorials.qmd
         text: "💻 Tutorials"
+      - href: latest/people.qmd
+        text: "📟 Contact"
 
 format:
   html:

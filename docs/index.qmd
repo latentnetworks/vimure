@@ -16,3 +16,8 @@ The model in the **VIMuRe** package is our proposed solution to this problem. It
 - **Input:** multiply-sampled social network data as a list of adjacency matrices or igraph objects.
 
 - **Output:** a fitted latent network model that can be used to obtain samples or a point-estimate network (an igraph object) from the posterior distribution of the fitted model.
+
+## Getting started
+
+- Head to the [📦 Installation](./latest/install.qmd) page to learn how to install the package (either R or Python).
+- Check out the [💻 Tutorials](./latest/tutorials.html) page to learn how to use the package.
