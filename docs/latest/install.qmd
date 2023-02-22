@@ -1,6 +1,6 @@
 ---
 title: "📦 Installation"
-subtitle: "VIMuRe v0.1.0 (latest)"
+subtitle: "VIMuRe v0.1 (latest)"
 ---
 
 VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.
@@ -9,14 +9,14 @@ VIMuRe is available in both R and Python. The R implementation is a wrapper arou
 
 ## R
 
-**Step 01:** install `reticulate` with the following command:
+### **Step 01:** install `reticulate` with the following command:
 
 ```r
 install.packages("reticulate")
 ```
 
 ::: {.callout-note collapse="true"}
-## Click here to learn more about `reticulate`
+## Why do I need this package?
 
 - Our core code is written in python, so we use `reticulate` to integrate our model in R. This package allows you to use Python within your R session in a seamless, high-performance interoperable way. 
 
@@ -27,7 +27,7 @@ install.packages("reticulate")
 
 :::
 
-**Step 02:** install `vimure==0.1` with the following command:
+### **Step 02:** install `vimure==0.1` with the following command:
 
 ```r
 require(devtools)

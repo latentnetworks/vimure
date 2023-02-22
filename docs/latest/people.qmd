@@ -1,7 +1,6 @@
 ---
 title: "People"
-subtitle: "VIMuRe v0.1.0"
-date: "12/12/2022"
+subtitle: "VIMuRe v0.1"
 ---
 
 # Who we are

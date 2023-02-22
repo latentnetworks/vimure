@@ -1,9 +1,7 @@
 ---
-title: "VIMuRe"
+title: "VIMuRe v0.1 (latest)"
 subtitle: "Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data"
 ---
-
-_(🚧 This is a work in progress. 🚧)_
 
 # 📑 Is this package for me?
 
