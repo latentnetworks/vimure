@@ -29,7 +29,16 @@ Choose your language:
     install.packages("reticulate")
     ```
 
-2. Check if `reticulate` has a valid Python installation by running the following command:
+2. Set up a python environment for reticulate so it doesn't mess up other python installations you might have installed on your computer.
+
+    ```r
+    reticulate::conda_create("venv-vimure")
+    reticulate::use_condaenv("venv-vimure", required = TRUE)
+    ```
+
+3. Close the R session and open it again to make sure the changes take effect.
+
+4.  Check if `reticulate` has a valid Python installation by running the following command:
 
     ```r
     reticulate::py_config()
@@ -38,12 +47,11 @@ Choose your language:
     You should see something like the following if you have a valid Python installation identified by `reticulate`:
 
     ```r
-    python:         ...path..to.../python/r-reticulate/bin/python
-    libpython:      ...path..to.../r-reticulate/lib/libpython3.8.so
-    pythonhome:     ...path..to.../r-reticulate:/home/jonathan/Workspace/vimure/renv/python/r-reticulate
+    python:         ..path../anaconda3/envs/venv-vimure/bin/python
+    libpython:      ..path../anaconda3/envs/venv-vimure/lib/libpython3.8.so
+    pythonhome:     ..path../anaconda3/envs/venv-vimure:..path../anaconda3/envs/venv-vimure
     version:        3.8.16 | packaged by conda-forge | (default, Feb  1 2023, 16:01:55)  [GCC 11.3.0]
-    numpy:          ...path..to.../python/r-reticulate/lib/python3.8/site-packages/numpy
-    numpy_version:  1.24.2
+    numpy:           [NOT FOUND]
     ```
 
     If instead, you see something like the following, type `Y` and press enter to install [miniconda](https://docs.conda.io/en/latest/miniconda.html):
@@ -57,7 +65,7 @@ Choose your language:
     Would you like to install Miniconda? [Y/n]: Y
     ```
 
-3. Close the R session and open it again to make sure the changes take effect.
+5. (Advanced) Alternatively, you can set up `reticulate` to use other pre-installed Python versions you might have on your computer. See [Alternative Versions section](src/R/README.md#alternate-versions-advanced-mode) on our R README for more details.
 
 ::: {.callout-note collapse="true"}
 ## Why do I need this package?
