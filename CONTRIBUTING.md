@@ -108,10 +108,48 @@ install.packages("renv")
 10. Install required libraries
 
     ```shell
-    pip install -r src/python/requirements.txt
+    pip install -r src/python/requirements_dev.txt
+    ```
+
+11. Install the `vimure` package in editable mode:
+
+    ```shell
+    pip install -e src/python/
     ```
 
 Now, whenever you open a Jupyter Notebook, you should see the `venv-vimure` kernel available.
+
+### How to add a feature to the Python package
+
+1. Create a new branch from `develop` and name it `feature/<feature_name>`. For example, if you are adding a new function to the `vimure` package, you could name your branch `feature/add_new_function`.
+
+2. Make your changes to the Python package.
+
+3. Run the tests to make sure everything is working as expected. See the next section for more details.
+
+4. Open a pull request to merge your branch into `develop`. This will allow us to review your changes before merging them into `develop`.
+
+### 🧪 Testing
+
+1. Ensure you have conda's `venv-vimure` environment activated.  
+
+2. Run the following command:
+    ```shell
+    python -m pytest -s -vv --pyargs src/python/vimure
+    ```
+
+3. If not all tests pass, you can run a specific test by running the following command:
+    ```shell
+    python -m pytest -s -vv --pyargs src/python/vimure -k <test_name>
+    ```
+    where `<test_name>` is the name of the test you want to run.
+
+
+    For example: 
+    
+    ```shell   
+    python -m pytest -s -vv --pyargs src/python/vimure -k test_mapping_ego_and_alter`
+    ```
 
 </details>
 
@@ -143,6 +181,7 @@ I, [@jonjoncardoso](github.com/jonjoncardoso), like to use R on VSCode (WSL Ubun
 
 I also use the following VSCode Extensions:
 
+- [Markdown Preview Enhanced](https://marketplace.visualstudio.com/items?itemName=shd101wyy.markdown-preview-enhanced)
 - [GitHub Pull Requests and Issues](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github)
 - [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
 - [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
