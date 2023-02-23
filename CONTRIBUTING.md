@@ -2,7 +2,11 @@
 
 When contributing to this repository, please first discuss the change you wish to make via issue, email, or any other method with the owners of this repository before making a change. 
 
-## 📃 Building the documentation locally
+## 📄 The Basics
+
+<details><summary>📃 Building the documentation locally</summary>
+
+### 📃 Building the documentation locally
 
 If you just want to make minor edits to the text in the documentation, you don't need to go to the trouble of setting up your environment. You can just edit the files in the `docs/` folder and commit+push your changes.
 
@@ -12,7 +16,11 @@ After cloning the repository, cd to `docs/` and run `quarto preview . --render a
 
 💡 If you want to change something in the structure of the documentation (say, the location of a menu or how the pages are laid out) take a look at the YAML file [docs/_quarto.yml](docs/_quarto.yml).
 
-## ✋ How to contribute
+</details>
+
+<details><summary>✋ How to contribute</summary>
+
+### ✋ How to contribute
 
 If you want to propose changes to the documentation if you were tasked to do something, you should follow the steps below:
 
@@ -22,7 +30,12 @@ If you want to propose changes to the documentation if you were tasked to do som
 3. Make your changes and commit them to your branch. Remember to commit often and to write meaningful commit messages. If you are working on a specific issue, you can use the following format: `#<issue-number> <commit-message>`. For example, if you are working on issue #3, you could write `#3 Fix numpy bug`. 
 4. When you are done, push all your commits and then open a [pull request](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request) to merge your branch into `develop`. You can do this by clicking on the "Compare & pull request" button on GitHub. Make sure to add a meaningful title and description to your pull request. If you are working on a specific issue, you can use the following format: `#<issue-number> <pull-request-title>`. For example, if you are working on issue #3, you could write `#3 Fix Numpy Bug`.
 
-## 🔀 Git branches
+</details>
+
+
+<details><summary>🔀 Our Git branches</summary>
+
+### 🔀 Our Git branches
 
 This repository has the following main branches:
 
@@ -36,10 +49,13 @@ However, you should not be working directly on `develop`. **Instead, you should 
 
 💡 Not familiar with Git branches? Check out [this tutorial](https://www.atlassian.com/git/tutorials/using-branches), or [this one](https://www.youtube.com/watch?v=JTE2Fn_sCZs), and keep a bookmark for [this cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet), or, perhaps the [Pro](https://git-scm.com/book/en/v2) Git book](https://git-scm.com/book/en/v2).
 
+</details>
 
 ## 🧰 Dev Setup
 
 Read on if you want a fuller setup to work on the documentation. This will allow you to run the documentation locally and also to make changes to the website structure.
+
+<details><summary> 🔨 Use this if you just want to build the <strong>documentation</strong> locally </summary>
 
 ### 🔨 Use this if you just want to build the documentation locally
 
@@ -65,11 +81,14 @@ install.packages("renv")
     This will read the instructions from `_quarto.yml` and render the website locally.
 5. Open your browser and navigate to `http://localhost:<port>/`. That's it!
 
+</details>
+
+<details><summary> 🔨 Use this if you want to make changes to the <strong>core Python package</strong> </summary>
 
 ### 🔨 Use this if you want to make changes to the core Python package
 #### 🐍 The Python setup
 
-1. Install [Python 3.9](python.org) or higher on your computer.
+1. Install [Python 3.8](python.org) or higher on your computer.
 2. Install [anaconda](https://www.anaconda.com/products/individual) or [miniconda](https://docs.conda.io/en/latest/miniconda.html) on your computer.
 3. Create a new conda environment:
 
@@ -78,19 +97,25 @@ install.packages("renv")
     ```
 4. Activate the environment and make sure you have `pip` installed inside that environment:
 
-  ```console
-  conda activate venv-vimure # the exact `activate` command will vary depending on your OS
-  ```
+    ```shell
+    conda activate venv-vimure 
+    ```
+
+  Note: the `activate` command might vary depending on your OS.
 
 💡 Remember to activate this particular `conda` environment whenever you reopen VSCode/the terminal.
 
 10. Install required libraries
 
-  ```console
-  pip install -r src/python/requirements.txt
-  ```
+    ```shell
+    pip install -r src/python/requirements.txt
+    ```
 
 Now, whenever you open a Jupyter Notebook, you should see the `venv-vimure` kernel available.
+
+</details>
+
+<details><summary> ⚒️ (Advanced) Jon's full setup </summary>
 
 ### ⚒️ (Advanced) Jon's full setup
 
@@ -122,3 +147,5 @@ I also use the following VSCode Extensions:
 - [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens)
 - [GitHub Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot)
 - [Grammarly](https://marketplace.visualstudio.com/items?itemName=znck.grammarly)
+
+</details>
