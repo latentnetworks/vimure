@@ -18,10 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: syphar/restore-virtualenv@v1
-        id: cache-virtualenv
-
-      - uses: syphar/restore-pip-download-cache@v1
 
       - run: pip install -r src/python/requirements.txt
         
