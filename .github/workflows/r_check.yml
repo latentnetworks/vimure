@@ -71,6 +71,9 @@ jobs:
       - name: Install remotes
         run: install.packages("remotes")
 
+      - name: Install devtools
+        run: install.packages("devtools")
+
       - name: Install system dependencies
         if: runner.os == 'Linux'
         shell: bash
