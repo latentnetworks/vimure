@@ -22,13 +22,10 @@ jobs:
         id: cache-virtualenv
 
       - uses: syphar/restore-pip-download-cache@v1
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
       - run: pip install -r src/python/requirements.txt
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
         
       - run: pip install pytest
-        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
 
   build_and_test:
     needs: create-virtualenv
@@ -39,8 +36,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - uses: syphar/restore-virtualenv@v1
-        id: cache-virtualenv
 
       # Install vimure
       - name: Install Vimure
