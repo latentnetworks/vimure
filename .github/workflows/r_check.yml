@@ -81,7 +81,7 @@ jobs:
             echo "$cmd"
             sudo $cmd
           done < <(Rscript -e "writeLines(remotes::system_requirements('$ID-$VERSION_ID'))")
-          sudo apt install libglpk-dev
+          sudo apt install libglpk-dev libcurl4-openssl-dev
           
       - name: Install package + deps
         run: remotes::install_local(path="src/R/", dependencies = TRUE, force = TRUE)
