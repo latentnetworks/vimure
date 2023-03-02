@@ -1,4 +1,8 @@
 # VIMuRe
+
+<img src="https://raw.githubusercontent.com/latentnetworks/vimure/main/docs/figures/stable_diffusion_stickmen.png" style="object-fit: cover;width:8em;height:8em;border-radius: 70%;"/>
+
+
 ![GitHub Badge](https://github.com/latentnetworks/vimure/workflows/test/badge.svg)
 
 [![codecov](https://codecov.io/gh/latentnetworks/vimure/branch/main/graph/badge.svg?token=NAZP90D12J)](https://codecov.io/gh/latentnetworks/vimure)
