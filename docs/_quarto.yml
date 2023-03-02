@@ -11,6 +11,7 @@ website:
   repo-url: latentnetworks.github.io/vimure/
   page-navigation: true
   reader-mode: true
+  favicon: "figures/stable_diffusion_stickmen.png"
   search:
     location: navbar
     type: overlay
