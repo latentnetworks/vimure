@@ -1,0 +1,371 @@
+---
+title: "💻 **Tutorial 01**: How to prepare your data for VIMuRe"
+subtitle: "VIMuRe v0.1.0 (latest)"
+categories: [basics]
+description: "This tutorial will show you how to prepare your data for VIMuRe."
+---
+
+::: callout-note
+
+ If you use `VIMuRe` in your research, please cite [@de_bacco_latent_2023].
+
+:::
+
+TLDR: By the end of this tutorial, you should produce a data frame in the following format:
+
+| respondent|      i|      j|tie_type     | weight|
+|----------:|------:|------:|:------------|------:|
+|     100201| 107603| 100201|borrowmoney  |      1|
+|     100202| 100201| 100202|borrowmoney  |      1|
+|     100601| 101901| 100601|borrowmoney  |      1|
+|     100601| 102601| 100601|borrowmoney  |      1|
+|     100601| 115501| 100601|borrowmoney  |      1|
+|     100602| 100501| 100602|borrowmoney  |      1|
+
+# Introduction
+
+Before you start using `VIMuRe`, you need to prepare your data in a specific format. This tutorial will show you how to do that. 
+
+Here, we will illustrate the process of preparing data for the `VIMuRe` package using the **"Data on Social Networks and Microfinance in Indian Villages"** dataset [@banerjee_diffusion_2013]. This dataset contains network data on 75 villages in the Karnataka state of India. 
+
+**⚙️ Setup**
+
+We will rely on the following packages in this tutorial:
+
+```r
+library(tidyverse)
+```
+
+This will automatically load:
+- [the pipe `%>%`](https://style.tidyverse.org/pipes.html)
+- the `haven` package, which we will use to read the data that is stored in the Stata DTA format
+- the `dplyr` package, which we will use to recode and select variables and for things like `mutate()`, `if_else()`
+- the `tidyr` package, which we will use to reshape the data
+
+---
+
+
+# Step 1: Download edgelist
+
+Follow the steps below to download the data.
+
+1. Click on [https://www.stanford.edu/~jacksonm/IndianVillagesDataFiles.zip) to download the dataset from Prof. [Matthew O. Jackson's website](https://web.stanford.edu/~jacksonm/) [^1]. This will download a file called `IndianVillagesDataFiles.zip` in your working directory.
+2. Unzip the file. This will create a folder called `2010-0760_Data` in your working directory.
+💡 Tip: you can use the `unzip()` function from within R to unzip the file.
+
+The folder structure should look like this:
+
+![](/figures/tutorials/jackson_download_zipfile.png){fig-alt="Screenshot of how folder structure should look like."}
+
+The data we need is within that `Data/Raw_csv/` folder, and looks like this:
+
+![](/figures/tutorials/karnataka_raw_csvs.png)
+
+
+# Step 2: Collect individual-level metadata
+
+We also need individual-level information metadata. This data is available on a separate source, the Harvard Dataverse [@banerjee_diffusion_2013-1].
+
+1. Go to [https://dataverse.harvard.edu/file.xhtml?fileId=2460959&version=9.4](https://dataverse.harvard.edu/file.xhtml?fileId=2460959&version=9.4), read and accept the "License/Data Use Agreement" to gain access to the data. We are using version 9.4 of the dataset.
+2. Click on the "Access File" button, then "Download | ZIP Archive" to download the data.
+
+> ![](/figures/tutorials/dataverse_harvard_download_zipfile.png){fig-alt="Screenshot of how to download data from Harvard Dataverse."}
+
+3. Unzip the file. This will create a folder called `datav4.0.zip` in your working directory.
+
+The data we need is within that `datav4.0/Data/2. Demographics and Outcomes/` folder.
+
+4. Read the data into R using the `read_dta()` function from the `haven` package:
+
+```r
+# Read Stata DTA files
+indivinfo <- haven::read_dta("datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta")
+indivinfo <- indivinfo[!duplicated(indivinfo$pid)==TRUE,] ## one individual (6109803) is repeated twice.
+```
+
+5. Ensure that the `pid` is a character vector:
+
+```r
+indivinfo$pid <- as.character(indivinfo$pid)
+```
+
+# Step 3: Build an edge list per village
+
+We will now build the edge list for each village. We will illustrate the process for village 1, but if you scroll down you will find the full script for all villages.
+
+## 3.1. Read metadata
+
+Let's first subset the individual-level metadata to keep only the relevant village:
+
+```r
+# Keep track of where the edgelist files are stored
+RAW_CSV_FOLDER <- "2010-0760_Data/Data/Raw_csv"
+
+# Let's focus on just one village for now
+selected_village <- 1
+
+# Filter the individual-level metadata to keep only the relevant village
+resp <- subset(indivinfo, indivinfo$village == selected_village)
+resp$didsurv <- 1
+```
+
+## 3.2. Read village data
+
+Now, let's read the `village_1.csv` file and merge it with the individual-level metadata:
+
+```r
+  village_file <- file.path(RAW_CSV_FOLDER, paste("village", selected_village, ".csv", sep = ""))
+  indiv <- read.csv(village_file, header = FALSE, as.is = TRUE)
+  colnames(indiv) <- c("hhid", "ppid", "gender", "age")
+
+  ## gender (1-Male, 2-Female)
+  indiv$gender <- dplyr::recode(indiv$gender, "Male", "Female")
+  
+  ## pre-process pid to match the format in the individual-level metadata
+  indiv$pid <- ifelse(nchar(indiv$ppid)==2, paste(indiv$hhid, indiv$ppid, sep = ""),
+                      paste(indiv$hhid, 0, indiv$ppid, sep = ""))
+  
+  ## Select only the relevant columns
+  selected_cols <- c("pid", "resp_status", "religion", "caste", "didsurv") 
+  indiv <- merge(indiv, resp[,selected_cols], by = "pid", all.x = TRUE, all.y = TRUE) 
+```
+
+Which produces a dataframe that looks like this:
+
+```r
+head(indiv)
+```
+
+|pid    | hhid| ppid|gender | age| resp_status| religion| caste| didsurv|
+|:------|----:|----:|:------|---:|-----------:|--------:|-----:|-------:|
+|100101 | 1001|    1|Male   |  75|          NA|       NA|    NA|      NA|
+|100102 | 1001|    2|Female |  55|          NA|       NA|    NA|      NA|
+|100103 | 1001|    3|Male   |  24|          NA|       NA|    NA|      NA|
+|100104 | 1001|    4|Female |  19|          NA|       NA|    NA|      NA|
+|100201 | 1002|    1|Male   |  38|           1|        1|     3|       1|
+|100202 | 1002|    2|Female |  27|           2|        1|     3|       1|
+
+## 3.3 Read reports per relationship type
+
+The survey that produced this data collected information on 5 types of relationships:
+
+- borrowmoney,
+- receivemoney,
+- helpdecision,
+- receiveadvice,
+- keroricego,
+- keroricecome,
+- visitgo,
+- visitcome
+
+Each of these relationships is stored in a separate file. For example, the file `borrowmoney1.csv` contains information on who reported borrowing money from whom in village 1.
+
+We can read each of these files using the `read.csv()` function. For example:
+
+```r
+filepath_borrowmoney <- file.path(RAW_CSV_FOLDER, paste("borrowmoney", selected_village, ".csv", sep=""))
+borrowmoney <- read.csv(filepath_borrowmoney, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+```
+
+The `ALL_NA_CODES` variable is a vector of all the codes that, after inspection, we identified were used to represent missing values in the data:
+
+```r
+ALL_NA_CODES <- c("9999999", "5555555", "7777777", "0")
+```
+
+**What the data looks like**
+
+The data is in a non-standard format and so it will need to be further pre-processed as an edge list:
+
+```r
+      V1     V2     V3     V4 V5 V6 V7 V8 V9
+1 100201 107603     NA     NA NA NA NA NA NA
+2 100202 100201     NA     NA NA NA NA NA NA
+3 100601 101901 102601 115501 NA NA NA NA NA
+4 100602 100501 101902     NA NA NA NA NA NA
+5 100701 100801 102101     NA NA NA NA NA NA
+6 100702 100801 104001     NA NA NA NA NA NA
+```
+
+Each row represents reports made by a single individual; the first number is the `pid` of the individual who reported the relationship, whereas the remaining however many numbers listed in the same row are the `pid`s of the individuals who were reported to be involved in the relationship.
+
+## 3.4. Pre-process the data to build the edge list
+
+We want the network data to be in the following format, plus a few additional columns:
+
+|     i |  j    |
+|------:|------:|
+| 100201| 107603|
+| 100202| 100201|
+| 100601| 101901|
+| 100601| 102601|
+| 100601| 115501|
+| 100602| 100501|
+| 100602| 101902|
+| 100701| 100801|
+| 100701| 102101|
+| 100702| 100801|
+
+To achieve this, we will need to [pivot](https://tidyr.tidyverse.org/articles/pivot.html) the data.
+
+```r
+tie_type <- "borrowmoney"
+
+# Example with the borrowmoney data
+df <- tidyr::pivot_longer(borrowmoney, cols=!V1, values_drop_na=TRUE)
+
+# View(df) to see what the data looks like
+```
+
+This produces a bogus `name` column, which we can drop. We should also rename the columns to something more meaningful. It is **important** that we add a `respondent` column. This will be the `pid` of the individual who reported the relationship.
+
+
+```r
+df <- df %>% 
+    dplyr::select(-name) %>% 
+    rename(i=V1, j=value) %>% 
+    mutate(respondent=i)
+
+# Let's also add a column for the tie type
+df$tie_type <- tie_type
+
+# Let's add a weight column too
+df$weight <- 1
+```
+
+Now, if the question was "Did you borrow money from anyone?", then the `i` column should be the respondent, and the `j` column should be the person who was reported to have borrowed money from the respondent. However, if the question was "Did anyone borrow money from you?", then the `i` column should be the person who was reported to have borrowed money from the respondent, and the `j` column should be the respondent. We can use the `tie_type` variable to determine which of these two scenarios applies.
+
+```r
+if(tie_type %in% c("receivemoney", "receiveadvice", "keroricecome", "visitcome")) {
+    df <- df %>% 
+        rename(i=j, j=i)
+}
+```
+
+Let's reorder the columns to guarantee we can `rbind` the data frames of all relationship tipes together later.
+
+```r
+df <- df %>% dplyr::select(respondent, i, j, tie_type, weight)
+```
+
+which produces the following data frame:
+
+```r
+head(df)
+```
+
+| respondent|      i|      j|tie_type     | weight|
+|----------:|------:|------:|:------------|------:|
+|     100201| 107603| 100201|borrowmoney  |      1|
+|     100202| 100201| 100202|borrowmoney  |      1|
+|     100601| 101901| 100601|borrowmoney  |      1|
+|     100601| 102601| 100601|borrowmoney  |      1|
+|     100601| 115501| 100601|borrowmoney  |      1|
+|     100602| 100501| 100602|borrowmoney  |      1|
+
+
+**The above is the format we want the data to be in! This format will make it easier to work with `VIMuRe`.**
+
+Use the full pre-processing script below to pre-process all the data for all tie types and save it to a single `vil1_edges.csv` file. We also save the `indiv` data frame to a `vil1_meta.csv` file.
+
+<details><summary>Click to see full pre-processing script</summary>
+
+```r
+VALID_VILLAGE_IDS <- c(1:12, 14:21, 23:77) # village IDs 13 and 22 are missing
+ALL_NA_CODES <- c("9999999", "5555555", "7777777", "0") # codes for missing values
+
+RAW_CSV_FOLDER <- "2010-0760_Data/Data/Raw_csv"
+
+
+for (i in VALID_VILLAGE_IDS){
+  selected_village <- i
+  ## Read in the files that include details of each individual and of each sharing unit
+  resp <- subset(indivinfo, indivinfo$village==selected_village)
+  resp$didsurv <- 1
+  
+  ## age (888-refuse to say; 999-do not know);
+ 
+  village_file <- file.path(RAW_CSV_FOLDER, paste("village", selected_village, ".csv", sep = ""))
+  indiv <- read.csv(village_file, header = FALSE, as.is = TRUE)
+  colnames(indiv) <- c("hhid", "ppid", "gender", "age")
+  ## gender (1-Male, 2-Female)
+  indiv$gender <- dplyr::recode(indiv$gender, "Male", "Female")
+  
+  indiv$pid <- ifelse(nchar(indiv$ppid)==2, paste(indiv$hhid, indiv$ppid, sep = ""),
+                      paste(indiv$hhid, 0, indiv$ppid, sep = ""))
+  
+  ## Select only the relevant columns
+  selected_cols <- c("pid", "resp_status", "religion", "caste", "didsurv") 
+  indiv <- merge(indiv, resp[,selected_cols], by = "pid", all.x = TRUE, all.y = TRUE) 
+  
+  ## Read in the files that include details on each relationship
+
+  filepath_borrowmoney <- file.path(RAW_CSV_FOLDER, paste("borrowmoney", selected_village, ".csv", sep=""))
+  borrowmoney <- read.csv(filepath_borrowmoney, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+
+  filepath_receivemoney <- file.path(RAW_CSV_FOLDER, paste("lendmoney", selected_village, ".csv", sep=""))
+  receivemoney <- read.csv(filepath_receivemoney, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+
+  filepath_giveadvice <- file.path(RAW_CSV_FOLDER, paste("giveadvice", selected_village, ".csv", sep=""))
+  receiveadvice <- read.csv(filepath_giveadvice, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+
+  filepath_helpdecision <- file.path(RAW_CSV_FOLDER, paste("helpdecision", selected_village, ".csv", sep=""))
+  helpdecision <- read.csv(filepath_helpdecision, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+
+  filepath_keroricecome <- file.path(RAW_CSV_FOLDER, paste("keroricecome", selected_village, ".csv", sep=""))
+  keroricecome <- read.csv(filepath_keroricecome, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+
+  filepath_keroricego <- file.path(RAW_CSV_FOLDER, paste("keroricego", selected_village, ".csv", sep=""))
+  keroricego <- read.csv(filepath_keroricego, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+
+  filepath_visitcome <- file.path(RAW_CSV_FOLDER, paste("visitcome", selected_village, ".csv", sep=""))
+  visitcome <- read.csv(filepath_visitcome, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+
+  filepath_visitgo <- file.path(RAW_CSV_FOLDER, paste("visitgo", selected_village, ".csv", sep=""))
+  visitgo <- read.csv(filepath_visitgo, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
+  
+  tietypes <- list("borrowmoney" = borrowmoney,
+                   "receivemoney" = receivemoney,
+                   "helpdecision" = helpdecision,
+                   "receiveadvice" = receiveadvice,
+                   "keroricego" = keroricego,
+                   "keroricecome" = keroricecome,
+                   "visitgo" = visitgo,
+                   "visitcome" = visitcome)
+  
+  edges <- data.frame()
+  
+  for(selected_tie_type in tietypes){
+    df <- tidyr::pivot_longer(tietypes[selected_tie_type], cols=!V1, values_drop_na=TRUE)
+
+    # Some pre-processing
+    df <- df %>% 
+        dplyr::select(-name) %>% 
+        rename(i=V1, j=value) %>% 
+        mutate(respondent=i)
+
+    # Let's also add a column for the tie type
+    df$tie_type <- tie_type
+
+    # Let's add a weight column too
+    df$weight <- 1
+
+    # We need to reverse the direction of the edge for some tie types
+    if(tie_type %in% c("receivemoney", "receiveadvice", "keroricecome", "visitcome")) {
+        df <- df %>% rename(i=j, j=i)
+    }
+
+    edges <- rbind(edges, df)
+  }
+
+  write.csv(edges, name = paste0("vil",i,"_edges.csv"))
+  write.csv(indiv, name = paste0("vil",i,"_meta.csv"))
+
+}
+```
+</details>
+
+
+
+
+[^1]: Note that the authors provide a different version of the edge list data on Harvard Dataverse [@banerjee_diffusion_2013-1]. However, we will use the raw version provided by Prof. Jackson in this tutorial, as this was the version used in our paper. We will use the Harvard Dataverse files just for the metadata.
