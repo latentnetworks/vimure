@@ -8,58 +8,27 @@ Latent Network Models to Account for Noisy, Multiply-Reported Social Network Dat
 
 If you use this code, please cite this article (preprint).
 
-> De Bacco C, Contisciani M, Cardoso-Silva J, Safdari H, Baptista D, Sweet T, Young JG, Koster J, Ross CT, McElreath R, Redhead D, Power EA. Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data. arXiv preprint [arXiv:2112.11396](https://arxiv.org/abs/2112.11396). 2021.
+> _Caterina De Bacco, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Gabriela Lima Borges, Diego Baptista, Tracy Sweet, Jean-Gabriel Young, Jeremy Koster, Cody T Ross, Richard McElreath, Daniel Redhead, Eleanor A Power, Latent network models to account for noisy, multiply reported social network data, Journal of the Royal Statistical Society Series A: Statistics in Society, 2023;, qnac004, [https://doi.org/10.1093/jrsssa/qnac004](https://doi.org/10.1093/jrsssa/qnac004)_
 
-VIMuRe package is available in R and Python. 
+## 📦 How can I use this package?
 
-## Do you want to contribute to this project?
+Check our [documentation page](https://latentnetworks.github.io/vimure/) to see if this package could be of help to you.
 
-Please take a look at the [contributing guidelines](CONTRIBUTING.md). You will find there information about how to contribute to the project, and how to set up your development environment.
+VIMuRe package is available in R and Python. Check out the 📦 [Installation page](https://latentnetworks.github.io/vimure/latest/install.html) for more details. 
 
-## Feedback
+## 🗣️ Feedback
 
 Report a bug and give general feedback about the library:
 - by taking this [survey](https://forms.gle/QaK5AWWYy78jZfyR6) or,
 - by [opening an issue](https://github.com/latentnetworks/vimure/issues/new/choose) on Github.
 
-# Python
+## ✋ Do you want to contribute to this project?
 
-Install `vimure==0.1` with the following command:
+Please take a look at the [contributing guidelines](CONTRIBUTING.md). You will find there information about how to contribute to the project, and how to set up your development environment.
 
-```console
-pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
-```
 
-Vimure Python package depends on Python > 3.6, and it is expected to work fine in all major OSes.
 
-See more about Python setup [here](src/python/README.md)
-
-## Notebooks
-
-To understand how you could use the code, check the notebooks folder:
-
-- [`Notebook 01 - Generate Synthetic Networks`](notebooks/python/Notebook%2001%20-%20Generate%20Synthetic%20Networks.ipynb)
-- [`Notebook 02 - Run Model`](notebooks/python/Notebook%2002%20-%20Run%20Model.ipynb)
-- [`Notebook 03 - Experiment Under and Over Reporters`](notebooks/python/Notebook%2003%20-%20Experiment%20under%20and%20over%20reporters.ipynb)
-- [`Notebook 04 - Karnataka data - Single Run`](notebooks/python/Notebook%2004%20-%20Karnataka%20data%20-%20Single%20Run.ipynb)
-- [`Notebook 04 - Karnataka data (Full)`](notebooks/python/Notebook%2004%20-%20Karnataka%20data.ipynb)
-- [`Notebook 05 - Experiment with varying reciprocity`](notebooks/python/Notebook%2005%20-%20Experiment%20varying%20reciprocity.ipynb)
-- [`Notebook 06 - Nicaragua data`](notebooks/python/Notebook%2006%20-%20Nicaragua%20data.ipynb)
-
-# R 
-
-Install `vimure` in R with the following command:
-
-```R
-install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
-```
-
-Vimure R package depends on R >= 3.3.0, and it is expected to work fine in all OSes.
-
-See more about R setup and quick start [here](https://latentnetworks.github.io/vimure/)
-
-# License
+## ⚖️ License
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software") to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
