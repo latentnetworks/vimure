@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="🚧 Under construction. 🚧 Feel like helping? Click here for more information.">
 
-<title>VIMuRe - 💻 Tutorials</title>
+<title>VIMuRe - 💻 Tutorial 01: Preparing your data for VIMuRe in python</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -23,27 +24,25 @@ ul.task-list li input[type="checkbox"] {
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/quarto-nav/headroom.min.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<link href="../latest/people.html" rel="next">
-<link href="../latest/install.html" rel="prev">
-<link href="../figures/stable_diffusion_stickmen.png" rel="icon" type="image/png">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<link href="../../../figures/stable_diffusion_stickmen.png" rel="icon" type="image/png">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -73,7 +72,7 @@ ul.task-list li input[type="checkbox"] {
   <header id="quarto-header" class="headroom fixed-top">
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">💻 Tutorials</h1>
+      <h1 class="quarto-secondary-nav-title">💻 <strong>Tutorial 01</strong>: Preparing your data for VIMuRe in python</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -86,7 +85,7 @@ ul.task-list li input[type="checkbox"] {
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="../">VIMuRe</a> 
+      <a href="../../../">VIMuRe</a> 
         <div class="sidebar-tools-main tools-wide">
     <a href="" title="" id="sidebar-tool-dropdown-0" class="sidebar-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-github"></i></a>
     <ul class="dropdown-menu" aria-labelledby="sidebar-tool-dropdown-0">
@@ -119,22 +118,22 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../index.html" class="sidebar-item-text sidebar-link">🏠 Home</a>
+  <a href="../../../index.html" class="sidebar-item-text sidebar-link">🏠 Home</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../latest/install.html" class="sidebar-item-text sidebar-link">📦 Installation</a>
+  <a href="../../../latest/install.html" class="sidebar-item-text sidebar-link">📦 Installation</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../latest/tutorials.html" class="sidebar-item-text sidebar-link active">💻 Tutorials</a>
+  <a href="../../../latest/tutorials.html" class="sidebar-item-text sidebar-link">💻 Tutorials</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../latest/people.html" class="sidebar-item-text sidebar-link">📟 Contact</a>
+  <a href="../../../latest/people.html" class="sidebar-item-text sidebar-link">📟 Contact</a>
   </div>
 </li>
     </ul>
@@ -149,10 +148,19 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">💻 Tutorials</h1>
-<p class="subtitle lead">VIMuRe v0.1 (latest)</p>
-</div>
+<h1 class="title d-none d-lg-block">💻 <strong>Tutorial 01</strong>: Preparing your data for VIMuRe in python</h1>
+<p class="subtitle lead">VIMuRe v0.1.0 (latest)</p>
+  <div class="quarto-categories">
+    <div class="quarto-category">basics</div>
+    <div class="quarto-category">python</div>
+  </div>
+  </div>
 
+<div>
+  <div class="description">
+    <span style="color:var(--bs-warning)">🚧 <strong>Under construction.</strong> 🚧</span> Feel like helping? Click here for more information.
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -165,21 +173,7 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>Choose your favourite language:</p>
-<div>
-<figure style="display:inline-block;padding:3em;margin-right:1em;align:middle;text-align:center;border-radius:2em;border:1px solid var(--bs-gray-200);background-color:var(--bs-gray-100);" class="figure">
-<a href="../latest/tutorials/R-tutorials.html"> <img src="../figures/logos/Rlogo.svg" alt="Logo of the programming language R" role="presentation" style="object-fit: fill;width:5em;height:5em;object-position: 0% -5;" class="figure-img"> </a>
-<figcaption class="figure-caption">
-<strong>R</strong>
-</figcaption>
-</figure>
-<figure style="display:inline-block;padding:3em;margin-left:1em;align:middle;text-align:center;border-radius:2em;border:1px solid var(--bs-gray-200);background-color:var(--bs-gray-100);" class="figure">
-<a href="../latest/tutorials/python-tutorials.html"> <img src="../figures/logos/python-logo-notext.svg" alt="Logo of the programming language python" role="presentation" style="object-fit: cover;width:5em;height:5em;object-position: 95% 0;" class="figure-img"> </a>
-<figcaption class="figure-caption">
-<strong>Python</strong>
-</figcaption>
-</figure>
-</div>
+<p>Would you like to help translating the <a href="../../../latest/tutorials/R/tutorial01-data-preparation.html">R tutorial</a> to python? Please <a href="https://github.com/latentnetworks/vimure/discussions">contact us</a>!</p>
 
 
 
@@ -448,18 +442,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../latest/install.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">📦 Installation</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../latest/people.html" class="pagination-link">
-        <span class="nav-page-text">📟 Contact</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 
