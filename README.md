@@ -18,9 +18,8 @@ VIMuRe package is available in R and Python. Check out the 📦 [Installation pa
 
 ## 🗣️ Feedback
 
-Report a bug and give general feedback about the library:
-- by taking this [survey](https://forms.gle/QaK5AWWYy78jZfyR6) or,
-- by [opening an issue](https://github.com/latentnetworks/vimure/issues/new/choose) on Github.
+- Join or create a new [**discussion**](https://github.com/latentnetworks/vimure/discussions) if you have general queries or comments.
+- Open [an issue](https://github.com/latentnetworks/vimure/issues/new/choose) here on Github if you want to report a bug or suggest a new feature
 
 ## ✋ Do you want to contribute to this project?
 
