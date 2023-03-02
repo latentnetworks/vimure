@@ -12,3 +12,10 @@ scikit-tensor-py3 @ https://github.com/jonjoncardoso/scikit-tensor-py3/archive/m
 matplotlib==3.7.0
 plotnine==0.10.0
 tqdm==4.64.1
+
+## Packages we need for testing and building the package
+ipykernel==6.21.2
+pytest==6.2.4
+pytest-cov==3.0.0
+wheel==0.37.1
+setuptools==60.1.0
