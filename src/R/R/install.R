@@ -70,6 +70,19 @@ install_vimure <- function(method = c("auto", "virtualenv", "conda"),
 
     method <- match.arg(method)
 
+    if (method == "conda") {
+      tryCatch(
+        reticulate::use_condaenv("venv-vimure"),
+        error = function(e) {
+          warning(
+            "Tried to use conda environment 'venv-vimure', but it does not exist. ",
+            "Using default conda environment instead. ",
+          )
+        }
+      )
+      
+    }
+
     if(file.exists(version)){
       package = version
     } else {
