@@ -1,14 +1,24 @@
 ---
-title: 💻 Tutorials
-listing:
-  contents: tutorials/*.qmd
-  sort: "title"
-  type: grid
-  categories: true
-  sort-ui: true
-  filter-ui: true
-  fields: [categories, title, date, reading-time, description]
-  feed: false
-page-layout: full
-title-block-banner: false
+title: "💻 Tutorials"
+subtitle: "VIMuRe v0.1 (latest)"
 ---
+
+Choose your favourite language:
+
+<div>
+
+<figure style="display:inline-block;padding:3em;margin-right:1em;align:middle;text-align:center;border-radius:2em;border:1px solid var(--bs-gray-200);background-color:var(--bs-gray-100);">
+    <a href="/latest/tutorials/R-tutorials.html">
+        <img src="/figures/logos/Rlogo.svg" alt="Logo of the programming language R"  role="presentation" style="object-fit: fill;width:5em;height:5em;object-position: 0% -5;">
+    </a>
+    <figcaption><strong>R</strong></figcaption>
+</figure>
+
+<figure style="display:inline-block;padding:3em;margin-left:1em;align:middle;text-align:center;border-radius:2em;border:1px solid var(--bs-gray-200);background-color:var(--bs-gray-100);">
+    <a href="/latest/tutorials/python-tutorials.html">
+        <img src="/figures/logos/python-logo-notext.svg" alt="Logo of the programming language python" role="presentation" style="object-fit: cover;width:5em;height:5em;object-position: 95% 0;">
+    </a>
+    <figcaption><strong>Python</strong></figcaption>
+</figure>
+
+</div>

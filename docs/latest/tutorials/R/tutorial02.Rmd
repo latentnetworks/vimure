@@ -6,125 +6,75 @@ tags:
   - basics
   - tutorial
   - R
-description: "Read to understand the data input format expected by the <code>vimure</code>, and how to run and  interpret the output of the model."
+description: "This notebook should be used by VIMuRe developers to test the code presented in Tutorial 2."
 ---
-
-<div style="display:inline-block;border-radius: 0.25rem;border: solid 1px #dee2e6;margin:1%;padding:1.5%;background-color:$popover-bg">
-
-If you use `vimure` in your research, please cite the following paper:
-
-> De Bacco, Caterina, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Diego Baptista, Gabriela L. Borges, Tracy Sweet, et al. 'Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data'. arXiv, 12 December 2022. doi:[10.48550/arXiv.2112.11396](https://arxiv.org/abs/2112.11396). [@de_bacco_latent_2022]
-
-</div>
-
-
-(🚧 This entire tutorial is a work in progress. 🚧)
 
 # ⚙️ Setup
 
 **Import packages**
 
 ```{r, eval=TRUE, echo=FALSE, message=FALSE, echo=FALSE}
-vimure::install_vimure()
+# Check if vimure is installed
+vimure::vm_config()
 ```
 
-```{r warning=FALSE, message=FALSE, echo=FALSE}
-library(knitr)
-```
-
-```{r setup, warning=FALSE, message=FALSE}
-library(tidyr)
-library(dplyr)
-library(ggplot2)
+```{r setup warning=FALSE, message=FALSE, echo=FALSE}
+require(knitr)
+library(tidyverse)
 
 library(igraph)
 library(vimure)
 ```
 
-# 📥 Load the data
+# Reading data
 
-Here, we'll use the `vimure` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1].
-
-We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $i$ if they **go** to $j$ for help, and also asking $j$ if $i$ **comes** to them for help). 
-
-Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will focus just on one tie type: the "visiting" relationship (based on two prompts: _"In your free time, whose house do you visit?" and "Who visits your house in his or her free time?"_). 
-
-::: panel-tabset
-
-## Load data.frame
-
-After our preprocessing, the input data takes the form of the dataset given below. 
-
-- `ego`: generally the requester, also referred to as $i$ in [@de_bacco_latent_2022] (required ✔️)
-- `alter`: generally the giver, also referred to as $j$ in [@de_bacco_latent_2022] (required ✔️)
-- `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2022] (required ✔️)
-- `prompt_type`: the prompt type that was given (optional)
-- `layer`: the tie type (optional)
-- `weight`: the weight of the edge (optional)
-
-Suppose we have a data frame `df_edges` of our village's data that looks like this:
-
-```r
-head(df_edges, 10)
-```
-
-```{r, echo = FALSE}
-URL <- "https://raw.githubusercontent.com/latentnetworks/vimure/develop/data/input/india_microfinance/formatted/"
+```{r}
+url <- "https://raw.githubusercontent.com/latentnetworks/vimure/develop/data/input/india_microfinance/formatted/" # nolint: line_length_linter.
 village <- "30" # change this parameter to run in another village
 
-df_metadata <- read.csv(paste0(URL, paste0("vil", village, "_meta.csv")))
-df_edges <- read.csv(paste0(URL, paste0("vil", village, "_edges.csv")), stringsAsFactors = F)
+df_metadata <- read_csv(paste0(url, paste0("vil", village, "_meta.csv")))
+df_edges <- read_csv(paste0(url, paste0("vil", village, "_edges.csv")))
 
-df_edges$layer <- factor(df_edges$type, 
-  levels=c(
-    "borrowmoney","receivemoney", "receiveadvice", "helpdecision",
+df_edges$layer <- factor(df_edges$type,
+  levels = c(
+    "borrowmoney", "receivemoney", "receiveadvice", "helpdecision",
     "keroricego", "keroricecome", "visitgo", "visitcome"
-    ), labels=c("money", "money", "advice", "advice", "kerorice", "kerorice", "visit", "visit"))
+    ),
+    labels = c(
+        "money", "money", "advice", "advice",
+        "kerorice", "kerorice", "visit", "visit"))
+
 layer <- "visit" # Change this to run for a different layer
 df_edges <- df_edges[df_edges$layer %in% layer, ]
 df_edges <- df_edges[df_edges$i != df_edges$j, ]
 
-df_edges <- 
-  df_edges %>% 
-  rename(m=respondent, prompt_type=`type`) %>% 
-  select(i, j, m, prompt_type, layer, weight) 
-  
-df_edges$prompt_type <- factor(df_edges$prompt_type, levels=c("visitgo", "visitcome"))
+df_edges <-
+  df_edges %>%
+  rename(m = respondent, prompt_type = `type`) %>%
+  select(i, j, m, prompt_type, layer, weight)
+
+df_edges$prompt_type <-
+    factor(df_edges$prompt_type, levels = c("visitgo", "visitcome"))
 
 # Only keep reports made by those who were MARKED as respondents in metadata CSV
-respondents <- df_metadata %>% filter(didsurv == 1) %>% pull(pid)
-df_edges <- df_edges %>% filter(i %in% respondents & j %in% respondents) %>% ungroup()
+respondents <-
+    df_metadata %>%
+    filter(didsurv == 1) %>%
+    pull(pid)
 
-df_edges <- df_edges %>% rename(ego=i, alter=j, reporter=m)
+df_edges <-
+    df_edges %>%
+    filter(i %in% respondents & j %in% respondents) %>%
+    ungroup()
 
-df_edges %>% 
-  head(10) %>% 
-  knitr::kable(row.names=FALSE, align = "cccccc", caption = "A typical data input for VIMuRe", full_width = FALSE)
+df_edges <- df_edges %>% rename(ego = i, alter = j, reporter = m)
 
+df_edges %>%
+  head(10) %>%
+  knitr::kable(row.names = FALSE, align = "cccccc", full_width = FALSE,
+               caption = "A typical data input for VIMuRe")
 ```
 
-## Load `igraph` object
-
-Alternatively, you might have your data as a **directed** `igraph` object. In this case, you must ensure that the `igraph` object has the following attributes:
-
-- `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2022] (required ✔️)
-- `prompt_type`: the prompt type that was given (optional)
-- `layer`: the tie type (optional)
-- `weight`: the weight of the edge (optional)
-
-Note that the `graph_from_data_frame` function assumes that the first two columns in the data frame comprise the edgelist (i.e., the $ego$ and $alter$ columns and treats all subsequent columns as edge attributes). 
-
-```{r, echo = FALSE}
-G <- igraph::graph_from_data_frame(df_edges, directed=TRUE)
-```
-
-Suppose our village's data is in the form of an `igraph` object `G`:
-
-```{r}
-G
-```
-
-:::
 
 ## 📊 Summary statistics
 
@@ -413,4 +363,4 @@ Because it might be tricky to interpret the $\rho$ array directly, we recommend 
 
 (🚧 This section is a work in progress. 🚧)
 
----------------------------
+--------------------------- 

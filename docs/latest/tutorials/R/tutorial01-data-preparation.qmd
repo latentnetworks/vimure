@@ -1,7 +1,7 @@
 ---
-title: "💻 **Tutorial 01**: How to prepare your data for VIMuRe"
+title: "💻 **Tutorial 01**: Preparing your data for VIMuRe in R"
 subtitle: "VIMuRe v0.1.0 (latest)"
-categories: [basics]
+categories: [basics, R]
 description: "This tutorial will show you how to prepare your data for VIMuRe."
 ---
 
