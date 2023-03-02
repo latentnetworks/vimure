@@ -11,7 +11,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/cdebacco.png" alt="Photo of Caterina De Bacco"  role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/cdebacco.png" alt="Photo of Caterina De Bacco"  role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://www.cdebacco.com/" target="_blank" class="external">Caterina De Bacco</a></span></strong> 
         <br>CyberValley Research Group Leader
@@ -24,7 +24,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/martina.jpeg" alt="Photo of Martina Contisciani" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/martina.jpeg" alt="Photo of Martina Contisciani" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong><span><a href="https://is.mpg.de/person/mcontisciani" target="_blank" class="external">Martina Contisciani</a></span></strong> 
         <br>Ph.D. Student
@@ -37,7 +37,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/jon.jpg" alt="Photo of Jon Cardoso-Silva" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/jon.jpg" alt="Photo of Jon Cardoso-Silva" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://www.lse.ac.uk/DSI/People/Jonathan-Cardoso-Silva" target="_blank" class="external">Jon Cardoso-Silva</a></span></strong> 
         <br/>Assist. Prof. Lecturer
@@ -50,7 +50,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 
 <figure>
-    <img src="/figures/hadiseh.jpeg" alt="Photo of Hadiseh Safdari" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/hadiseh.jpeg" alt="Photo of Hadiseh Safdari" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://is.mpg.de/person/hsafdari" target="_blank" class="external">Hadiseh Safdari</a></span></strong> 
         <br/>Postdoctoral Researcher
@@ -61,7 +61,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/diego.jpg" alt="Photo of Diego Baptista Theuerkauf" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/diego.jpg" alt="Photo of Diego Baptista Theuerkauf" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong><span><a href="https://is.mpg.de/person/dtheuerkauf" target="_blank" class="external">Diego Baptista Theuerkauf</a></span></strong> 
         <br/>Ph.D. Student
@@ -73,7 +73,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/gabi.jpg" alt="Photo of Gabriela Lima Borges" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/gabi.jpg" alt="Photo of Gabriela Lima Borges" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong><span><a href="https://github.com/gabiborges1" target="_blank" class="external">Gabriela Lima Borges</a></span></strong> 
         <br/>Data Scientist / Guest Researcher
@@ -85,7 +85,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/tracy.jpg" alt="Photo of Tracy Sweet" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/tracy.jpg" alt="Photo of Tracy Sweet" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://education.umd.edu/directory/tracy-sweet" target="_blank" class="external">Tracy Sweet</a></span></strong> 
         <br/>Associate Professor
@@ -96,7 +96,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/jgyoung.png" alt="Photo of Jean-Gabriel Young" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" role="presentation"  class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/jgyoung.png" alt="Photo of Jean-Gabriel Young" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" role="presentation"  class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://www.jgyoung.ca/" target="_blank" class="external">Jean-Gabriel Young</a></span></strong> 
         <br/>Assistant Professor
@@ -107,7 +107,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/jeremy.jpg" alt="Photo of Jeremy Koster"  role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/jeremy.jpg" alt="Photo of Jeremy Koster"  role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://researchdirectory.uc.edu/p/kosterjy" target="_blank" class="external">Jeremy Koster</a></span></strong> 
         <br/>Professor
@@ -118,7 +118,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/codyross.jpg" alt="Photo of Cody T. Ross" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/codyross.jpg" alt="Photo of Cody T. Ross" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/cody-ross/" target="_blank" class="external">Cody T. Ross</a></span></strong> 
         <br/>Research Scientist
@@ -129,7 +129,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/richard.jpg" alt="Photo of Richard McElreath" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;object-position: 100% 0" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/richard.jpg" alt="Photo of Richard McElreath" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;object-position: 100% 0" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/richard-mcelreath/" target="_blank" class="external">Richard McElreath</a></span></strong> 
         <br/>Professor
@@ -140,7 +140,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/dan.jpg" alt="Photo of Daniel Redhead" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/dan.jpg" alt="Photo of Daniel Redhead" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;" class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://www.eva.mpg.de/ecology/staff/daniel-redhead/" target="_blank" class="external">Daniel Redhead</a></span></strong> 
         <br/>Research Scientist
@@ -151,7 +151,7 @@ The people behind the conception, development, and maintenance of VIMuRe are lis
 
 ::: {.column style="display:inline-block;width:400px;height:260px;border-radius:1em;margin:1%;padding:1.5%;background-color:#fafafa"}
 <figure>
-    <img src="/figures/elly.jpg" alt="Photo of Eleanor A. Power" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;object-position: 65% 0;"  class="img-responsive atto_image_button_text-bottom">
+    <img src="/figures/people/elly.jpg" alt="Photo of Eleanor A. Power" role="presentation" style="object-fit: cover;width:5em;height:5em;border-radius: 50%;object-position: 65% 0;"  class="img-responsive atto_image_button_text-bottom">
     <figcaption>
         <strong>Dr.&nbsp;<span><a href="https://www.lse.ac.uk/Methodology/People/Academic-Staff/Eleanor-Power/Eleanor-Power" target="_blank" class="external">Eleanor A. Power</a></span></strong> 
         <br/>Assistant Professor
