@@ -12,7 +12,7 @@ Latent Network Models to Account for Noisy, Multiply-Reported Social Network Dat
 
 If you use this code, please cite this article:
 
-> _Caterina De Bacco, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Gabriela Lima Borges, Diego Baptista, Tracy Sweet, Jean-Gabriel Young, Jeremy Koster, Cody T Ross, Richard McElreath, Daniel Redhead, Eleanor A Power, Latent network models to account for noisy, multiply reported social network data, Journal of the Royal Statistical Society Series A: Statistics in Society, 2023;, qnac004, [https://doi.org/10.1093/jrsssa/qnac004](https://doi.org/10.1093/jrsssa/qnac004)_
+> _Caterina De Bacco, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Gabriela Lima Borges, Diego Baptista, Tracy Sweet, Jean-Gabriel Young, Jeremy Koster, Cody T Ross, Richard McElreath, Daniel Redhead, Eleanor A Power, **Latent network models to account for noisy, multiply reported social network data**, Journal of the Royal Statistical Society Series A: Statistics in Society, 2023;, qnac004, [https://doi.org/10.1093/jrsssa/qnac004](https://doi.org/10.1093/jrsssa/qnac004)_
 
 ## 📦 How can I use this package?
 
