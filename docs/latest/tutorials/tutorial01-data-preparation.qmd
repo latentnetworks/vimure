@@ -147,7 +147,7 @@ head(indiv)
 
 ## 3.3 Read reports per relationship type
 
-The survey that produced this data collected information on 5 types of relationships:
+The survey that produced this data collected information on a number of different types of relationships, four of which were "double sampled" (i.e., asked about in two ways, who people **go** to for that type of support, and who **comes** to them. Specifically, they asked about borrowing and receiving money, giving and receiving advice, borrowing and lending household items like kerosene and rice, and visiting and receiving guests. These distinct questions are represented in the data files with the following names:
 
 - borrowmoney,
 - receivemoney,
@@ -175,7 +175,7 @@ ALL_NA_CODES <- c("9999999", "5555555", "7777777", "0")
 
 **What the data looks like**
 
-The data is in a non-standard format and so it will need to be further pre-processed as an edge list:
+The data is stored here as a node list, but it will need to be further pre-processed as an edge list:
 
 ```r
       V1     V2     V3     V4 V5 V6 V7 V8 V9
@@ -187,7 +187,7 @@ The data is in a non-standard format and so it will need to be further pre-proce
 6 100702 100801 104001     NA NA NA NA NA NA
 ```
 
-Each row represents reports made by a single individual; the first number is the `pid` of the individual who reported the relationship, whereas the remaining however many numbers listed in the same row are the `pid`s of the individuals who were reported to be involved in the relationship.
+Each row represents reports made by a single individual; the first number is the `pid` (the "person identifier") of the individual who reported the relationship, whereas the remaining however many numbers listed in the same row are the `pid`s of the individuals who were reported to be involved in the relationship.
 
 ## 3.4. Pre-process the data to build the edge list
 
@@ -282,8 +282,6 @@ for (i in VALID_VILLAGE_IDS){
   ## Read in the files that include details of each individual and of each sharing unit
   resp <- subset(indivinfo, indivinfo$village==selected_village)
   resp$didsurv <- 1
-  
-  ## age (888-refuse to say; 999-do not know);
  
   village_file <- file.path(RAW_CSV_FOLDER, paste("village", selected_village, ".csv", sep = ""))
   indiv <- read.csv(village_file, header = FALSE, as.is = TRUE)
@@ -335,8 +333,8 @@ for (i in VALID_VILLAGE_IDS){
   
   edges <- data.frame()
   
-  for(selected_tie_type in tietypes){
-    df <- tidyr::pivot_longer(tietypes[selected_tie_type], cols=!V1, values_drop_na=TRUE)
+  for(selected_tie_type in 1:length(tietypes)){
+    df <- tidyr::pivot_longer(tietypes[[selected_tie_type]], cols=!V1, values_drop_na=TRUE)
 
     # Some pre-processing
     df <- df %>% 
@@ -358,8 +356,8 @@ for (i in VALID_VILLAGE_IDS){
     edges <- rbind(edges, df)
   }
 
-  write.csv(edges, name = paste0("vil",i,"_edges.csv"))
-  write.csv(indiv, name = paste0("vil",i,"_meta.csv"))
+  write.csv(edges, file = paste0("vil",i,"_edges.csv"))
+  write.csv(indiv, file = paste0("vil",i,"_meta.csv"))
 
 }
 ```
@@ -368,4 +366,4 @@ for (i in VALID_VILLAGE_IDS){
 
 
 
-[^1]: Note that the authors provide a different version of the edge list data on Harvard Dataverse [@banerjee_diffusion_2013-1]. However, we will use the raw version provided by Prof. Jackson in this tutorial, as this was the version used in our paper. We will use the Harvard Dataverse files just for the metadata.
+[^1]: Note that the authors provide a different version of the network data on Harvard Dataverse [@banerjee_diffusion_2013-1]. However, we will use the raw version provided by Prof. Jackson in this tutorial, as the version of the Dataverse has already had some pre-processing (importantly, they have made the adjacency matrices symmetric), while the version provided by Prof. Jackson gives the original node list. We will use the Harvard Dataverse files just for the metadata.
