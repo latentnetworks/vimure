@@ -27,6 +27,15 @@ website:
         text: "💻 Tutorials"
       - href: latest/people.qmd
         text: "📟 Contact"
+    tools:
+      - icon: github
+        menu:
+          - text: Source Code
+            url:  https://github.com/latentnetworks/vimure
+          - text: Ask Questions
+            url:  https://github.com/latentnetworks/vimure/discussions
+          - text: Report a Bug
+            url:  https://github.com/latentnetworks/vimure/issues/new/choose
 
 format:
   html:
