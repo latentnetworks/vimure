@@ -54,7 +54,7 @@ In your R console, type the following commands:
 
 ```r
 require(devtools)
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="main")
 ```
 
 Check out [devtools](https://devtools.r-lib.org/) package documentation if you are not familiar with it.
