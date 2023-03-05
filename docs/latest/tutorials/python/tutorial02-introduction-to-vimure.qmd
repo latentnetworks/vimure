@@ -1,11 +1,7 @@
 ---
-title: "💻 **Tutorial 02**: Introduction to VIMuRe in R"
+title: "💻 **Tutorial 02**: Introduction to VIMuRe in Python"
 subtitle: "VIMuRe v0.1.0 (latest)."
-categories: [basics, R]
-tags: 
-  - basics
-  - tutorial
-  - R
+categories: [basics, python]
 description: "If you have an edge list, or a set of igraph objects, VIMuRe can help you model the latent network structure."
 ---
 
@@ -27,20 +23,16 @@ Found an interesting use case for `VIMuRe`? Let us know! Open a [discussion](htt
 
 **Import packages**
 
-```r
-library(tidyr)
-library(dplyr)
-library(ggplot2)
-
-library(igraph)
-library(vimure)
+```python
+import pandas as pd
+import vimure as vm
 ```
 
 ⚠️ Ensure you have installed the latest version of `VIMuRe` before running this tutorial. Follow the 📦 [Installation instructions](/latest/install.qmd) if you haven't already.
 
 # 📥 Load the data
 
-Here, we'll use the `VIMuRe` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1]. See [💻 Tutorial 1](/latest/tutorials/R/tutorial01-data-preparation.qmd). for more details on how to prepare data for `VIMuRe`.
+Here, we'll use the `VIMuRe` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1]. See [💻 Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) for more details on how to prepare data for `VIMuRe`.
 
 We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $i$ if they **go** to $j$ for help, and also asking $j$ if $i$ **comes** to them for help). 
 
@@ -62,21 +54,21 @@ After our preprocessing, the input data takes the form of the dataset given belo
 Suppose we have a data frame `df_edges` of our village's data that looks like this:
 
 ```r
-head(df_edges, 10)
+df_edges.head(10)
 ```
 
-|   ego   |  alter  | reporter | prompt_type | layer | weight |
-|:-------:|:-------:|:--------:|:-----------:|:-----:|:------:|
-| 3000202 | 3000302 | 3000202  |   visitgo   | visit |   1    |
-| 3000203 | 3000301 | 3000203  |   visitgo   | visit |   1    |
-| 3000204 | 3000302 | 3000204  |   visitgo   | visit |   1    |
-| 3000208 | 3000306 | 3000208  |   visitgo   | visit |   1    |
-| 3000209 | 3000302 | 3000209  |   visitgo   | visit |   1    |
-| 3000302 | 3001502 | 3000302  |   visitgo   | visit |   1    |
-| 3000306 | 3001103 | 3000306  |   visitgo   | visit |   1    |
-| 3000307 | 3001102 | 3000307  |   visitgo   | visit |   1    |
-| 3001105 | 3001302 | 3001105  |   visitgo   | visit |   1    |
-| 3001202 | 3001102 | 3001202  |   visitgo   | visit |   1    |
+|   ego   |  alter  | reporter | prompt_type | weight |
+|:-------:|:-------:|:--------:|:-----------:|:------:|
+| 3000202 | 3000302 | 3000202  |   visitgo   |   1    |
+| 3000203 | 3000301 | 3000203  |   visitgo   |   1    |
+| 3000204 | 3000302 | 3000204  |   visitgo   |   1    |
+| 3000208 | 3000306 | 3000208  |   visitgo   |   1    |
+| 3000209 | 3000302 | 3000209  |   visitgo   |   1    |
+| 3000302 | 3001502 | 3000302  |   visitgo   |   1    |
+| 3000306 | 3001103 | 3000306  |   visitgo   |   1    |
+| 3000307 | 3001102 | 3000307  |   visitgo   |   1    |
+| 3001105 | 3001302 | 3001105  |   visitgo   |   1    |
+| 3001202 | 3001102 | 3001202  |   visitgo   |   1    |
 
 : A typical data input for `VIMuRe`
 
@@ -91,14 +83,23 @@ Alternatively, you might have your data as a **directed** `igraph` object. In th
 
 Note that the `graph_from_data_frame` function assumes that the first two columns in the data frame comprise the edge list (i.e., the $ego$ and $alter$ columns and treat all subsequent columns as edge attributes). 
 
-```r
-G <- igraph::graph_from_data_frame(df_edges, directed=TRUE)
+```python
+import igraph as ig
+
+g = ig.Graph.DataFrame(df_edges, directed=True, use_vids=False)
 ```
 
 Suppose our village's data is in the form of an `igraph` object `G`:
 
-```r
-G
+```python
+print(g.summary())
+```
+
+which gives us the following output:
+
+```python
+IGRAPH DNW- 386 2699 -- 
++ attr: name (v), j (e), type (e), weight (e)
 ```
 
 :::

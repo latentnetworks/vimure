@@ -1,0 +1,282 @@
+---
+title: "💻 **Tutorial 02**: Introduction to VIMuRe in R"
+subtitle: "VIMuRe v0.1.0 (latest)."
+categories: [basics, R]
+tags: 
+  - basics
+  - tutorial
+  - R
+description: "If you have an edge list, or a set of igraph objects, VIMuRe can help you model the latent network structure."
+---
+
+::: callout-note
+
+ If you use `VIMuRe` in your research, please cite [@de_bacco_latent_2023].
+
+:::
+
+TLDR: By the end of this tutorial, you will be able to:
+
+- Load data into `VIMuRe`
+- Fit a model to your data
+- Obtain estimates of the latent network structure
+
+Found an interesting use case for `VIMuRe`? Let us know! Open a [discussion](https://github.com/latentnetworks/vimure/discussions) on our GitHub repository.
+
+# ⚙️ Setup
+
+**Import packages**
+
+```r
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+library(igraph)
+library(vimure)
+```
+
+⚠️ Ensure you have installed the latest version of `VIMuRe` before running this tutorial. Follow the 📦 [Installation instructions](/latest/install.qmd) if you haven't already.
+
+# 📥 Load the data
+
+Here, we'll use the `VIMuRe` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1]. See [💻 Tutorial 1](/latest/tutorials/R/tutorial01-data-preparation.qmd) for more details on how to prepare data for `VIMuRe`.
+
+We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $i$ if they **go** to $j$ for help, and also asking $j$ if $i$ **comes** to them for help). 
+
+Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will focus just on one tie type: the "visiting" relationship (based on two prompts: _"In your free time, whose house do you visit?" and "Who visits your house in his or her free time?"_). 
+
+::: panel-tabset
+
+## Load data.frame
+
+After our preprocessing, the input data takes the form of the dataset given below. 
+
+- `ego`: generally the requester, who is also referred to as $i$ in [@de_bacco_latent_2023] (required ✔️)
+- `alter`: generally the giver, also referred to as $j$ in [@de_bacco_latent_2023] (required ✔️)
+- `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2023] (required ✔️)
+- `prompt_type`: the prompt type that was given (optional)
+- `layer`: the tie type (optional)
+- `weight`: the weight of the edge (optional)
+
+Suppose we have a data frame `df_edges` of our village's data that looks like this:
+
+```r
+head(df_edges, 10)
+```
+
+|   ego   |  alter  | reporter | prompt_type | layer | weight |
+|:-------:|:-------:|:--------:|:-----------:|:-----:|:------:|
+| 3000202 | 3000302 | 3000202  |   visitgo   | visit |   1    |
+| 3000203 | 3000301 | 3000203  |   visitgo   | visit |   1    |
+| 3000204 | 3000302 | 3000204  |   visitgo   | visit |   1    |
+| 3000208 | 3000306 | 3000208  |   visitgo   | visit |   1    |
+| 3000209 | 3000302 | 3000209  |   visitgo   | visit |   1    |
+| 3000302 | 3001502 | 3000302  |   visitgo   | visit |   1    |
+| 3000306 | 3001103 | 3000306  |   visitgo   | visit |   1    |
+| 3000307 | 3001102 | 3000307  |   visitgo   | visit |   1    |
+| 3001105 | 3001302 | 3001105  |   visitgo   | visit |   1    |
+| 3001202 | 3001102 | 3001202  |   visitgo   | visit |   1    |
+
+: A typical data input for `VIMuRe`
+
+## Load `igraph` object
+
+Alternatively, you might have your data as a **directed** `igraph` object. In this case, you must ensure that the `igraph` object has the following attributes:
+
+- `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2023] (required ✔️)
+- `prompt_type`: the prompt type that was given (optional)
+- `layer`: the tie type (optional)
+- `weight`: the weight of the edge (optional)
+
+Note that the `graph_from_data_frame` function assumes that the first two columns in the data frame comprise the edge list (i.e., the $ego$ and $alter$ columns and treat all subsequent columns as edge attributes). 
+
+```r
+G <- igraph::graph_from_data_frame(df_edges, directed=TRUE)
+```
+
+Suppose our village's data is in the form of an `igraph` object `G`:
+
+```r
+summary(G)
+```
+
+which gives us the following summary:
+
+```r
+IGRAPH b90cdcb DNW- 386 2699 -- 
++ attr: name (v/c), j (e/n), type (e/c), weight (e/n)
+```
+
+:::
+
+## 📊 Summary statistics
+
+### Number of nodes
+
+::: panel-tabset
+
+## data.frame
+
+```r
+dplyr::union(df_edges$i, df_edges$j) %>% n_distinct()
+```
+```r
+[1] 417
+```
+
+## `igraph` object
+
+```r
+igraph::vcount(G)
+```
+
+:::
+
+
+### Number of reporters
+
+::: panel-tabset
+
+## data.frame
+
+```{r}
+df_edges$reporter %>% n_distinct()
+```
+
+## `igraph` object
+
+```{r}
+igraph::get.edge.attribute(G, "reporter") %>% unique() %>% length()
+```
+
+:::
+
+### Average number of ties per reporter
+
+There are a couple of things to note about this dataset: the maximum number of name generators is four, and reporters can only report on ties that they are a part of (e.g., if a reporter is not a part of a tie, they cannot report on it). Because we are modeling double-sampled questions, each reporter can report a maximum of 8 ties.
+
+
+::: panel-tabset
+
+## data.frame
+
+```{r, fig.width=8, fig.height=4}
+plot_df <- 
+  df_edges %>% 
+  group_by(prompt_type, reporter) %>% 
+  summarise(n = n(), .groups="keep")
+
+# Sort n in descending order
+plot_df$n <- factor(plot_df$n, levels=sort(unique(plot_df$n), decreasing=TRUE))
+
+
+g <- 
+(
+  ggplot(plot_df, aes(x = n, fill=prompt_type)) +
+  geom_bar() +
+
+  scale_fill_manual(values = c("visitgo" = "#1f77b4", "visitcome" = "#ff7f0e"),
+                    labels = c("visitgo" = "Whose house do you visit?", 
+                               "visitcome" = "Who visits your house?")) +
+  coord_flip() +
+
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x = "Number of ties per reporter", 
+       y = "Number of reporters",
+       fill = "Prompt type")
+)
+g
+```
+
+## `igraph` object
+
+```{r, fig.width=8, fig.height=4}
+plot_df <- 
+  bind_cols(reporter=E(G)$reporter, prompt_type=E(G)$prompt_type) %>%
+  group_by(prompt_type, reporter) %>% 
+  summarise(n = n(), .groups="keep")
+
+# Sort n in descending order
+plot_df$n <- factor(plot_df$n, levels=sort(unique(plot_df$n), decreasing=TRUE))
+
+g <- 
+(
+  ggplot(plot_df, aes(x = n, fill=prompt_type)) +
+  geom_bar() +
+
+  scale_fill_manual(values = c("visitgo" = "#1f77b4", "visitcome" = "#ff7f0e"),
+                    labels = c("visitgo" = "Whose house do you visit?", 
+                               "visitcome" = "Who visits your house?")) +
+  coord_flip() +
+
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  labs(x = "Number of ties per reporter", 
+       y = "Number of reporters",
+       fill = "Prompt type")
+)
+g
+```
+
+:::
+
+### Union vs. Intersection and the concept of Concordance
+
+Concordance is the proportion of the ties in the network that both reporters report. It measures the extent to which the two reporters agree about the network [@ready_measuring_2021]. It is calculated as follows:
+
+
+$$
+\text{Concordance} = \frac{\text{\# of ties reported by both reporters}}{\text{\# number of unique ties reported}} 
+$$
+
+
+::: panel-tabset
+
+## data.frame
+
+```{r, message=FALSE}
+# Take the intersection: keep only records where 
+# both reporters report on the same tie in both prompt_types
+df_intersection <- 
+  df_edges %>% 
+  group_by(ego, alter, .drop=FALSE) %>% 
+  filter(n() == 2) %>% 
+  select(ego, alter) %>%
+  distinct()
+
+# Take the union: keep all ties reported 
+# irrespective of prompt_type and how many times they were reported
+df_union <- df_edges %>% select(ego, alter) %>% distinct()
+
+# Concordance
+cat(paste0("Concordance is: ", nrow(df_intersection) / nrow(df_union)))
+```
+
+
+## `igraph` object
+
+```{r}
+# Take the intersection: keep only records where
+# both reporters report on the same tie in both prompt_types
+which_edges_intersection <- E(G)[count_multiple(G, E(G)) == 2]
+
+G_intersection <- 
+  igraph::subgraph.edges(G, which_edges_intersection) %>%
+  igraph::simplify()
+
+# Take the union: keep all ties reported
+# irrespective of prompt_type and how many times they were reported
+
+G_union <- igraph::simplify(G)
+
+# Concordance
+cat(
+  paste0(
+    "Concordance is: ", 
+    igraph::ecount(G_intersection) / igraph::ecount(G_union)
+  )
+)
+```
+:::
