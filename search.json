@@ -25,7 +25,7 @@
     "href": "latest/install.html#step-02-install-the-latest-vimure-v0.1",
     "title": "📦 Installation",
     "section": "Step 02: Install the latest vimure (v0.1)",
-    "text": "Step 02: Install the latest vimure (v0.1)\nIn your R console, type the following commands:\nrequire(devtools)\ndevtools::install_github(\"latentnetworks/vimure\", subdir=\"src/R\", ref=\"develop\")\nCheck out devtools package documentation if you are not familiar with it."
+    "text": "Step 02: Install the latest vimure (v0.1)\nIn your R console, type the following commands:\nrequire(devtools)\ndevtools::install_github(\"latentnetworks/vimure\", subdir=\"src/R\", ref=\"main\")\nCheck out devtools package documentation if you are not familiar with it."
   },
   {
     "objectID": "latest/install.html#step-03-install-the-python-package",
