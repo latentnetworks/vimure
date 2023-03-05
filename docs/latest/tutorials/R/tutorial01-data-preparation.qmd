@@ -147,7 +147,7 @@ head(indiv)
 
 ## 3.3 Read reports per relationship type
 
-The survey that produced this data collected information on a number of different types of relationships, four of which were "double sampled" (i.e., asked about in two ways, who people **go** to for that type of support, and who **comes** to them. Specifically, they asked about borrowing and receiving money, giving and receiving advice, borrowing and lending household items like kerosene and rice, and visiting and receiving guests. These distinct questions are represented in the data files with the following names:
+The survey that produced this data collected information on a number of different types of relationships, four of which were "double sampled" (i.e., asked about in two ways, who people **go** to for that type of support, and who **comes** to them). Specifically, they asked about borrowing and receiving money, giving and receiving advice, borrowing and lending household items like kerosene and rice, and visiting and receiving guests. These distinct questions are represented in the data files with the following names:
 
 - borrowmoney,
 - receivemoney,
