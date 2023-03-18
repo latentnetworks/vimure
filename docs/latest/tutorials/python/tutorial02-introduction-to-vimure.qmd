@@ -30,7 +30,7 @@ import vimure as vm
 
 ⚠️ Ensure you have installed the latest version of `VIMuRe` before running this tutorial. Follow the 📦 [Installation instructions](/latest/install.qmd) if you haven't already.
 
-# 📥 Load the data
+# 📥 Step 1: Load the data
 
 Here, we'll use the `VIMuRe` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1]. See [💻 Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) for more details on how to prepare data for `VIMuRe`.
 
@@ -40,7 +40,7 @@ Four different tie types (or "layers") were double-sampled in this way (i.e., el
 
 ::: panel-tabset
 
-## Load data.frame
+## Load Data Frame
 
 After our preprocessing, the input data takes the form of the dataset given below. 
 
@@ -57,20 +57,21 @@ Suppose we have a data frame `df_edges` of our village's data that looks like th
 df_edges.head(10)
 ```
 
-|   ego   |  alter  | reporter | prompt_type | weight |
-|:-------:|:-------:|:--------:|:-----------:|:------:|
-| 3000202 | 3000302 | 3000202  |   visitgo   |   1    |
-| 3000203 | 3000301 | 3000203  |   visitgo   |   1    |
-| 3000204 | 3000302 | 3000204  |   visitgo   |   1    |
-| 3000208 | 3000306 | 3000208  |   visitgo   |   1    |
-| 3000209 | 3000302 | 3000209  |   visitgo   |   1    |
-| 3000302 | 3001502 | 3000302  |   visitgo   |   1    |
-| 3000306 | 3001103 | 3000306  |   visitgo   |   1    |
-| 3000307 | 3001102 | 3000307  |   visitgo   |   1    |
-| 3001105 | 3001302 | 3001105  |   visitgo   |   1    |
-| 3001202 | 3001102 | 3001202  |   visitgo   |   1    |
+|    ego |   alter |   reporter | prompt_type   |   weight |
+|-------:|--------:|-----------:|:--------------|---------:|
+| 100201 |  107603 |     100201 | borrowmoney   |        1 |
+| 100202 |  100201 |     100202 | borrowmoney   |        1 |
+| 100601 |  101901 |     100601 | borrowmoney   |        1 |
+| 100602 |  100501 |     100602 | borrowmoney   |        1 |
+| 100701 |  100801 |     100701 | borrowmoney   |        1 |
+| 100702 |  100801 |     100702 | borrowmoney   |        1 |
+| 100801 |  100701 |     100801 | borrowmoney   |        1 |
+| 100802 |  100902 |     100802 | borrowmoney   |        1 |
+| 100805 |  100801 |     100805 | borrowmoney   |        1 |
+| 100806 |  100801 |     100806 | borrowmoney   |        1 |
 
 : A typical data input for `VIMuRe`
+
 
 ## Load `igraph` object
 
@@ -98,9 +99,232 @@ print(g.summary())
 which gives us the following output:
 
 ```python
-IGRAPH DNW- 386 2699 -- 
-+ attr: name (v), j (e), type (e), weight (e)
+IGRAPH DNW- 324 625 -- 
++ attr: name (v), prompt_type (e), reporter (e), weight (e)
 ```
 
 :::
 
+::: {.callout-note collapse="false"}
+
+Note that the summaries above implicitly assumes that all nodes are observed and are present in the data frame. If you have nodes that are reporters but do not appear in the `ego` or `alter` columns, they will be ignored by `VIMuRe`.
+
+There are ways to include these nodes in the model, but this is beyond the scope of this tutorial. A future tutorial will cover this topic. Add a comment to our [Discussions page](https://github.com/latentnetworks/vimure/discussions) if you have questions or you'd like to see this tutorial sooner.
+
+:::
+
+# 📊 Step 2: Summary statistics
+
+## Number of nodes and edges
+
+::: panel-tabset
+
+## Data Frame
+
+```python
+unique_nodes = pd.concat([df_edges['ego'], df_edges['alter']]).unique()
+
+print(f"Number of nodes: {len(unique_nodes)}")
+print(f"Number of edges: {len(df_edges)}")
+```
+
+which yields:
+
+```text
+Number of nodes: 324
+Number of edges: 625
+```
+
+## `igraph` object
+
+```python
+print(f"Number of nodes: {g.vcount()}")
+print(f"Number of edges: {g.ecount()}")
+```
+
+which yields:
+
+```text
+Number of nodes: 324
+Number of edges: 625
+```
+:::
+
+## Number of reporters
+
+::: panel-tabset
+
+## Data Frame
+
+```r
+reporters = df_edges["reporter"].unique()
+print(f"Number of reporters: {len(reporters)}")
+```
+
+```text
+Number of reporters: 191
+```
+
+## `igraph` object
+
+```r
+reporters = set(g.es["reporter"])
+print(f"Number of reporters: {len(reporters)}")
+```
+
+```text
+Number of reporters:  191 
+```
+
+:::
+
+## Average number of ties per reporter
+
+There are a couple of things to note about this dataset: the maximum number of name generators is four, and reporters can only report on ties that they are a part of (e.g., if a reporter is not a part of a tie, they cannot report on it). Because we are modeling double-sampled questions, each reporter can report a maximum of 8 ties.
+
+Let's create a plot to visualise the distribution of the number of ties per reporter:
+
+::: panel-tabset
+
+## Data Frame
+
+```python
+# Create a plot_df to summarise the number of ties per reporter
+
+plot_df = (
+    df_edges.groupby(['prompt_type', 'reporter'])
+    .size()
+    .reset_index(name='n_ties')
+    .groupby(['n_ties', 'prompt_type'])
+    .size()
+    .reset_index(name='n_reporters')
+    .sort_values(['n_ties', 'prompt_type'])
+)
+```
+
+## `igraph` object
+
+```python
+# Create a plot_df to summarise the number of ties per reporter
+
+plot_df = (
+    pd.DataFrame({attr: g.es[attr] for attr in ["reporter", "prompt_type"]})
+    .groupby("reporter")
+    .apply(lambda x: x["prompt_type"].value_counts())
+    .reset_index(name="n_ties")
+    .rename(columns={"level_1": "prompt_type"})
+    .groupby(["n_ties", "prompt_type"])
+    .size()
+    .reset_index(name="n_reporters")
+    .sort_values(["n_ties", "prompt_type"])
+)
+```
+
+:::
+
+producing the following table:
+
+::: {style="width:50%"}
+
+|   n_ties | prompt_type   |   n_reporters |
+|---------:|:--------------|--------------:|
+|        1 | borrowmoney   |            57 |
+|        1 | receivemoney  |            66 |
+|        2 | borrowmoney   |            92 |
+|        2 | receivemoney  |            85 |
+|        3 | borrowmoney   |            31 |
+|        3 | receivemoney  |            17 |
+|        4 | borrowmoney   |             1 |
+
+:::
+
+Or, alternatively as a bar plot:
+
+<details><summary>Click to show plot code</summary>
+
+```python
+from plotnine import *
+
+
+ggplot(plot_df, aes(x = "n_ties", y="n_reporters", fill="prompt_type")) +
+geom_col() +
+
+scale_fill_manual(values = {"borrowmoney": "#1f77b4", 
+                            "receivemoney": "#ff7f0e"},
+                labels = {"borrowmoney": "Who borrows money from you?", 
+                            "receivemoney": "Did you borrow money from anyone"}) +
+coord_flip() +
+
+# Keep the x-axis (y-axis after coord_flip) in descending order
+scale_x_reverse() +
+
+theme_bw() +
+theme(legend_position = "bottom",
+    legend_box_spacing = 0.5) +
+labs(x = "Number of ties per reporter", 
+    y = "Number of reporters",
+    fill = "Prompt type")
+
+```
+
+</details>
+
+![](figures/tutorial02_fig01.png){width=50%}
+
+## Union vs. Intersection and the concept of Concordance
+
+Concordance is the proportion of the ties in the network that both reporters report. It measures the extent to which the two reporters agree about the network [@ready_measuring_2021]. It is calculated as follows:
+
+
+$$
+\text{Concordance} = \frac{\text{\# of ties reported by both reporters}}{\text{\# number of unique ties reported}} 
+$$
+
+::: panel-tabset
+
+## Data Frame
+
+```python
+# Take the intersection: keep only records where 
+# both reporters report on the same tie in both prompt_types
+df_intersection = (
+    df_edges.groupby(['ego', 'alter'], dropna=False)
+    .filter(lambda x: len(x) == 2)
+    .loc[:, ['ego', 'alter']]
+    .drop_duplicates()
+)
+
+# Take the union: keep all ties reported 
+# irrespective of prompt_type and how many times they were reported
+df_union = df_edges.loc[:, ['ego', 'alter']].drop_duplicates()
+
+# Concordance
+concordance = len(df_intersection) / len(df_union)
+print(f"Concordance is: {concordance}")
+```
+
+## `igraph` object
+
+```python
+# Take the intersection: keep only records where 
+# both reporters report on the same tie in both prompt_types
+which_edges_intersection = [e for e in g.es if g.count_multiple(e) == 2]
+
+G_intersection = g.subgraph_edges(which_edges_intersection)
+G_intersection = G_intersection.simplify()
+
+# Take the union: keep all ties reported 
+# irrespective of prompt_type and how many times they were reported
+G_union = G.simplify()
+
+# Concordance
+print("Concordance is:", G_intersection.ecount() / G_union.ecount())
+```
+
+:::
+
+producing:
+
+```text
+Concordance is: 0.016260162601626018
+```
