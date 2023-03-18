@@ -369,8 +369,8 @@ def read_from_edgelist(
                 data = np.ones(N - 1)
 
                 R[rep][layerIdx] = sparse.coo_matrix((data, (row, col)), shape=(N, N))
-                R[rep][layerIdx] = sparse_max(R[rep][layerIdx], R[rep][layerIdx].T,)
-                R[rep][layerIdx] = R[rep][layerIdx].tocoo()
+                R[rep][layerIdx] = sparse_max(R[rep][layerIdx], R[rep][layerIdx].T,) # type: ignore
+                R[rep][layerIdx] = R[rep][layerIdx].tocoo() # type: ignore
 
     elif R.shape != (L, N, N, M):
         msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
@@ -414,8 +414,6 @@ def read_from_edgelist(
         K = np.max(X.vals) + 1
         msg = f"Parameter K was None. Defaulting to: {K}"
         warnings.warn(msg, UserWarning)
-    else:
-        K = np.max(X) + 1
 
     # TODO: For future users, we might want to keep track of nodeName2Id too (nodeId2Name)
     network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, nodeNames=nodeId2Name, **kwargs)

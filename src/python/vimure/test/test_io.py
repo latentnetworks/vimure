@@ -160,6 +160,13 @@ class TestReadFromEdgelist:
             assert net_obj.N == len(set(df['ego'].tolist()+df['alter'].tolist()))
             assert net_obj.M == net_obj.N
 
+            # Check nodes
+            assert isinstance(net_obj.nodeNames, pd.DataFrame)
+            assert net_obj.nodeNames.shape == (net_obj.N, 2)
+
+            nodes = ['Tom', 'nick', 'krish', 'jack']
+            assert net_obj.nodeNames['name'].tolist() == nodes
+
         # Check that it registered several warnings
         assert len(record) == 4
         
@@ -185,17 +192,42 @@ class TestReadFromEdgelist:
         fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
         assert str(record[3].message) == fourth_warn_msg
 
-    # def test_mapping_ego_and_alter(self):
-    #     df = self.dataset()
-    #     net_obj = vm.io.parse_graph_from_edgelist(df, ego="i", alter="j", reporter = "respondent")
+    def test_standard_names_with_nodes_param(self):
+        """
+        Tests that the function works as expected when you pass the nodes parameter
+        """
 
-    #     assert net_obj.L == 1
-    #     assert net_obj.N == len(set(df['i'].tolist()+df['j'].tolist()))
-    #     assert net_obj.M == net_obj.N
+        df = synth_dataset_standard_names()
+        nodes = ['Tom', 'nick', 'krish', 'jack']
 
-    #     model = vm.model.VimureModel(mutuality=True, verbose=True)
-    #     model.fit(net_obj.X, R=net_obj.R, num_realisations=2, max_iter=21)
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_edgelist(df, nodes=nodes, K=2)
 
+            assert net_obj.L == 1
+            assert net_obj.K == 2
+            assert net_obj.N == len(set(df['ego'].tolist()+df['alter'].tolist()))
+            assert net_obj.M == net_obj.N
+
+            # Check nodes
+            assert isinstance(net_obj.nodeNames, pd.DataFrame)
+            assert net_obj.nodeNames.shape == (net_obj.N, 2)
+            assert net_obj.nodeNames['name'].tolist() == nodes
+
+            # Check that it registered several warnings
+            assert len(record) == 2
+
+            first_warn_msg =  (
+                "The set of reporters was not informed, "
+                "assuming set(reporters) = set(nodes) and N = M."
+            )
+            assert str(record[0].message) == first_warn_msg
+
+            second_warn_msg =  (
+                "Reporters Mask was not informed (parameter R). "
+                "Parser will build it from reporter column, "
+                "assuming a reporter can only report their own ties."
+            )
+            assert str(record[1].message) == second_warn_msg
 
 class TestIO:
     @pytest.mark.skip(
