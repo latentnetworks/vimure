@@ -1,5 +1,6 @@
 """Read and parse data"""
 from asyncio.log import logger
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -93,7 +94,10 @@ class BaseNetwork(metaclass=ABCMeta):
 
 class RealNetwork(BaseNetwork):
     """
-    Class to represent a real network
+    Class to represent all elements of a real network, and distinguish 
+    it from synthetic networks (vimure.synthetic module).
+
+    Note: this class is not meant to be used directly by users.
     """
 
     def __init__(self, X, R=None, **kwargs):
@@ -138,35 +142,41 @@ def read_from_edgelist(
     K=None,
     R=None,
     **kwargs,
-):
+) -> RealNetwork:
     """
     Parameters
     -----------
 
-    df: pd.DataFrame
-        DataFrame representing the edgelist
-    nodes: list
-        list of all nodes
-    reporters: list
-        list of the nodes who took the survey
-    is_weighted: bool
-        True if we should add weights to adjacency matrices
-    reporter: str
-        reporter column
-    layer: str
-        layer column
-    ego: str
-        ego column
-    alter: str
-        alter column
-    weight: str
-        weight column
-    K: int
-        maximum value on the adjacency matrix
-    R: list of list of sparse COO array NxN, tot dimension is MxLxNxN (same dimension of the data)
-        If this is None, we assume reporters only reports their own ties (of any type)
-    **kwargs:
-        any other parameters to be sent to RealNetwork.__init__
+        df: pd.DataFrame
+            DataFrame representing the edgelist
+        nodes: list
+            list of all nodes
+        reporters: list
+            list of the nodes who took the survey
+        is_weighted: bool
+            True if we should add weights to adjacency matrices
+        reporter: str
+            reporter column
+        layer: str
+            layer column
+        ego: str
+            ego column
+        alter: str
+            alter column
+        weight: str
+            weight column
+        K: int
+            maximum value on the adjacency matrix
+        R: list of list of sparse COO array NxN, tot dimension is MxLxNxN (same dimension of the data)
+            If this is None, we assume reporters only reports their own ties (of any type)
+        **kwargs:
+            any other parameters to be sent to RealNetwork.__init__
+
+    Returns
+    -----------
+
+        A RealNetwork object that is used to represent the observed network
+
     """
 
     all_params = {key: value for key, value in locals().items() if key != 'self'}
@@ -252,7 +262,10 @@ def read_from_edgelist(
         # Keep track of nonzero entries 
         data_nnz = data > 0 # type: ignore
         rel_data = data[data_nnz]  # Relevant data
-        rep = nodeName2Id[idx[0]]  # Current reporter
+        
+        # Current reporter
+        # TODO: #71 In the future, we might want to allow reporters to be externals (not in the network)
+        rep = nodeName2Id[idx[0]]  
         layer = layerName2Id[idx[1]]  # Current layer
 
         X[rep][layer] = sparse.coo_matrix((rel_data, # type: ignore
@@ -280,6 +293,33 @@ def read_from_edgelist(
     network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, nodeNames=nodeId2Name, **kwargs)
     return network
 
+def read_from_csv(
+    filename: str,
+    **kwargs,
+) -> RealNetwork: # type: ignore
+    """
+    Reads a csv file and returns a RealNetwork object
+
+    Parameters
+    ----------
+    filename : str
+        Path to the csv file
+    **kwargs:
+        Any other parameters to be sent to read_from_edgelist
+
+    Returns
+    -------
+
+    RealNetwork
+        A RealNetwork object
+    """  
+
+    df = pd.read_csv(filename)
+
+    net_obj = read_from_edgelist(df, **kwargs)
+    return net_obj
+
+
 def parse_igraph_object(G, **kwargs):
     """
     
@@ -306,39 +346,6 @@ def parse_igraph_object(G, **kwargs):
 def parse_graph_from_networkx(G, **kwargs):
     df = nx.to_pandas_edgelist(G)
     return parse_graph_from_edgelist(df, **kwargs)
-
-def parse_graph_from_csv(
-    filename: str,
-    is_weighted: bool = False,
-    is_undirected: bool = True,
-    reporter="reporter",
-    layer="layer",
-    ego="Ego",
-    alter="Alter",
-    weight="weight",
-    K=None,
-    **kwargs,
-):
-    """
-    Parameters
-    -----------
-
-    filename: str
-        path to CSV file
-    """
-
-    df = pd.read_csv(filename)
-    return read_from_edgelist(
-        df,
-        is_weighted=is_weighted,
-        is_undirected=is_undirected,
-        reporter=reporter,
-        layer=layer,
-        ego=ego,
-        alter=alter,
-        weight=weight,
-        **kwargs,
-    )
 
 ### Utility functions ###
 

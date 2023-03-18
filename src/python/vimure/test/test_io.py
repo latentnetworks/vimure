@@ -1,5 +1,7 @@
 import math
 from multiprocessing.sharedctypes import Value
+import os
+import tempfile
 import pytest
 import logging
 
@@ -390,6 +392,133 @@ class TestReadFromEdgelist:
             "using ego and alter columns to infer nodes."
         )
         assert str(record[0].message) == first_warn_msg
+
+class TestReadFromCSV:
+
+    def test_read_from_csv(self):
+        """
+        Tests that the function works as expected
+        """
+        
+        df = synth_dataset_standard_names()
+
+        # Save dataframe to a random file in the temp folder
+        temp_filename = os.path.join(tempfile.gettempdir(), "test.csv")
+        df.to_csv(temp_filename, index=False)
+        print(temp_filename)
+
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_csv(temp_filename)
+
+            assert net_obj.L == 1
+            assert net_obj.K == 2
+            assert net_obj.N == len(set(df['ego'].tolist()+df['alter'].tolist()))
+            assert net_obj.M == net_obj.N
+
+            # Check nodes
+            assert isinstance(net_obj.nodeNames, pd.DataFrame)
+            assert net_obj.nodeNames.shape == (net_obj.N, 2)
+
+            nodes = ['Tom', 'nick', 'krish', 'jack']
+            assert net_obj.nodeNames['name'].tolist() == nodes
+
+        # Check that it registered several warnings
+        assert len(record) == 4
+        
+        first_warn_msg = (
+            "The set of nodes was not informed, "
+            "using ego and alter columns to infer nodes."
+        )
+        assert str(record[0].message) == first_warn_msg
+
+        second_warn_msg =  (
+            "The set of reporters was not informed, "
+            "assuming set(reporters) = set(nodes) and N = M."
+        )
+        assert str(record[1].message) == second_warn_msg
+
+        third_warn_msg =  (
+            "Reporters Mask was not informed (parameter R). "
+            "Parser will build it from reporter column, "
+            "assuming a reporter can only report their own ties."
+        )
+        assert str(record[2].message) == third_warn_msg
+
+        fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
+        assert str(record[3].message) == fourth_warn_msg
+
+    def test_read_from_csv_incorrect_name_mapping(self):
+        """
+        Tests that read_from_csv throws an error if the user
+        does not provide the correct column names mapping.
+        """
+
+        df = synth_dataset_custom_names()
+
+        # Save dataframe to a random file in the temp folder
+        temp_filename = os.path.join(tempfile.gettempdir(), "test.csv")
+        df.to_csv(temp_filename, index=False)
+        print(temp_filename)
+
+        expected_error_msg = (
+            "Required columns not found in data frame: ego, alter, reporter. "
+            "Mapping used: ego='ego', alter='alter', reporter='reporter'. "
+            "Hint: Use params ego,alter,... for mapping column names."
+        )
+
+        with pytest.raises(ValueError, match=expected_error_msg):
+            vm.io.read_from_csv(temp_filename)
+
+    def test_non_standard_names_correct_mapping(self):
+        df = synth_dataset_custom_names()
+
+        # Save dataframe to a random file in the temp folder
+        temp_filename = os.path.join(tempfile.gettempdir(), "test.csv")
+        df.to_csv(temp_filename, index=False)
+        print(temp_filename)
+
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_csv(temp_filename, 
+                                          ego="i",
+                                          alter="j",
+                                          reporter="r")
+
+            assert net_obj.L == 1
+            assert net_obj.K == 2
+            assert net_obj.N == len(set(df['i'].tolist()+df['j'].tolist()))
+            assert net_obj.M == net_obj.N
+
+            # Check nodes
+            assert isinstance(net_obj.nodeNames, pd.DataFrame)
+            assert net_obj.nodeNames.shape == (net_obj.N, 2)
+
+            nodes = ['Tom', 'nick', 'krish', 'jack']
+            assert net_obj.nodeNames['name'].tolist() == nodes
+
+        # Check that it registered several warnings
+        assert len(record) == 4
+        
+        first_warn_msg = (
+            "The set of nodes was not informed, "
+            "using i and j columns to infer nodes."
+        )
+        assert str(record[0].message) == first_warn_msg
+
+        second_warn_msg =  (
+            "The set of reporters was not informed, "
+            "assuming set(reporters) = set(nodes) and N = M."
+        )
+        assert str(record[1].message) == second_warn_msg
+
+        third_warn_msg =  (
+            "Reporters Mask was not informed (parameter R). "
+            "Parser will build it from reporter column, "
+            "assuming a reporter can only report their own ties."
+        )
+        assert str(record[2].message) == third_warn_msg
+
+        fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
+        assert str(record[3].message) == fourth_warn_msg
 
 
 class TestIO:
