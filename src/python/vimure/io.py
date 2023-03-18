@@ -90,6 +90,29 @@ class BaseNetwork(metaclass=ABCMeta):
         return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, seed={self.seed})"
 
     
+def parse_igraph_object(G, **kwargs):
+    """
+    
+    """
+
+    # get the edgelist as a list of tuples
+    edgelist = G.get_edgelist()
+
+    # extract the edge atgtributes as a list of dictionaries
+    edge_attrs = [{attr: G.es[edge_idx][attr] for attr in G.es.attributes()} 
+                  for edge_idx in range(G.ecount())]
+
+    # create a pandas dataframe from the edgelist and edge_attrs
+    df = pd.DataFrame(edgelist, columns=['source', 'target'])
+    for attr in edge_attrs[0]:
+        df[attr] = [edge[attr] for edge in edge_attrs]
+
+    df = df.rename(columns={"source":"Ego", "target":"Alter"})\
+        .assign(ego=lambda x: G.vs[x.Ego]["name"], 
+                target=lambda x: G.vs[x.Alter]["name"])
+    
+    return parse_graph_from_edgelist(df, **kwargs)
+
 def parse_graph_from_networkx(G, **kwargs):
     df = nx.to_pandas_edgelist(G)
     return parse_graph_from_edgelist(df, **kwargs)
@@ -115,7 +138,7 @@ def parse_graph_from_csv(
     """
 
     df = pd.read_csv(filename)
-    return parse_graph_from_edgelist(
+    return read_from_edgelist(
         df,
         is_weighted=is_weighted,
         is_undirected=is_undirected,
@@ -127,18 +150,133 @@ def parse_graph_from_csv(
         **kwargs,
     )
 
+def _check_params_consistency(**kwargs):
+    """
+    Check if the parameters are consistent with each other.
+    """
 
-def parse_graph_from_edgelist(
+    df = kwargs.get("df")
+
+    # Required columns
+    ego = kwargs.get("ego")
+    alter = kwargs.get("alter")
+    reporter = kwargs.get("reporter")
+
+    # Optional columns
+    layer = kwargs.get("layer")
+    weight = kwargs.get("weight")
+
+    # Optional parameters
+    nodes = kwargs.get("nodes")
+    reporters = kwargs.get("reporters")
+
+    if not isinstance(df, pd.DataFrame):
+        msg = f"'df' should be a DataFrame, instead it is of type: {type(df)}."
+        raise ValueError(msg)
+    
+    # Throws a ValueError if the required columns are not present in df
+    dict_required_columns = {"ego": ego, "alter": alter, "reporter": reporter}
+    _check_required_columns(df, dict_required_columns)
+
+    if nodes is not None and not isinstance(nodes, list):
+        msg = f"'nodes' should be a list, instead it is of type: {type(nodes)}."
+        raise ValueError(msg)
+
+    if nodes == []:
+        msg = (
+            "The set of nodes was not informed, "
+            f"using {ego} and {alter} columns to infer nodes."
+        )
+        warnings.warn(msg, UserWarning)
+        nodes = pd.concat([df[ego], df[alter]]).unique().tolist() # type: ignore
+
+    if np.logical_or(~df[ego].isin(nodes), ~df[alter].isin(nodes)).any(): # type: ignore
+        msg = (
+            "A list of nodes was informed, "
+            "but it does not contain all nodes in the data frame."
+        )
+        raise ValueError(msg)
+    
+    # Check optional columns. Does not throw an error if they are not present.
+    dict_optional_columns = {"layer": layer, "weight": weight}
+    missing_optional_columns = _check_optional_columns(df, dict_optional_columns)
+
+    if len(missing_optional_columns) > 0:
+        if layer in missing_optional_columns:
+            df.loc[:, layer] = "1" # type: ignore
+        
+        if weight in missing_optional_columns:
+            df.loc[:, weight] = 1 # type: ignore
+
+    if reporters is None or reporters == []:
+        msg = (
+            "The set of reporters was not informed, "
+            "assuming set(reporters) = set(nodes) and N = M."
+        )
+        warnings.warn(msg, UserWarning)
+        
+        # https://stackoverflow.com/a/40382592/843365
+        reporters = nodes[:] # type: ignore
+
+    if not set(reporters).issubset(nodes): # type: ignore
+        raise ValueError("Set of reporters is not a subset of nodes!")
+
+    if not set(nodes).issubset(reporters): # type: ignore
+        warnings.warn(
+            "Not necessarily a problem, but"
+            " the set of nodes is not a subset of reporters.",
+            UserWarning
+        )
+
+    return df, nodes, reporters
+
+def _check_required_columns(df, dict_required_columns):
+    """
+    Check if the required columns are present in the dataframe.
+    """
+
+    required_columns = list(dict_required_columns.values())
+
+    # Collect which required columns are not present in df
+    missing_columns = [col for col in required_columns if col not in df.columns]
+
+    if len(missing_columns) > 0:
+        error_msg = (
+            f"Required columns not found in data frame: {', '.join(missing_columns)}. "
+            "Mapping used: "
+            f"ego='{dict_required_columns['ego']}', "
+            f"alter='{dict_required_columns['alter']}', "
+            f"reporter='{dict_required_columns['reporter']}'. "
+            "Hint: Use params ego,alter,... for mapping column names."
+        )
+        raise ValueError(error_msg)
+    
+    return True
+
+def _check_optional_columns(df, dict_optional_columns):
+    """
+    Check if the optional columns are present in the dataframe.
+    """
+
+    optional_columns = list(dict_optional_columns.values())
+
+    # Collect which optional columns are not present in df
+    missing_columns = [col for col in optional_columns if col not in df.columns]
+
+    return missing_columns
+
+
+def read_from_edgelist(
     df: pd.DataFrame,
-    nodes: list = None,
-    reporters: list = None,
+    nodes: list = [],
+    reporters: list = [],
     is_weighted: bool = False,
     is_undirected: bool = False,
-    reporter="reporter",
-    layer="layer",
-    ego="Ego",
-    alter="Alter",
-    weight="weight",
+    reporter: str ="reporter",
+    layer: str = "layer",
+    ego: str = "ego",
+    alter: str = "alter",
+    weight: str = "weight",
     K=None,
     R=None,
     **kwargs,
@@ -173,64 +311,19 @@ def parse_graph_from_edgelist(
         any other parameters to be sent to RealNetwork.__init__
     """
 
-    if not isinstance(df, pd.DataFrame):
-        msg = "Invalid 'type' ({}) of argument 'df'".format(type(df))
-        raise ValueError(msg)
-
-    expected_columns = [ego, alter, reporter, layer, weight]
-    real_columns = df.columns.values
-    diff_columns = list(set(expected_columns) - set(real_columns))
-
-    # Dataframe has no expected column
-    if len(diff_columns) == len(expected_columns):
-        msg = "Invalid columns in 'df'. Hint: Use params"
-        msg += " ego,alter,... for mapping column names."
-        raise ValueError(msg)
-        
-    if ego in diff_columns or alter in diff_columns:
-        msg = "Columns '{}' or '{}' were not found in 'df'. Hint: Use params".format(ego, alter)
-        msg += " ego,alter,... for mapping column names."
-        raise ValueError(msg)
-        
-    if reporter in diff_columns:
-        msg = "'{}' column not found in 'df'. Using '{}' columns as reporter.".format(reporter, ego)
-        warnings.warn(msg, UserWarning)
-        df.loc[:, reporter] = df[ego]
-        
-    if layer in diff_columns:
-        df.loc[:, layer] = "1"
-        
-    if weight in diff_columns:
-        df.loc[:, weight] = 1
+    all_params = {key: value for key, value in locals().items() if key != 'self'}
+    df, nodes, reporters = _check_params_consistency(**all_params) # type: ignore
 
     # Put nodes and reporters in alphabetical order
     layers = sorted(df[layer].unique())
-    
-    if nodes is None:
-        msg = "The set of nodes was not informed, "
-        msg += "using {} and {} columns to infer nodes.".format(ego, alter)
-        warnings.warn(msg, UserWarning)
-        nodes = set(sum(df[[ego, alter]].values.tolist(), []))
-
-    if np.logical_or(~df[ego].isin(nodes), ~df[alter].isin(nodes)).any():
-        msg = "Some nodes in the edgelist are not listed in the `nodes` variable."
-        raise ValueError(msg)
 
     L = len(layers)
     N = len(nodes)
-    if reporters is None:
-        msg = "The set of reporters was not informed, "
-        msg += "assuming set(reporters) = set(nodes) and N = M."
-        warnings.warn(msg, UserWarning)
-
-        reporters = nodes
-
-    if not set(reporters).issubset(nodes):
-        raise ValueError("Set of reporters is not a subset of nodes!")
     M = len(reporters)
 
     # Remove duplicates
-    df = df[expected_columns].drop_duplicates()
+    all_columns = [ego, alter, reporter, layer, weight]
+    df = df[all_columns].drop_duplicates()
 
     """
     Configure mappers
@@ -249,9 +342,11 @@ def parse_graph_from_edgelist(
         layerId2Name[i] = l
 
     if R is None:
-        msg = "Reporters Mask was not informed (parameter R). "
-        msg += "Parser will build it from reporter column, "
-        msg += "assuming a reporter can only report their own ties."
+        msg = (
+            "Reporters Mask was not informed (parameter R). "
+            "Parser will build it from reporter column, "
+            "assuming a reporter can only report their own ties."
+        )
 
         warnings.warn(msg, UserWarning)
 
@@ -277,7 +372,6 @@ def parse_graph_from_edgelist(
                 R[rep][layerIdx] = sparse_max(R[rep][layerIdx], R[rep][layerIdx].T,)
                 R[rep][layerIdx] = R[rep][layerIdx].tocoo()
 
-        # TODO: If some reporters do not appear in the edgelit, we should also warn the user
     elif R.shape != (L, N, N, M):
         msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
         module_logger.error(msg)
