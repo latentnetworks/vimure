@@ -111,7 +111,7 @@ def parse_igraph_object(G, **kwargs):
         .assign(ego=lambda x: G.vs[x.Ego]["name"], 
                 target=lambda x: G.vs[x.Alter]["name"])
     
-    return parse_graph_from_edgelist(df, **kwargs)
+    return read_from_edgelist(df, **kwargs)
 
 def parse_graph_from_networkx(G, **kwargs):
     df = nx.to_pandas_edgelist(G)
@@ -181,6 +181,10 @@ def _check_params_consistency(**kwargs):
     if nodes is not None and not isinstance(nodes, list):
         msg = f"'nodes' should be a list, instead it is of type: {type(nodes)}."
         raise ValueError(msg)
+    
+    if reporters is not None and not isinstance(reporters, list):
+        msg = f"'reporters' should be a list, instead it is of type: {type(reporters)}."
+        raise ValueError(msg)
 
     if nodes == []:
         msg = (
@@ -218,13 +222,43 @@ def _check_params_consistency(**kwargs):
         # https://stackoverflow.com/a/40382592/843365
         reporters = nodes[:] # type: ignore
 
+        # Reporters were inferred from nodes,
+        #  so we need to check if they are all reporters
+        reporters_in_df = df[reporter].unique().tolist() # type: ignore
+        if not set(reporters_in_df).issubset(reporters):
+            error_msg = (
+                "This survey setup is not currently supported by the package: "
+                " some reporters are not nodes in the network. "
+                "Hint: If this is unexpected behaviour, "
+                f"compare the unique values of the `{str(reporter)}` column "
+                f"with those of the `{str(ego)}` and `{str(alter)}` columns."
+            )
+            raise ValueError(error_msg)
+    else:
+        reporters_in_df = df[reporter].unique().tolist() # type: ignore
+        if not set(reporters_in_df).issubset(reporters):
+            error_msg = (
+                "Some reporters in the data frame do not appear "
+                "in the list of reporters provided. "
+                f"Hint: Compare the unique values of the `{str(reporter)}` column "
+                "with the list of reporters passed as parameter."
+            )
+            raise ValueError(error_msg)
+
     if not set(reporters).issubset(nodes): # type: ignore
-        raise ValueError("Set of reporters is not a subset of nodes!")
+        error_msg = (
+            "This survey setup is not currently supported by the package: "
+            " some reporters are not nodes in the network. "
+            "Hint: If this is unexpected behaviour, "
+            f"compare the unique values of the `{str(reporter)}` column "
+            f"with those of the `{str(ego)}` and `{str(alter)}` columns."
+        )
+        raise ValueError(error_msg)
 
     if not set(nodes).issubset(reporters): # type: ignore
         warnings.warn(
             "Not necessarily a problem, but"
-            " the set of nodes is not a subset of reporters.",
+            " some of the nodes are not reporters.",
             UserWarning
         )
 

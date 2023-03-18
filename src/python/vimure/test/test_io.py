@@ -37,7 +37,25 @@ def synth_dataset_custom_names():
     data = {
         'i': ['Tom', 'nick', 'krish', 'jack', 'jack'],
         'j': ['nick', 'Tom', 'jack', 'nick', 'nick'],
-        'respondent': ['Tom', 'Tom', 'jack', 'jack', 'Tom']
+        'r': ['Tom', 'Tom', 'jack', 'jack', 'Tom']
+    }
+
+    df = pd.DataFrame(data)
+    return df
+
+def synth_dataset_externals():
+    """
+    Produces a data frame with the expected column names
+    """
+
+    data = {
+        'ego': ['Tom', 'nick', 'krish', 'jack', 'jack'],
+        'alter': ['nick', 'Tom', 'jack', 'nick', 'nick'],
+        'reporter': ['External Reporter 1', 
+                     'External Reporter 1', 
+                     'External Reporter 2', 
+                     'External Reporter 1', 
+                     'External Reporter 2']
     }
 
     df = pd.DataFrame(data)
@@ -116,12 +134,12 @@ class TestReadFromEdgelist:
 
         expected_error_msg = (
             "Required columns not found in data frame: ego, alter. "
-            "Mapping used: ego='ego', alter='alter', reporter='respondent'. "
+            "Mapping used: ego='ego', alter='alter', reporter='r'. "
             "Hint: Use params ego,alter,... for mapping column names."
         )
 
         with pytest.raises(ValueError, match=expected_error_msg):
-            vm.io.read_from_edgelist(synth_dataset_custom_names(), reporter="respondent")
+            vm.io.read_from_edgelist(synth_dataset_custom_names(), reporter="r")
 
     def test_nodes_parameter(self):
         """
@@ -142,6 +160,37 @@ class TestReadFromEdgelist:
             vm.io.read_from_edgelist(synth_dataset_standard_names(),
                                      nodes=nodes_missing_jack)
 
+    def test_reporters_parameter(self):
+        """
+        Tests that an error is raised when the reporters parameter is passed and
+        is not a valid list.
+        """ 
+        error_msg = "'reporters' should be a list, instead it is of type: <class 'str'>."
+
+        with pytest.raises(ValueError, match=error_msg):
+            vm.io.read_from_edgelist(synth_dataset_standard_names(), 
+                                     reporters="test") # type: ignore
+
+        reporters_missing_jack = ['Tom', 'nick', 'krish']
+        error_msg = (
+            "Some reporters in the data frame do not appear "
+            "in the list of reporters provided. "
+            "Hint: Compare the unique values of the `reporter` column "
+            "with the list of reporters passed as parameter."
+        )
+        with pytest.warns(None) as record:
+            with pytest.raises(ValueError, match=error_msg):
+                vm.io.read_from_edgelist(synth_dataset_standard_names(),
+                                         reporters=reporters_missing_jack)
+                    
+                # Check that it registered the warning about nodes
+                assert len(record) == 1
+                
+                first_warn_msg = (
+                    "The set of nodes was not informed, "
+                    "using ego and alter columns to infer nodes."
+                )
+                assert str(record[0].message) == first_warn_msg
 
     ### Tests for correct output
 
@@ -192,6 +241,54 @@ class TestReadFromEdgelist:
         fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
         assert str(record[3].message) == fourth_warn_msg
 
+    def test_non_standard_names(self):
+        """
+        Tests that the function works with non standard column names
+        if parameters are set up correctly.
+        """
+
+        df = synth_dataset_custom_names()
+
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_edgelist(df, ego="i", alter="j", reporter="r")
+
+            assert net_obj.L == 1
+            assert net_obj.K == 2
+            assert net_obj.N == len(set(df['i'].tolist()+df['j'].tolist()))
+            assert net_obj.M == net_obj.N
+
+            # Check nodes
+            assert isinstance(net_obj.nodeNames, pd.DataFrame)
+            assert net_obj.nodeNames.shape == (net_obj.N, 2)
+
+            nodes = ['Tom', 'nick', 'krish', 'jack']
+            assert net_obj.nodeNames['name'].tolist() == nodes
+
+        # Check that it registered several warnings
+        assert len(record) == 4
+        
+        first_warn_msg = (
+            "The set of nodes was not informed, "
+            "using i and j columns to infer nodes."
+        )
+        assert str(record[0].message) == first_warn_msg
+
+        second_warn_msg =  (
+            "The set of reporters was not informed, "
+            "assuming set(reporters) = set(nodes) and N = M."
+        )
+        assert str(record[1].message) == second_warn_msg
+
+        third_warn_msg =  (
+            "Reporters Mask was not informed (parameter R). "
+            "Parser will build it from reporter column, "
+            "assuming a reporter can only report their own ties."
+        )
+        assert str(record[2].message) == third_warn_msg
+
+        fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
+        assert str(record[3].message) == fourth_warn_msg      
+
     def test_standard_names_with_nodes_param(self):
         """
         Tests that the function works as expected when you pass the nodes parameter
@@ -228,6 +325,72 @@ class TestReadFromEdgelist:
                 "assuming a reporter can only report their own ties."
             )
             assert str(record[1].message) == second_warn_msg
+
+    ### Tests edge cases
+
+    def test_external_reporters_are_not_supported(self):
+        """
+        We do not support reporters that are not nodes.
+        Test that it raises an error when this happens.
+        """
+        df = synth_dataset_externals()
+
+        error_msg = (
+            "This survey setup is not currently supported by the package: "
+            " some reporters are not nodes in the network. "
+            "Hint: If this is unexpected behaviour, "
+            "compare the unique values of the `reporter` column "
+            "with those of the `ego` and `alter` columns."
+        )
+
+        with pytest.warns(None) as record:
+            with pytest.raises(ValueError, match=error_msg):
+                vm.io.read_from_edgelist(df)
+
+        # Check that it registered several warnings
+        assert len(record) == 2
+        
+        first_warn_msg = (
+            "The set of nodes was not informed, "
+            "using ego and alter columns to infer nodes."
+        )
+        assert str(record[0].message) == first_warn_msg
+
+        second_warn_msg =  (
+            "The set of reporters was not informed, "
+            "assuming set(reporters) = set(nodes) and N = M."
+        )
+        assert str(record[1].message) == second_warn_msg
+
+    def test_external_reporters_are_not_supported_even_if_informed(self):
+        """
+        We do not support reporters that are not nodes.
+        Test that it raises an error when this happens.
+        """
+        df = synth_dataset_externals()
+        reporters = ['External Reporter 1', 'External Reporter 2']
+
+        error_msg = (
+            "This survey setup is not currently supported by the package: "
+            " some reporters are not nodes in the network. "
+            "Hint: If this is unexpected behaviour, "
+            "compare the unique values of the `reporter` column "
+            "with those of the `ego` and `alter` columns."
+        )
+
+        with pytest.warns(None) as record:
+            with pytest.raises(ValueError, match=error_msg):
+                vm.io.read_from_edgelist(df, reporters=reporters)
+
+        # Check that it registered several warnings
+        assert len(record) == 1
+        
+        first_warn_msg = (
+            "The set of nodes was not informed, "
+            "using ego and alter columns to infer nodes."
+        )
+        assert str(record[0].message) == first_warn_msg
+
 
 class TestIO:
     @pytest.mark.skip(
