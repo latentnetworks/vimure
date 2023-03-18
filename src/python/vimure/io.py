@@ -24,6 +24,7 @@ SETUP
 """
 module_logger = setup_logging("vm.io")
 
+### Classes ###
 
 class BaseNetwork(metaclass=ABCMeta):
     """
@@ -89,7 +90,196 @@ class BaseNetwork(metaclass=ABCMeta):
     def __str__(self):
         return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, seed={self.seed})"
 
-    
+
+class RealNetwork(BaseNetwork):
+    """
+    Class to represent a real network
+    """
+
+    def __init__(self, X, R=None, **kwargs):
+        """
+        Parameters
+        ------------
+
+        X: tensor of dimensions L x N x N x M
+            Represents the observed network as reported by each reporter M
+        R: list of list of sparse COO array NxN, tot dimension is L x N x N x M (same dimension of the data)
+            If this is None, we assume reporters only reports their own ties (of any type)
+        """
+
+        super().__init__(**kwargs)
+
+        self.setX(X)
+        self.R = R
+
+        if "nodeNames" in kwargs:
+            self.nodeNames = pd.DataFrame(kwargs["nodeNames"].items(), columns = ["id", "name"])
+
+        def __repr__(self):
+            return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, number_ties={self.X.vals.sum()})"
+
+        def __str__(self):
+            return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, number_ties={self.X.vals.sum()})"
+
+
+### I/O Functions ###
+
+def read_from_edgelist(
+    df: pd.DataFrame,
+    nodes: list = [],
+    reporters: list = [],
+    is_weighted: bool = False,
+    is_undirected: bool = False,
+    reporter: str ="reporter",
+    layer: str = "layer",
+    ego: str = "ego",
+    alter: str = "alter",
+    weight: str = "weight",
+    K=None,
+    R=None,
+    **kwargs,
+):
+    """
+    Parameters
+    -----------
+
+    df: pd.DataFrame
+        DataFrame representing the edgelist
+    nodes: list
+        list of all nodes
+    reporters: list
+        list of the nodes who took the survey
+    is_weighted: bool
+        True if we should add weights to adjacency matrices
+    reporter: str
+        reporter column
+    layer: str
+        layer column
+    ego: str
+        ego column
+    alter: str
+        alter column
+    weight: str
+        weight column
+    K: int
+        maximum value on the adjacency matrix
+    R: list of list of sparse COO array NxN, tot dimension is MxLxNxN (same dimension of the data)
+        If this is None, we assume reporters only reports their own ties (of any type)
+    **kwargs:
+        any other parameters to be sent to RealNetwork.__init__
+    """
+
+    all_params = {key: value for key, value in locals().items() if key != 'self'}
+    df, nodes, reporters = _check_params_consistency(**all_params) # type: ignore
+
+    # Put nodes and reporters in alphabetical order
+    layers = sorted(df[layer].unique())
+
+    L = len(layers)
+    N = len(nodes)
+    M = len(reporters)
+
+    # Remove duplicates
+    all_columns = [ego, alter, reporter, layer, weight]
+    df = df[all_columns].drop_duplicates()
+
+    """
+    Configure mappers
+    """
+    # map str to id
+    nodeName2Id = {}
+    nodeId2Name = {}
+    for i, l in enumerate(nodes):
+        nodeName2Id[l] = i
+        nodeId2Name[i] = l
+
+    layerName2Id = {}
+    layerId2Name = {}
+    for i, l in enumerate(layers):
+        layerName2Id[l] = i
+        layerId2Name[i] = l
+
+    if R is None:
+        msg = (
+            "Reporters Mask was not informed (parameter R). "
+            "Parser will build it from reporter column, "
+            "assuming a reporter can only report their own ties."
+        )
+
+        warnings.warn(msg, UserWarning)
+
+        """
+        Infer R
+        """
+
+        # While in theory R would be of dimension (M x L), we chose it to be (N x L)
+        #  since R and X are later converted to sparse tensors
+        #  and then we don't need to create a reporterName2Id mapping.
+        #  We can use the same mapping of nodeName2Id
+        R = [[[] for _ in range(L)] for _ in range(N)]
+
+        for layerName, layerIdx in layerName2Id.items():
+            for repName in reporters:
+                rep = nodeName2Id[repName]
+                # This reporter can report on any ties involving themselves
+                row = rep * np.ones(N - 1)
+                col = np.array(list(set(np.arange(N)) - set([rep])))
+                data = np.ones(N - 1)
+
+                R[rep][layerIdx] = sparse.coo_matrix((data, (row, col)), shape=(N, N))
+                R[rep][layerIdx] = sparse_max(R[rep][layerIdx], R[rep][layerIdx].T,) # type: ignore
+                R[rep][layerIdx] = R[rep][layerIdx].tocoo() # type: ignore
+
+    elif R.shape != (L, N, N, M):
+        msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
+        module_logger.error(msg)
+        raise ValueError(msg)
+
+    """
+    Set X
+    """
+    g = df.groupby(by=[reporter, layer])
+    X = [[[] for _ in range(L)] for _ in range(N)]  # M x L list
+    for idx, n in g:
+        row = n[ego].map(nodeName2Id).values
+        col = n[alter].map(nodeName2Id).values
+
+        if is_weighted:
+            data = n[weight].values
+        else:
+            data = (n[weight].values > 0).astype("int") # type: ignore
+
+        # Keep track of nonzero entries 
+        data_nnz = data > 0 # type: ignore
+        rel_data = data[data_nnz]  # Relevant data
+        rep = nodeName2Id[idx[0]]  # Current reporter
+        layer = layerName2Id[idx[1]]  # Current layer
+
+        X[rep][layer] = sparse.coo_matrix((rel_data, # type: ignore
+                                           (row[data_nnz], col[data_nnz])), 
+                                           (N, N)) 
+        if is_undirected:
+            X[rep][layer] = sparse_max(X[rep][layer], X[rep][layer].T,) # type: ignore
+            X[rep][layer] = X[rep][layer].tocoo() # type: ignore
+
+    # Convert to sptensor object
+    X = sptensor_from_list(X)
+
+    if isinstance(R, list):
+        R = sptensor_from_list(R)
+
+    """
+    Set K
+    """
+    if K is None:
+        K = np.max(X.vals) + 1
+        msg = f"Parameter K was None. Defaulting to: {K}"
+        warnings.warn(msg, UserWarning)
+
+    # TODO: For future users, we might want to keep track of nodeName2Id too (nodeId2Name)
+    network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, nodeNames=nodeId2Name, **kwargs)
+    return network
+
 def parse_igraph_object(G, **kwargs):
     """
     
@@ -149,6 +339,8 @@ def parse_graph_from_csv(
         weight=weight,
         **kwargs,
     )
+
+### Utility functions ###
 
 def _check_params_consistency(**kwargs):
     """
@@ -300,182 +492,3 @@ def _check_optional_columns(df, dict_optional_columns):
     return missing_columns
 
 
-def read_from_edgelist(
-    df: pd.DataFrame,
-    nodes: list = [],
-    reporters: list = [],
-    is_weighted: bool = False,
-    is_undirected: bool = False,
-    reporter: str ="reporter",
-    layer: str = "layer",
-    ego: str = "ego",
-    alter: str = "alter",
-    weight: str = "weight",
-    K=None,
-    R=None,
-    **kwargs,
-):
-    """
-    Parameters
-    -----------
-
-    df: pd.DataFrame
-        DataFrame representing the edgelist
-    nodes: list
-        list of all nodes
-    reporters: list
-        list of the nodes who took the survey
-    is_weighted: bool
-        True if we should add weights to adjacency matrices
-    reporter: str
-        reporter column
-    layer: str
-        layer column
-    ego: str
-        ego column
-    alter: str
-        alter column
-    weight: str
-        weight column
-    K: int
-        maximum value on the adjacency matrix
-    R: list of list of sparse COO array NxN, tot dimension is MxLxNxN (same dimension of the data)
-        If this is None, we assume reporters only reports their own ties (of any type)
-    **kwargs:
-        any other parameters to be sent to RealNetwork.__init__
-    """
-
-    all_params = {key: value for key, value in locals().items() if key != 'self'}
-    df, nodes, reporters = _check_params_consistency(**all_params) # type: ignore
-
-    # Put nodes and reporters in alphabetical order
-    layers = sorted(df[layer].unique())
-
-    L = len(layers)
-    N = len(nodes)
-    M = len(reporters)
-
-    # Remove duplicates
-    all_columns = [ego, alter, reporter, layer, weight]
-    df = df[all_columns].drop_duplicates()
-
-    """
-    Configure mappers
-    """
-    # map str to id
-    nodeName2Id = {}
-    nodeId2Name = {}
-    for i, l in enumerate(nodes):
-        nodeName2Id[l] = i
-        nodeId2Name[i] = l
-
-    layerName2Id = {}
-    layerId2Name = {}
-    for i, l in enumerate(layers):
-        layerName2Id[l] = i
-        layerId2Name[i] = l
-
-    if R is None:
-        msg = (
-            "Reporters Mask was not informed (parameter R). "
-            "Parser will build it from reporter column, "
-            "assuming a reporter can only report their own ties."
-        )
-
-        warnings.warn(msg, UserWarning)
-
-        """
-        Infer R
-        """
-
-        # While in theory R would be of dimension (M x L), we chose it to be (N x L)
-        #  since R and X are later converted to sparse tensors
-        #  and then we don't need to create a reporterName2Id mapping.
-        #  We can use the same mapping of nodeName2Id
-        R = [[[] for _ in range(L)] for _ in range(N)]
-
-        for layerName, layerIdx in layerName2Id.items():
-            for repName in reporters:
-                rep = nodeName2Id[repName]
-                # This reporter can report on any ties involving themselves
-                row = rep * np.ones(N - 1)
-                col = np.array(list(set(np.arange(N)) - set([rep])))
-                data = np.ones(N - 1)
-
-                R[rep][layerIdx] = sparse.coo_matrix((data, (row, col)), shape=(N, N))
-                R[rep][layerIdx] = sparse_max(R[rep][layerIdx], R[rep][layerIdx].T,) # type: ignore
-                R[rep][layerIdx] = R[rep][layerIdx].tocoo() # type: ignore
-
-    elif R.shape != (L, N, N, M):
-        msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
-        module_logger.error(msg)
-        raise ValueError(msg)
-
-    """
-    Set X
-    """
-    g = df.groupby(by=[reporter, layer])
-    X = [[[] for _ in range(L)] for _ in range(N)]  # M x L list
-    for idx, n in g:
-        row = n[ego].map(nodeName2Id).values
-        col = n[alter].map(nodeName2Id).values
-
-        if is_weighted:
-            data = n[weight].values
-        else:
-            data = (n[weight].values > 0).astype("int")
-
-        data_nnz = data > 0  # Keep track of nonzero entries
-        rel_data = data[data_nnz]  # Relevant data
-        rep = nodeName2Id[idx[0]]  # Current reporter
-        layer = layerName2Id[idx[1]]  # Current layer
-
-        X[rep][layer] = sparse.coo_matrix((rel_data, (row[data_nnz], col[data_nnz])), (N, N))
-        if is_undirected:
-            X[rep][layer] = sparse_max(X[rep][layer], X[rep][layer].T,)
-            X[rep][layer] = X[rep][layer].tocoo()
-
-    # Convert to sptensor object
-    X = sptensor_from_list(X)
-
-    if isinstance(R, list):
-        R = sptensor_from_list(R)
-
-    """
-    Set K
-    """
-    if K is None:
-        K = np.max(X.vals) + 1
-        msg = f"Parameter K was None. Defaulting to: {K}"
-        warnings.warn(msg, UserWarning)
-
-    # TODO: For future users, we might want to keep track of nodeName2Id too (nodeId2Name)
-    network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, nodeNames=nodeId2Name, **kwargs)
-    return network
-
-
-class RealNetwork(BaseNetwork):
-    def __init__(self, X, R=None, **kwargs):
-        """
-        Parameters
-        ------------
-
-        X: tensor of dimensions L x N x N x M
-            Represents the observed network as reported by each reporter M
-        R: list of list of sparse COO array NxN, tot dimension is L x N x N x M (same dimension of the data)
-            If this is None, we assume reporters only reports their own ties (of any type)
-        """
-
-        super().__init__(**kwargs)
-
-        self.setX(X)
-        self.R = R
-
-        if "nodeNames" in kwargs:
-            self.nodeNames = pd.DataFrame(kwargs["nodeNames"].items(), columns = ["id", "name"])
-
-        def __repr__(self):
-            return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, number_ties={self.X.vals.sum()})"
-
-        def __str__(self):
-            return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, number_ties={self.X.vals.sum()})"
