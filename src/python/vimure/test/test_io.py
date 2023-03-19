@@ -1,8 +1,6 @@
-import math
-from multiprocessing.sharedctypes import Value
 import os
+import math
 import tempfile
-from typing import Any
 import pytest
 import logging
 
@@ -11,7 +9,7 @@ import pandas as pd
 import vimure as vm
 import sktensor as skt
 
-from sklearn.metrics import f1_score
+from typing import Any
 
 logger = logging.getLogger("vm.test.test_model")
 logger.setLevel(logging.DEBUG)
