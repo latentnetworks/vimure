@@ -535,10 +535,13 @@ def karnataka_edgelist_vil1():
     yield df, nodes, reporters
 
 class TestRealData:
+    """
+    Using Karnataka data to test read_from_edgelist
+    """
 
     def test_not_inform_nodes_reporters(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
         
-        df, nodes, reporters = karnataka_edgelist_vil1
+        df, _, _ = karnataka_edgelist_vil1
 
         with pytest.warns(None) as record:
             net_obj = vm.io.read_from_edgelist(df, K=2)
