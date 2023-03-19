@@ -2,6 +2,7 @@ import math
 from multiprocessing.sharedctypes import Value
 import os
 import tempfile
+from typing import Any
 import pytest
 import logging
 
@@ -479,7 +480,7 @@ class TestReadFromCSV:
 
         with pytest.warns(None) as record:
             net_obj = vm.io.read_from_csv(temp_filename, 
-                                          ego="i",
+                                                   ego="i",
                                           alter="j",
                                           reporter="r")
 
@@ -520,19 +521,54 @@ class TestReadFromCSV:
         fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
         assert str(record[3].message) == fourth_warn_msg
 
+@pytest.fixture()
+def karnataka_edgelist_vil1():
 
-class TestIO:
-    @pytest.mark.skip(
-        reason="This is being reviewed. Checkout Notebook04 to see the current approach to reading this data."
-    )
+    import sys
+    sys.path.insert(0, "notebooks/python/experiments/")
 
-    def test_read_karnataka_village_from_csv(self):
-        file = "/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_visit.csv"
-        net_obj = vm.io.parse_graph_from_csv(file)
+    from karnataka import read_village_data # type: ignore
+    df, nodes, reporters = read_village_data("vil1", 
+                                             data_folder="data/input/india_microfinance/formatted/",
+                                             filter_layer="money")
+    df.rename(columns={"Ego": "ego", "Alter": "alter"}, inplace=True)
+    yield df, nodes, reporters
 
+class TestRealData:
+
+    def test_not_inform_nodes_reporters(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
+        
+        df, nodes, reporters = karnataka_edgelist_vil1
+
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_edgelist(df, K=2)
+
+        # Check that it registered several warnings
+        assert len(record) == 3
+        
+        first_warn_msg = (
+            "The set of nodes was not informed, "
+            "using ego and alter columns to infer nodes."
+        )
+        assert str(record[0].message) == first_warn_msg
+
+        second_warn_msg = (
+            "The set of reporters was not informed, "
+            "assuming set(reporters) = set(nodes) and N = M."
+        )
+        
+        assert str(record[1].message) == second_warn_msg
+
+        third_warn_msg =  (
+            "Reporters Mask was not informed (parameter R). "
+            "Parser will build it from reporter column, "
+            "assuming a reporter can only report their own ties."
+        )
+        assert str(record[2].message) == third_warn_msg
+    
         assert net_obj.L == 1
-        assert net_obj.N == 214
-        assert net_obj.M == 196
+        assert net_obj.N == 324
+        assert net_obj.M == 324
 
         assert isinstance(net_obj.X, skt.sptensor)
         assert net_obj.X.vals.sum() > 0  # Not all 0s
@@ -561,32 +597,46 @@ class TestIO:
             nodes_to = net_obj.R.subs[idxNodeTo][idx_reporting]
             assert np.logical_or(nodes_from == m, nodes_to == m).all(), msg % m
 
-    @pytest.mark.skip(
-        reason="This is being reviewed. Checkout Notebook04 to see the current approach to reading this data."
-    )
-    def test_read_karnataka_village_multilayer(self):
+    def test_inform_nodes_reporters(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
+        
+        df, nodes, reporters = karnataka_edgelist_vil1
 
-        # Read all layers from village 57
-        layers = ["visit", "kerorice", "money", "help"]
-        pattern = "/mnt/data/input/india_microfinance/formatted_singel_layer/vil57_%s.csv"
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
 
-        df = pd.concat([pd.read_csv(pattern % layer) for layer in layers])
+        # Check that it registered several warnings
+        assert len(record) == 2
+        
+        first_warn_msg = (
+            "Not necessarily a problem, "
+            "but some of the nodes are not reporters."
+        )
+        assert str(record[0].message) == first_warn_msg
 
-        net_obj = vm.io.parse_graph_from_edgelist(df)
-
-        assert net_obj.L == 4
-        assert net_obj.N == 233
-        assert net_obj.M == 229
+        second_warn_msg =  (
+            "Reporters Mask was not informed (parameter R). "
+            "Parser will build it from reporter column, "
+            "assuming a reporter can only report their own ties."
+        )
+        assert str(record[1].message) == second_warn_msg
+    
+        assert net_obj.L == 1
+        assert net_obj.N == 330 # bigger than when not-informed
+        assert net_obj.M == 203
 
         assert isinstance(net_obj.X, skt.sptensor)
         assert net_obj.X.vals.sum() > 0  # Not all 0s
-        assert net_obj.X.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+
+        # TODO: Change this to (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        assert net_obj.X.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.N)
         # https://stackoverflow.com/a/48648756/843365
         assert net_obj.X.vals.sum() < math.prod(net_obj.X.shape)  # Not all 1s
 
         assert isinstance(net_obj.R, skt.sptensor)
         assert net_obj.R.vals.sum() > 0  # Not all 0s
-        assert net_obj.R.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+
+        # TODO: Change this to (net_obj.L, net_obj.N, net_obj.N, net_obj.M)
+        assert net_obj.R.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.N)
         # https://stackoverflow.com/a/48648756/843365
         assert net_obj.R.vals.sum() < math.prod(net_obj.R.shape)  # Not all 1s
 

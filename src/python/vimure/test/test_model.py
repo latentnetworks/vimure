@@ -9,7 +9,11 @@ logger = logging.getLogger("vm.test.test_model")
 logger.setLevel(logging.DEBUG)
 
 
-class TestVimureModel:
+class TestVimureWithRandomNetworks:
+    """
+    Tests of the VimureModel class
+    """
+
     def check_final_parameters(self, model, synth_net):
 
         """Latent Variables - Parameter rho"""
@@ -50,6 +54,10 @@ class TestVimureModel:
         assert model.nu_rte >= 0
 
     def test_vimure_model_with_standard_sbm(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
         logger.debug("Generating synthetic network (Standard SBM) for testing")
         gt_network = vm.synthetic.StandardSBM(
             N=20,
@@ -71,6 +79,10 @@ class TestVimureModel:
         self.check_final_parameters(model, gt_network)
 
     def test_vimure_model_issues_appropriate_warnings(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
         logger.debug("Generating synthetic network (Standard SBM) for testing")
         gt_network = vm.synthetic.StandardSBM(
             N=20,
@@ -304,6 +316,7 @@ class TestVimureModel:
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
 
         assert np.allclose(f1_score(Y_true, Y_rec), 0.97, atol=1e-2)
+
 
 
 class TestInferredModel:
