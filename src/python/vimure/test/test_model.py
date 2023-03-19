@@ -1,8 +1,11 @@
+from typing import Any
 import pytest
 import logging
 import numpy as np
+import pandas as pd
 import vimure as vm
 
+from . import karnataka_edgelist_vil1
 from sklearn.metrics import f1_score
 
 logger = logging.getLogger("vm.test.test_model")
@@ -317,6 +320,29 @@ class TestVimureWithRandomNetworks:
 
         assert np.allclose(f1_score(Y_true, Y_rec), 0.97, atol=1e-2)
 
+
+class TestVimureWithReadData:
+    """
+    Tests the model with real data
+    """
+
+    def test_inform_nodes_reporters(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
+        df, nodes, reporters = karnataka_edgelist_vil1
+
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
+
+        model = vm.model.VimureModel(mutuality=True, verbose=True)
+        model.fit(
+            net_obj.X,
+            K=2,
+            seed=1,
+            theta_prior=(0.1, 0.1),
+            eta_prior=(0.5, 1),
+            num_realisations=2,
+            max_iter=21,
+            R=net_obj.R,
+        )
 
 
 class TestInferredModel:
