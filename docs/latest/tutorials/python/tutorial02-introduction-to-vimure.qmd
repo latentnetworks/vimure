@@ -73,6 +73,22 @@ df_edges.head(10)
 : A typical data input for `VIMuRe`
 
 
+\# TODO: add `layer` column
+
+```python
+ties_layer_mapping={
+             "borrowmoney": "money",
+             "receivemoney": "money",
+             "receiveadvice": "advice",
+             "helpdecision": "advice",
+             "keroricego": "kerorice",
+             "keroricecome": "kerorice",
+             "visitgo": "visit",
+             "visitcome": "visit",
+         }
+df_edges = df_edges[df_edges["layer"] == "money"].copy()
+```
+
 ## Load `igraph` object
 
 Alternatively, you might have your data as a **directed** `igraph` object. In this case, you must ensure that the `igraph` object has the following attributes:
@@ -328,3 +344,31 @@ producing:
 ```text
 Concordance is: 0.016260162601626018
 ```
+
+# 📦 Use `vimure` package to run the model
+
+If you have already prepared your data (See [Tutorial 01](/latest/tutorials/python/tutorial01-data-preparation.qmd)), you can use the `vimure` package to run the model directly on your data.
+
+::: panel-tabset
+
+## Data Frame
+
+```python
+import vimure as vm
+
+# Run the model
+model = vm.model.VimureModel()
+model.fit(df_edges, seed=1, num_realisations=1, max_iter=500)
+```
+
+## `igraph` object
+
+```python
+import vimure as vm
+
+# Run the model
+model = vm.model.VimureModel()
+model.fit(g, seed=1, num_realisations=1, max_iter=500)
+```
+
+:::

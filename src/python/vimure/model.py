@@ -1,6 +1,5 @@
 """Inference model"""
 import sys
-import math
 import time
 import warnings
 
@@ -10,6 +9,7 @@ import sktensor as skt
 import scipy.special as sp
 from scipy.stats import poisson
 
+from .io import read_from_edgelist
 from .log import setup_logging
 from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_threshold
 
@@ -81,7 +81,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
     def __check_fit_params(
         self,
-        X: np.ndarray,
+        X,
         lambda_prior=(10.0, 10.0),
         theta_prior=(0.1, 0.1),
         eta_prior=(0.5, 1.0),
@@ -106,6 +106,13 @@ class VimureModel(TransformerMixin, BaseEstimator):
             if extra_param not in available_extra_params:
                 msg = "Ignoring unrecognised parameter %s." % extra_param
                 self.logger.warn(msg)
+
+        is_R_set = False
+        if isinstance(X, pd.DataFrame):
+            net_obj = read_from_edgelist(X)
+            X = net_obj.X
+            R = net_obj.R
+            is_R_set = True
 
         # If the network is undirected, then do not estimate the mutuality
         if self.undirected and not np.array_equal(
@@ -179,7 +186,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
             msg = f"Parameter K was None. Defaulting to: {self.K}"
             warnings.warn(msg, UserWarning)
 
-        if "R" in extra_params:
+        if not is_R_set and "R" in extra_params:
             R = extra_params["R"]
             if R.shape != (self.L, self.N, self.N, self.M):
                 msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
@@ -306,7 +313,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
     def fit(
         self,
-        X: np.ndarray,
+        X,
         theta_prior=(0.1, 0.1),
         lambda_prior=(10.0, 10.0),
         eta_prior=(0.5, 1.0),
