@@ -318,7 +318,6 @@ class TestVimureWithRandomNetworks:
         assert np.allclose(f1_score(Y_true, Y_rec), 0.97, atol=1e-2)
 
 
-
 class TestInferredModel:
     @classmethod
     def setup_class(cls):

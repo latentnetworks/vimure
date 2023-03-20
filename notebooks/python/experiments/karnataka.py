@@ -35,6 +35,7 @@ def read_village_data(
     },
     data_folder: str = DATA_INPUT_FOLDER,
     print_details: bool = True,
+    filter_layer: str = None,
 ):
     """
     IMPORTANT: Here we assume that only the people who actually appears as reporters
@@ -62,14 +63,17 @@ def read_village_data(
     edgelist = pd.read_csv(os.path.join(data_folder, FILE_PATTERN_EDGES % village))
     metadata = pd.read_csv(os.path.join(data_folder, FILE_PATTERN_META % village))
 
-    respondents = set(metadata[metadata["didsurv"] == 1]["pid"])
-    nodes = respondents.union(set(edgelist["i"])).union(set(edgelist["j"]))
-
     if ties_layer_mapping is not None:
         # Convert ties to layers
         edgelist["layer"] = edgelist["type"].map(ties_layer_mapping)
     else:
         edgelist["layer"] = edgelist["type"]
+
+    if filter_layer is not None:
+        edgelist = edgelist[edgelist["layer"] == filter_layer].copy()
+
+    respondents = set(metadata[metadata["didsurv"] == 1]["pid"])
+    nodes = respondents.union(set(edgelist["i"])).union(set(edgelist["j"]))
 
     # Remove self-loops
     edgelist = edgelist[edgelist["i"] != edgelist["j"]].copy()

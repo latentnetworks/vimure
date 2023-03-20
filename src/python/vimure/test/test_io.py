@@ -11,6 +11,9 @@ import sktensor as skt
 
 from typing import Any
 
+from . import karnataka_edgelist_vil1
+
+
 logger = logging.getLogger("vm.test.test_model")
 logger.setLevel(logging.DEBUG)
 
@@ -518,19 +521,6 @@ class TestReadFromCSV:
 
         fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
         assert str(record[3].message) == fourth_warn_msg
-
-@pytest.fixture()
-def karnataka_edgelist_vil1():
-
-    import sys
-    sys.path.insert(0, "notebooks/python/experiments/")
-
-    from karnataka import read_village_data # type: ignore
-    df, nodes, reporters = read_village_data("vil1", 
-                                             data_folder="data/input/india_microfinance/formatted/",
-                                             filter_layer="money")
-    df.rename(columns={"Ego": "ego", "Alter": "alter"}, inplace=True)
-    yield df, nodes, reporters
 
 class TestRealData:
     """
