@@ -133,7 +133,7 @@ indiv["gender"] = indiv["gender"].map({1: "Male", 2: "Female"})
 ## pre-process pid to match the format in the individual-level metadata
 indiv["ppid"] = indiv["ppid"].astype(str)
 indiv["hhid"] = indiv["hhid"].astype(str)
-indiv["pid"] =  indiv.apply(lambda x: f'{x["hhid"]}{0 if len(x["ppid"]) != 2 else None}{x["ppid"]}', axis=1)
+indiv["pid"] =  indiv.apply(lambda x: f'{x["hhid"]}{0 if len(x["ppid"]) != 2 else ""}{x["ppid"]}', axis=1)
 
 ## Select only the relevant columns
 selected_cols = ["pid", "resp_status", "religion", "caste", "didsurv"]
@@ -327,14 +327,14 @@ def get_karnataka_survey_data(village_id: int, tie_type: str,
     ## pre-process pid to match the format in the individual-level metadata
     metadata["ppid"] = metadata["ppid"].astype(str)
     metadata["hhid"] = metadata["hhid"].astype(str)
-    metadata["pid"] =  metadata.apply(lambda x: f'{x["hhid"]}{0 if len(x["ppid"]) != 2 else None}{x["ppid"]}', axis=1)
+    metadata["pid"] =  metadata.apply(lambda x: f'{x["hhid"]}{0 if len(x["ppid"]) != 2 else ""}{x["ppid"]}', axis=1)
 
     ## Select only the relevant columns
     selected_cols = ["pid", "resp_status", "religion", "caste", "didsurv"]
     metadata = pd.merge(metadata, resp[selected_cols], on="pid", how="left")
 
     # Read the raw data
-    filepath = os.path.join(RAW_CSV_FOLDER, f"{tie_type}{village_id}.csv")
+    filepath = os.path.join(raw_csv_folder, f"{tie_type}{village_id}.csv")
     df_raw = pd.read_csv(filepath, header=None, na_values=all_na_codes, dtype=str)
 
     # Example with the data
@@ -502,14 +502,14 @@ def get_karnataka_survey_data(village_id: int, tie_type: str,
     ## pre-process pid to match the format in the individual-level metadata
     metadata["ppid"] = metadata["ppid"].astype(str)
     metadata["hhid"] = metadata["hhid"].astype(str)
-    metadata["pid"] =  metadata.apply(lambda x: f'{x["hhid"]}{0 if len(x["ppid"]) != 2 else None}{x["ppid"]}', axis=1)
+    metadata["pid"] =  metadata.apply(lambda x: f'{x["hhid"]}{0 if len(x["ppid"]) != 2 else ""}{x["ppid"]}', axis=1)
 
     ## Select only the relevant columns
     selected_cols = ["pid", "resp_status", "religion", "caste", "didsurv"]
     metadata = pd.merge(metadata, resp[selected_cols], on="pid", how="left")
 
     # Read the raw data
-    filepath = os.path.join(RAW_CSV_FOLDER, f"{tie_type}{village_id}.csv")
+    filepath = os.path.join(raw_csv_folder, f"{tie_type}{village_id}.csv")
     df_raw = pd.read_csv(filepath, header=None, na_values=all_na_codes, dtype=str)
 
     # Example with the data
