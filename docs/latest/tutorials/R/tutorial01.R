@@ -7,6 +7,10 @@ library(magrittr)
 # Set the working directory accordingly
 # setwd("C:/Users/.../karnataka_survey") # nolint
 
+DEFAULT_METADATA_FILEPATH <- "datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta" # nolint
+VALID_VILLAGE_IDS <- c(1:12, 14:21, 23:77) # village IDs 13 and 22 are missing
+RAW_CSV_FOLDER <- "2010-0760_Data/Data/Raw_csv"
+
 ties_layer_mapping <- list(borrowmoney = "money",
                           lendmoney = "money",
                           giveadvice = "advice",
@@ -31,7 +35,7 @@ get_karnataka_survey_data <- function(
                                     visitcome = "visit"
                                   ),
                                 all_na_codes=c("9999999", "5555555", "7777777", "0"), # nolint
-                                raw_csv_folder="2010-0760_Data/Data/Raw_csv") {
+                                raw_csv_folder=RAW_CSV_FOLDER) {
 
   # Filter the individual-level metadata to keep only the relevant village
   resp <- subset(indivinfo, indivinfo$village == village_id)
@@ -93,7 +97,6 @@ get_karnataka_survey_data <- function(
   reporters <- metadata %>%
     dplyr::filter(didsurv == 1) %>%
     dplyr::pull(pid) %>%
-    unique() %>%
     as.vector()
   nodes <- reporters %>% union(edgelist$ego) %>% union(edgelist$alter)
 
@@ -113,7 +116,7 @@ get_karnataka_survey_data <- function(
 get_layer <- function(village_id,
                       layer_name,
                       indivinfo,
-                      raw_csv_folder = "2010-0760_Data/Data/Raw_csv") {
+                      raw_csv_folder = RAW_CSV_FOLDER) {
 
   tie_types <- list(
     money = c("borrowmoney", "lendmoney"),
@@ -137,9 +140,6 @@ get_layer <- function(village_id,
 
   return(list(edgelist = edgelist, reporters = reporters))
 }
-
-
-DEFAULT_METADATA_FILEPATH <- "datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta" # nolint
 
 get_indivinfo <- function(metadata_file = DEFAULT_METADATA_FILEPATH){
     indivinfo <- haven::read_dta(metadata_file)

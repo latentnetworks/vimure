@@ -1,0 +1,7 @@
+# Ignore .bib file
+*.bib -linguist-detectable
+
+*.md linguist-documentation
+*.qmd linguist-documentation
+
+*.ipynb -linguist-detectable
