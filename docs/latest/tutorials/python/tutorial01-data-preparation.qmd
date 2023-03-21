@@ -362,11 +362,11 @@ def get_karnataka_survey_data(village_id: int, tie_type: str,
     #### Further pre-processing steps ####
 
     # Who could actually report on the ties?
-    respondents = set(metadata[metadata["didsurv"] == 1]["pid"])
-    nodes = respondents.union(set(edgelist["ego"])).union(set(edgelist["alter"]))
+    reporters = set(metadata[metadata["didsurv"] == 1]["pid"])
+    nodes = reporters.union(set(edgelist["ego"])).union(set(edgelist["alter"]))
 
-    # Only keep reports made by those who were MARKED as respondents in metadata CSV
-    edgelist = edgelist[edgelist["reporter"].isin(respondents)].copy()
+    # Only keep reports made by those who were MARKED as reporters in metadata CSV
+    edgelist = edgelist[edgelist["reporter"].isin(reporters)].copy()
 
     # Remove self-loops
     edgelist = edgelist[edgelist["ego"] != edgelist["alter"]].copy()
@@ -374,7 +374,7 @@ def get_karnataka_survey_data(village_id: int, tie_type: str,
     # Remove duplicates
     edgelist.drop_duplicates(inplace=True)
 
-    return edgelist, respondents
+    return edgelist, reporters
 ```
 
 </details>
@@ -437,7 +437,7 @@ edgelist_money.sample(n=10, random_state=1)
 
 
 
-Use the full pre-processing script below to pre-process all the data for all tie types and save it to a single `vil1_money.csv` file. We also save the `respondents` list to, as a data frame, to a `vil1_money_respondents.csv` file.
+Use the full pre-processing script below to pre-process all the data for all tie types and save it to a single `vil1_money.csv` file. We also save the `reporters` list to, as a data frame, to a `vil1_money_reporters.csv` file.
 
 <details><summary>Click to see full pre-processing script</summary>
 
@@ -537,11 +537,11 @@ def get_karnataka_survey_data(village_id: int, tie_type: str,
     #### Further pre-processing steps ####
 
     # Who could actually report on the ties?
-    respondents = set(metadata[metadata["didsurv"] == 1]["pid"])
-    nodes = respondents.union(set(edgelist["ego"])).union(set(edgelist["alter"]))
+    reporters = set(metadata[metadata["didsurv"] == 1]["pid"])
+    nodes = reporters.union(set(edgelist["ego"])).union(set(edgelist["alter"]))
 
-    # Only keep reports made by those who were MARKED as respondents in metadata CSV
-    edgelist = edgelist[edgelist["reporter"].isin(respondents)].copy()
+    # Only keep reports made by those who were MARKED as reporters in metadata CSV
+    edgelist = edgelist[edgelist["reporter"].isin(reporters)].copy()
 
     # Remove self-loops
     edgelist = edgelist[edgelist["ego"] != edgelist["alter"]].copy()
@@ -549,7 +549,7 @@ def get_karnataka_survey_data(village_id: int, tie_type: str,
     # Remove duplicates
     edgelist.drop_duplicates(inplace=True)
 
-    return edgelist, respondents
+    return edgelist, reporters
 
 def get_layer(village_id, layer_name, indivinfo, 
               raw_csv_folder="2010-0760_Data/Data/Raw_csv"):
@@ -564,20 +564,20 @@ def get_layer(village_id, layer_name, indivinfo,
     selected_tie_types = tie_types[layer_name]
 
     edgelist = pd.DataFrame()
-    respondents = set()
+    reporters = set()
 
     for tie_type in selected_tie_types:
-        edgelist_, respondents_ = get_karnataka_survey_data(village_id=village_id, 
+        edgelist_, reporters_ = get_karnataka_survey_data(village_id=village_id, 
                                                             tie_type=tie_type, 
                                                             indivinfo=indivinfo,
                                                             raw_csv_folder=raw_csv_folder)
         edgelist = pd.concat([edgelist, edgelist_])
-        respondents = respondents.union(respondents_)
+        reporters = reporters.union(reporters_)
 
-    return edgelist, respondents
+    return edgelist, reporters
 
 
-indivinfo = pd.read_stata("docs/data/datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta")
+indivinfo = pd.read_stata("datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta")
 indivinfo.drop_duplicates(subset=["pid"], inplace=True) ## one individual (6109803) is repeated twice.
 indivinfo["pid"] = indivinfo["pid"].astype(str)
 indivinfo["hhid"] = indivinfo["hhid"].astype(str)
@@ -586,18 +586,18 @@ indivinfo["hhid"] = indivinfo["hhid"].astype(str)
 # village IDs 13 and 22 are missing
 VALID_VILLAGE_IDS = [i for i in range(1, 77+1) if i != 13 and i != 22] 
 
-RAW_CSV_FOLDER = "docs/data/2010-0760_Data/Data/Raw_csv"
+RAW_CSV_FOLDER = "2010-0760_Data/Data/Raw_csv"
 
 for i in VALID_VILLAGE_IDS:
     for layer_name in ["money", "advice", "kerorice", "visit"]:
       print(f"Processing village {i}")
-      edgelist, respondents = get_layer(village_id=i, 
+      edgelist, reporters = get_layer(village_id=i, 
                                         layer_name=layer_name, 
                                         indivinfo=indivinfo, 
                                         raw_csv_folder=RAW_CSV_FOLDER)
       edgelist.to_csv(f"vil{i}_{layer_name}.csv", index=False)
-      # save respondents to a separate file
-      pd.DataFrame({"pid": list(respondents)}).to_csv(f"vil{i}_{layer_name}_respondents.csv", index=False)
+      # save reporters to a separate file
+      pd.DataFrame({"pid": list(reporters)}).to_csv(f"vil{i}_{layer_name}_reporters.csv", index=False)
 
     print(f"Done with village {i}")
 
