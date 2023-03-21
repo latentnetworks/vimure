@@ -40,9 +40,9 @@ library(vimure)
 
 # 📥 Step 1: Load the data
 
-Here, we'll use the `VIMuRe` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1]. See [💻 Tutorial 1](/latest/tutorials/R/tutorial01-data-preparation.qmd) for more details on how to prepare data for `VIMuRe`.
+Here, we'll use the `VIMuRe` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1]. See 💻 [Tutorial 1](/latest/tutorials/R/tutorial01-data-preparation.qmd) for more details on how to prepare data for `VIMuRe`.
 
-We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $i$ if they **go** to $j$ for help, and also asking $j$ if $i$ **comes** to them for help). 
+We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $ego$ if they **go** to $alter$ for help, and also asking $alter$ if $ego$ **comes** to them for help). 
 
 Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will focus just on one tie type: the "visiting" relationship (based on two prompts: _"In your free time, whose house do you visit?" and "Who visits your house in his or her free time?"_). 
 
@@ -59,24 +59,27 @@ After our preprocessing, the input data takes the form of the dataset given belo
 - `layer`: the tie type (optional)
 - `weight`: the weight of the edge (optional)
 
-Suppose we have a data frame `df_edges` of our village's data that looks like this:
+Suppose we have a data frame `edgelist` of our village's data that looks like this:
+
 
 ```r
-head(df_edges, 10)
+set.seed(100) # for reproducibility
+
+edgelist %>% dplyr::sample_n(size = 10, replace = FALSE)
 ```
 
-|    ego |   alter |   reporter | prompt_type   |   weight |
-|-------:|--------:|-----------:|:--------------|---------:|
-| 100201 |  107603 |     100201 | borrowmoney   |        1 |
-| 100202 |  100201 |     100202 | borrowmoney   |        1 |
-| 100601 |  101901 |     100601 | borrowmoney   |        1 |
-| 100602 |  100501 |     100602 | borrowmoney   |        1 |
-| 100701 |  100801 |     100701 | borrowmoney   |        1 |
-| 100702 |  100801 |     100702 | borrowmoney   |        1 |
-| 100801 |  100701 |     100801 | borrowmoney   |        1 |
-| 100802 |  100902 |     100802 | borrowmoney   |        1 |
-| 100805 |  100801 |     100805 | borrowmoney   |        1 |
-| 100806 |  100801 |     100806 | borrowmoney   |        1 |
+|    ego|  alter| reporter|tie_type    |layer | weight|
+|------:|------:|--------:|:-----------|:-----|------:|
+| 116702| 116402|   116402|borrowmoney |money |      1|
+| 107308| 106302|   107308|lendmoney   |money |      1|
+| 113601| 107901|   107901|borrowmoney |money |      1|
+| 116307| 114302|   114302|borrowmoney |money |      1|
+| 106204| 109201|   106204|lendmoney   |money |      1|
+| 117002| 117102|   117102|borrowmoney |money |      1|
+| 113201| 104001|   104001|borrowmoney |money |      1|
+| 110601| 102901|   110601|lendmoney   |money |      1|
+| 114303| 111502|   114303|lendmoney   |money |      1|
+| 110402| 116203|   116203|borrowmoney |money |      1|
 
 : A typical data input for `VIMuRe`
 
@@ -94,7 +97,7 @@ Alternatively, you might have your data as a **directed** `igraph` object. In th
 Note that the `graph_from_data_frame` function assumes that the first two columns in the data frame comprise the edge list (i.e., the $ego$ and $alter$ columns and treat all subsequent columns as edge attributes). 
 
 ```r
-G <- igraph::graph_from_data_frame(df_edges, directed=TRUE)
+G <- igraph::graph_from_data_frame(edgelist, directed=TRUE)
 ```
 
 Suppose our village's data is in the form of an `igraph` object `G`:
