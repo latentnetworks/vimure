@@ -55,7 +55,7 @@ After our preprocessing, the input data takes the form of the dataset given belo
 - `ego`: generally the requester, who is also referred to as $i$ in [@de_bacco_latent_2023] (required ✔️)
 - `alter`: generally the giver, also referred to as $j$ in [@de_bacco_latent_2023] (required ✔️)
 - `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2023] (required ✔️)
-- `prompt_type`: the prompt type that was given (optional)
+- `tie_type`: the prompt type that was given (optional)
 - `layer`: the tie type (optional)
 - `weight`: the weight of the edge (optional)
 
@@ -90,7 +90,7 @@ edgelist %>% dplyr::sample_n(size = 10, replace = FALSE)
 Alternatively, you might have your data as a **directed** `igraph` object. In this case, you must ensure that the `igraph` object has the following attributes:
 
 - `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2023] (required ✔️)
-- `prompt_type`: the prompt type that was given (optional)
+- `tie_type`: the prompt type that was given (optional)
 - `layer`: the tie type (optional)
 - `weight`: the weight of the edge (optional)
 
@@ -109,17 +109,9 @@ summary(G)
 which gives us the following summary:
 
 ```r
-IGRAPH e80f388 DNW- 324 625 -- 
-+ attr: name (v/c), reporter (e/c), prompt_type (e/c), weight (e/n)
+IGRAPH 8a150e4 DNW- 324 624 -- 
++ attr: name (v/c), reporter (e/n), tie_type (e/c), layer (e/c), weight (e/n)
 ```
-
-:::
-
-::: {.callout-note collapse="false"}
-
-Note that the summaries above implicitly assumes that all nodes are observed and are present in the data frame. If you have nodes that are reporters but do not appear in the `ego` or `alter` columns, they will be ignored by `VIMuRe`.
-
-There are ways to include these nodes in the model, but this is beyond the scope of this tutorial. A future tutorial will cover this topic. Add a comment to our [Discussions page](https://github.com/latentnetworks/vimure/discussions) if you have questions or you'd like to see this tutorial sooner.
 
 :::
 
@@ -132,15 +124,15 @@ There are ways to include these nodes in the model, but this is beyond the scope
 ## data.frame
 
 ```r
-unique_nodes <- dplyr::union(df_edges$ego, df_edges$alter) %>% unique()
+unique_nodes <- dplyr::union(edgelist$ego, edgelist$alter) %>% unique()
 
 cat("Number of nodes:", length(unique_nodes), "\n")
-cat("Number of edges:", nrow(df_edges), "\n")
+cat("Number of edges:", nrow(edgelist), "\n")
 ```
 
 ```text
 Number of nodes: 324
-Number of edges: 625 
+Number of edges: 624 
 ```
 
 ## `igraph` object
@@ -164,7 +156,7 @@ Number of edges: 625
 ## data.frame
 
 ```r
-reporters <- df_edges$reporter %>% unique()
+reporters <- edgelist$reporter %>% unique()
 cat("Number of reporters: ", length(reporters), "\n")
 ```
 
@@ -185,6 +177,27 @@ Number of reporters:  191
 
 :::
 
+::: {.callout-note collapse="false"}
+
+When running VIMuRe, if you do not inform the full list of reporters, VIMuRe will implicitly assume that only reporters who appeared in the `reporter` column (or in the igraph's edge attribute of the same name) were interviewed. That is, if you just pass the data frame or `igraph` object as above, VIMuRe will assume that there were 191 reporters.
+
+However, if you followed 💻 [Tutorial 01](/latest/tutorials/R/tutorial01-data-preparation.qmd), you might notice that at the end, you have 12 more reporters:
+
+```r
+# After running:
+data <- get_layer(...)
+
+length(data$reporter)
+```
+
+```text
+203
+```
+
+If these twelve additional reporters are present in the data as either ego or alter nodes in the network, you can inform VIMuRe about them. However, if they are not included in either of these columns, an error will occur. Our current implementation does not support "external reporters" yet. If this is a feature you would like to see sonner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
+
+:::
+
 ## Average number of ties per reporter
 
 There are a couple of things to note about this dataset: the maximum number of name generators is four, and reporters can only report on ties that they are a part of (e.g., if a reporter is not a part of a tie, they cannot report on it). Because we are modeling double-sampled questions, each reporter can report a maximum of 8 ties.
@@ -199,24 +212,24 @@ Let's create a plot to visualise the distribution of the number of ties per repo
 ```r
 # Create a plot_df to store the summary
 plot_df <- 
-  df_edges %>% 
-  group_by(prompt_type, reporter) %>% 
+  edgelist %>% 
+  group_by(tie_type, reporter) %>% 
   summarise(n_ties = n(), .groups="keep") %>%
-  group_by(n_ties, prompt_type) %>%
+  group_by(n_ties, tie_type) %>%
   summarise(n_reporters = n(), .groups="keep") %>%
-  arrange(n_ties, prompt_type)
+  arrange(n_ties, tie_type)
 ```
 
 ## `igraph` object
 
 ```r
 plot_df <- 
-  bind_cols(reporter=E(G)$reporter, prompt_type=E(G)$prompt_type) %>%
-  group_by(prompt_type, reporter) %>% 
+  bind_cols(reporter=E(G)$reporter, tie_type=E(G)$tie_type) %>%
+  group_by(tie_type, reporter) %>% 
   summarise(n_ties = n(), .groups="keep") %>%
-  group_by(n_ties, prompt_type) %>%
+  group_by(n_ties, tie_type) %>%
   summarise(n_reporters = n(), .groups="keep") %>%
-  arrange(n_ties, prompt_type)
+  arrange(n_ties, tie_type)
 ```
 :::
 
@@ -224,15 +237,15 @@ producing the following table:
 
 ::: {style="width:50%"}
 
-|   n_ties | prompt_type   |   n_reporters |
-|---------:|:--------------|--------------:|
-|        1 | borrowmoney   |            57 |
-|        1 | receivemoney  |            66 |
-|        2 | borrowmoney   |            92 |
-|        2 | receivemoney  |            85 |
-|        3 | borrowmoney   |            31 |
-|        3 | receivemoney  |            17 |
-|        4 | borrowmoney   |             1 |
+| n_ties|tie_type    | n_reporters|
+|------:|:-----------|-----------:|
+|      1|borrowmoney |          57|
+|      1|lendmoney   |          66|
+|      2|borrowmoney |          92|
+|      2|lendmoney   |          86|
+|      3|borrowmoney |          31|
+|      3|lendmoney   |          16|
+|      4|borrowmoney |           1|
 
 :::
 
@@ -245,12 +258,12 @@ Or, alternatively as a bar plot:
 g <- 
 (
   ggplot(plot_df, 
-    aes(x = n_ties, y=n_reporters, fill=prompt_type)) +
+    aes(x = n_ties, y=n_reporters, fill=tie_type)) +
   geom_col() +
 
-  scale_fill_manual(values = c("borrowmoney" = "#1f77b4", "receivemoney" = "#ff7f0e"),
+  scale_fill_manual(values = c("borrowmoney" = "#1f77b4", "lendmoney" = "#ff7f0e"),
                     labels = c("borrowmoney" = "Who borrows money from you?", 
-                               "receivemoney" = "Did you borrow money from anyone")) +
+                               "lendmoney" = "Who did you lend money to?")) +
   coord_flip() +
 
   # Keep the x-axis (y-axis after coord_flip) in descending order
@@ -262,12 +275,13 @@ g <-
        y = "Number of reporters",
        fill = "Prompt type")
 )
-g
+ggsave("tutorial02_fig01.png", g, width=6, height=4, dpi=300)
+
 ```
 
 </details>
 
-![](figures/tutorial02_fig01.png){width=50%}
+![](/latest/tutorials/R/tutorial02_fig01.png){width=50%}
 
 
 ## Union vs. Intersection and the concept of Concordance
@@ -286,17 +300,17 @@ $$
 
 ```r
 # Take the intersection: keep only records where 
-# both reporters report on the same tie in both prompt_types
+# both reporters report on the same tie in both tie_types
 df_intersection <- 
-  df_edges %>% 
+  edgelist %>% 
   group_by(ego, alter, .drop=FALSE) %>% 
   filter(n() == 2) %>% 
   select(ego, alter) %>%
   distinct()
 
 # Take the union: keep all ties reported 
-# irrespective of prompt_type and how many times they were reported
-df_union <- df_edges %>% select(ego, alter) %>% distinct()
+# irrespective of tie_type and how many times they were reported
+df_union <- edgelist %>% select(ego, alter) %>% distinct()
 
 # Concordance
 cat(paste0("Concordance is: ", nrow(df_intersection) / nrow(df_union)))
@@ -306,7 +320,7 @@ cat(paste0("Concordance is: ", nrow(df_intersection) / nrow(df_union)))
 
 ```r
 # Take the intersection: keep only records where
-# both reporters report on the same tie in both prompt_types
+# both reporters report on the same tie in both tie_types
 which_edges_intersection <- E(G)[count_multiple(G, E(G)) == 2]
 
 G_intersection <- 
@@ -314,7 +328,7 @@ G_intersection <-
   igraph::simplify()
 
 # Take the union: keep all ties reported
-# irrespective of prompt_type and how many times they were reported
+# irrespective of tie_type and how many times they were reported
 
 G_union <- igraph::simplify(G)
 
@@ -333,6 +347,6 @@ cat(
 producing:
 
 ```text
-Concordance is: 0.016260162601626018
+Concordance is: 0.0146341463414634
 ```
 

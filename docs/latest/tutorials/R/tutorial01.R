@@ -93,6 +93,7 @@ get_karnataka_survey_data <- function(
   reporters <- metadata %>%
     dplyr::filter(didsurv == 1) %>%
     dplyr::pull(pid) %>%
+    unique() %>%
     as.vector()
   nodes <- reporters %>% union(edgelist$ego) %>% union(edgelist$alter)
 

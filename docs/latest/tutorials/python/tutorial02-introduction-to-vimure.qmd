@@ -47,7 +47,7 @@ After our preprocessing, the input data takes the form of the dataset given belo
 - `ego`: generally the requester, who is also referred to as $i$ in [@de_bacco_latent_2023] (required ✔️)
 - `alter`: generally the giver, also referred to as $j$ in [@de_bacco_latent_2023] (required ✔️)
 - `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2023] (required ✔️)
-- `prompt_type`: the prompt type that was given (optional)
+- `tie_type`: the prompt type that was given (optional)
 - `layer`: the tie type (optional)
 - `weight`: the weight of the edge (optional)
 
@@ -77,7 +77,7 @@ edgelist.sample(n=10, random_state=1)
 Alternatively, you might have your data as a **directed** `igraph` object. In this case, you must ensure that the `igraph` object has the following attributes:
 
 - `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2023] (required ✔️)
-- `prompt_type`: the prompt type that was given (optional)
+- `tie_type`: the prompt type that was given (optional)
 - `layer`: the tie type (optional)
 - `weight`: the weight of the edge (optional)
 
@@ -86,33 +86,28 @@ Note that the igraph function assumes that the first two columns in the data fra
 ```python
 import igraph as ig
 
-g = ig.Graph.DataFrame(edgelist, directed=True, use_vids=False)
+G = ig.Graph.DataFrame(edgelist, directed=True, use_vids=False)
 ```
 
 Suppose our village's data is in the form of an `igraph` object `G`:
 
 ```python
-print(g.summary())
+print(G.summary())
 ```
 
 which gives us the following output:
 
 ```python
-IGRAPH DNW- 324 625 -- 
-+ attr: name (v), prompt_type (e), reporter (e), weight (e)
+IGRAPH DNW- 324 624 -- 
++ attr: name (v), layer (e), reporter (e), tie_type (e), weight (e)
 ```
 
 :::
 
-::: {.callout-note collapse="false"}
-
-Note that the summaries above implicitly assumes that all nodes are observed and are present in the data frame. If you have nodes that are reporters but do not appear in the `ego` or `alter` columns, they will be ignored by `VIMuRe`.
-
-There are ways to include these nodes in the model, but this is beyond the scope of this tutorial. A future tutorial will cover this topic. Add a comment to our [Discussions page](https://github.com/latentnetworks/vimure/discussions) if you have questions or you'd like to see this tutorial sooner.
-
-:::
 
 # 📊 Step 2: Summary statistics
+
+Let's take a closer look at how many nodes and edges we have in our data. We can also look at how many reporters we have in our data.
 
 ## Number of nodes and edges
 
@@ -121,24 +116,24 @@ There are ways to include these nodes in the model, but this is beyond the scope
 ## Data Frame
 
 ```python
-unique_nodes = pd.concat([df_edges['ego'], df_edges['alter']]).unique()
+unique_nodes = pd.concat([edgelist['ego'], edgelist['alter']]).unique()
 
 print(f"Number of nodes: {len(unique_nodes)}")
-print(f"Number of edges: {len(df_edges)}")
+print(f"Number of edges: {len(edgelist)}")
 ```
 
 which yields:
 
 ```text
 Number of nodes: 324
-Number of edges: 625
+Number of edges: 624
 ```
 
 ## `igraph` object
 
 ```python
-print(f"Number of nodes: {g.vcount()}")
-print(f"Number of edges: {g.ecount()}")
+print(f"Number of nodes: {G.vcount()}")
+print(f"Number of edges: {G.ecount()}")
 ```
 
 which yields:
@@ -156,7 +151,7 @@ Number of edges: 625
 ## Data Frame
 
 ```r
-reporters = df_edges["reporter"].unique()
+reporters = edgelist["reporter"].unique()
 print(f"Number of reporters: {len(reporters)}")
 ```
 
@@ -177,6 +172,27 @@ Number of reporters:  191
 
 :::
 
+::: {.callout-note collapse="false"}
+
+When running VIMuRe, if you do not inform the full list of reporters, VIMuRe will implicitly assume that only reporters who appeared in the `reporter` column (or in the igraph's edge attribute of the same name) were interviewed. That is, if you just pass the data frame or `igraph` object as above, VIMuRe will assume that there were 191 reporters.
+
+However, if you followed 💻 [Tutorial 01](/latest/tutorials/python/tutorial01-data-preparation.qmd), you might notice that at the end, you have 12 more reporters:
+
+```r
+# After running:
+edgelist, reporters <- get_layer(...)
+
+len(reporters)
+```
+
+```text
+203
+```
+
+If these twelve additional reporters are present in the data as either ego or alter nodes in the network, you can inform VIMuRe about them. However, if they are not included in either of these columns, an error will occur. Our current implementation does not support "external reporters" yet. If this is a feature you would like to see sonner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
+
+:::
+
 ## Average number of ties per reporter
 
 There are a couple of things to note about this dataset: the maximum number of name generators is four, and reporters can only report on ties that they are a part of (e.g., if a reporter is not a part of a tie, they cannot report on it). Because we are modeling double-sampled questions, each reporter can report a maximum of 8 ties.
@@ -191,13 +207,13 @@ Let's create a plot to visualise the distribution of the number of ties per repo
 # Create a plot_df to summarise the number of ties per reporter
 
 plot_df = (
-    df_edges.groupby(['prompt_type', 'reporter'])
+    edgelist.groupby(['tie_type', 'reporter'])
     .size()
     .reset_index(name='n_ties')
-    .groupby(['n_ties', 'prompt_type'])
+    .groupby(['n_ties', 'tie_type'])
     .size()
     .reset_index(name='n_reporters')
-    .sort_values(['n_ties', 'prompt_type'])
+    .sort_values(['n_ties', 'tie_type'])
 )
 ```
 
@@ -207,15 +223,15 @@ plot_df = (
 # Create a plot_df to summarise the number of ties per reporter
 
 plot_df = (
-    pd.DataFrame({attr: g.es[attr] for attr in ["reporter", "prompt_type"]})
+    pd.DataFrame({attr: G.es[attr] for attr in ["reporter", "tie_type"]})
     .groupby("reporter")
-    .apply(lambda x: x["prompt_type"].value_counts())
+    .apply(lambda x: x["tie_type"].value_counts())
     .reset_index(name="n_ties")
-    .rename(columns={"level_1": "prompt_type"})
-    .groupby(["n_ties", "prompt_type"])
+    .rename(columns={"level_1": "tie_type"})
+    .groupby(["n_ties", "tie_type"])
     .size()
     .reset_index(name="n_reporters")
-    .sort_values(["n_ties", "prompt_type"])
+    .sort_values(["n_ties", "tie_type"])
 )
 ```
 
@@ -225,15 +241,15 @@ producing the following table:
 
 ::: {style="width:50%"}
 
-|   n_ties | prompt_type   |   n_reporters |
-|---------:|:--------------|--------------:|
-|        1 | borrowmoney   |            57 |
-|        1 | receivemoney  |            66 |
-|        2 | borrowmoney   |            92 |
-|        2 | receivemoney  |            85 |
-|        3 | borrowmoney   |            31 |
-|        3 | receivemoney  |            17 |
-|        4 | borrowmoney   |             1 |
+|   n_ties | tie_type    |   n_reporters |
+|---------:|:------------|--------------:|
+|        1 | borrowmoney |            57 |
+|        1 | lendmoney   |            66 |
+|        2 | borrowmoney |            92 |
+|        2 | lendmoney   |            86 |
+|        3 | borrowmoney |            31 |
+|        3 | lendmoney   |            16 |
+|        4 | borrowmoney |             1 |
 
 :::
 
@@ -245,30 +261,33 @@ Or, alternatively as a bar plot:
 from plotnine import *
 
 
-ggplot(plot_df, aes(x = "n_ties", y="n_reporters", fill="prompt_type")) +
-geom_col() +
+g = (
+    ggplot(plot_df, aes(x = "n_ties", y="n_reporters", fill="tie_type")) +
+    geom_col() +
 
-scale_fill_manual(values = {"borrowmoney": "#1f77b4", 
-                            "receivemoney": "#ff7f0e"},
-                labels = {"borrowmoney": "Who borrows money from you?", 
-                            "receivemoney": "Did you borrow money from anyone"}) +
-coord_flip() +
+    scale_fill_manual(values = {"borrowmoney": "#1f77b4", "lendmoney": "#ff7f0e"},
+                    labels = ["Who borrows money from you?", "Who did you lend money to?"]) +
+    coord_flip() +
 
-# Keep the x-axis (y-axis after coord_flip) in descending order
-scale_x_reverse() +
+    # Keep the x-axis (y-axis after coord_flip) in descending order
+    scale_x_reverse() +
 
-theme_bw() +
-theme(legend_position = "bottom",
-    legend_box_spacing = 0.5) +
-labs(x = "Number of ties per reporter", 
-    y = "Number of reporters",
-    fill = "Prompt type")
+    theme_bw() +
+    theme(legend_position = "bottom",
+        legend_box_spacing = 0.5) +
+    labs(x = "Number of ties per reporter", 
+        y = "Number of reporters",
+        fill = "Prompt type")
+)
+
+ggsave(g, "tutorial02_fig01.png", width=6, height=4, dpi=300)
 
 ```
 
 </details>
 
-![](figures/tutorial02_fig01.png){width=50%}
+
+![](/latest/tutorials/python/tutorial02_fig01.png){width=50%}
 
 ## Union vs. Intersection and the concept of Concordance
 
@@ -285,17 +304,17 @@ $$
 
 ```python
 # Take the intersection: keep only records where 
-# both reporters report on the same tie in both prompt_types
+# both reporters report on the same tie in both tie_types
 df_intersection = (
-    df_edges.groupby(['ego', 'alter'], dropna=False)
+    edgelist.groupby(['ego', 'alter'], dropna=False)
     .filter(lambda x: len(x) == 2)
     .loc[:, ['ego', 'alter']]
     .drop_duplicates()
 )
 
 # Take the union: keep all ties reported 
-# irrespective of prompt_type and how many times they were reported
-df_union = df_edges.loc[:, ['ego', 'alter']].drop_duplicates()
+# irrespective of tie_type and how many times they were reported
+df_union = edgelist.loc[:, ['ego', 'alter']].drop_duplicates()
 
 # Concordance
 concordance = len(df_intersection) / len(df_union)
@@ -306,14 +325,14 @@ print(f"Concordance is: {concordance}")
 
 ```python
 # Take the intersection: keep only records where 
-# both reporters report on the same tie in both prompt_types
-which_edges_intersection = [e for e in g.es if g.count_multiple(e) == 2]
+# both reporters report on the same tie in both tie_types
+which_edges_intersection = [e for e in G.es if G.count_multiple(e) == 2]
 
-G_intersection = g.subgraph_edges(which_edges_intersection)
+G_intersection = G.subgraph_edges(which_edges_intersection)
 G_intersection = G_intersection.simplify()
 
 # Take the union: keep all ties reported 
-# irrespective of prompt_type and how many times they were reported
+# irrespective of tie_type and how many times they were reported
 G_union = G.simplify()
 
 # Concordance
@@ -325,7 +344,7 @@ print("Concordance is:", G_intersection.ecount() / G_union.ecount())
 producing:
 
 ```text
-Concordance is: 0.016260162601626018
+Concordance is: 0.014634146341463415
 ```
 
 # 📦 Use `vimure` package to run the model
@@ -341,7 +360,7 @@ import vimure as vm
 
 # Run the model
 model = vm.model.VimureModel()
-model.fit(df_edges, seed=1, num_realisations=1, max_iter=500)
+model.fit(edgelist, seed=1, num_realisations=1, max_iter=500)
 ```
 
 ## `igraph` object
