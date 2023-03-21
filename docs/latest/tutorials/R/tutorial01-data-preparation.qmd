@@ -66,7 +66,7 @@ The folder structure should look like this:
 
 ![](/figures/tutorials/jackson_download_zipfile.png){fig-alt="Screenshot of how folder structure should look like."}
 
-The data we need is within that `Data/Raw_csv/` folder, and looks like this:
+The data we need is within that `Data/Raw_csv/` folder, and look like this:
 
 ![](/figures/tutorials/karnataka_raw_csvs.png)
 
@@ -188,7 +188,7 @@ The `ALL_NA_CODES` variable is a vector of all the codes that, after inspection,
 ALL_NA_CODES <- c("9999999", "5555555", "7777777", "0")
 ```
 
-**What the data looks like**
+**What the data look like**
 
 The data is stored here as a node list, but it will need to be further pre-processed as an edge list:
 
@@ -236,7 +236,7 @@ tie_type <- "lendmoney"
 # Example with the lendmoney data
 edgelist_lendmoney <- tidyr::pivot_longer(lendmoney, cols=!V1, values_drop_na=TRUE)
 
-# View(edgelist_lendmoney) to see what the data looks like
+# View(edgelist_lendmoney) to see what the data look like
 ```
 
 This produces a bogus `name` column, which we can drop. We should also rename the columns to something more meaningful. It is **important** that we add a `respondent` column. This will be the `pid` of the individual who reported the relationship.
@@ -299,7 +299,7 @@ get_karnataka_survey_data <- function(
                                     visitcome = "visit"
                                   ),
                                 all_na_codes=c("9999999", "5555555", "7777777", "0"),
-                                raw_csv_folder="2010-0760_Data/Data/Raw_csv"){
+                                raw_csv_folder=RAW_CSV_FOLDER){
 
   # Filter the individual-level metadata to keep only the relevant village
   resp <- subset(indivinfo, indivinfo$village == village_id)
@@ -438,6 +438,9 @@ library(tidyverse)
 # Set the working directory accordingly
 # setwd("C:/Users/.../karnataka_survey")
 
+VALID_VILLAGE_IDS <- c(1:12, 14:21, 23:77) # village IDs 13 and 22 are missing
+RAW_CSV_FOLDER <- "2010-0760_Data/Data/Raw_csv"
+
 ties_layer_mapping = list(borrowmoney = "money",
                           lendmoney = "money",
                           giveadvice = "advice",
@@ -462,7 +465,7 @@ get_karnataka_survey_data <- function(
                                     visitcome = "visit"
                                   ),
                                 all_na_codes=c("9999999", "5555555", "7777777", "0"),
-                                raw_csv_folder="2010-0760_Data/Data/Raw_csv"){
+                                raw_csv_folder=RAW_CSV_FOLDER){
 
   # Filter the individual-level metadata to keep only the relevant village
   resp <- subset(indivinfo, indivinfo$village == village_id)
@@ -532,7 +535,8 @@ get_karnataka_survey_data <- function(
 
 }
 
-get_layer <- function(village_id, layer_name, indivinfo, raw_csv_folder="2010-0760_Data/Data/Raw_csv"){
+get_layer <- function(village_id, layer_name, indivinfo,
+                      raw_csv_folder=RAW_CSV_FOLDER){
 
   tie_types <- list(
     money = c("borrowmoney", "lendmoney"),
@@ -561,9 +565,6 @@ get_layer <- function(village_id, layer_name, indivinfo, raw_csv_folder="2010-07
 indivinfo <- haven::read_dta("datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta")
 indivinfo <- indivinfo[!duplicated(indivinfo$pid)==TRUE,] ## one individual (6109803) is repeated twice.
 
-VALID_VILLAGE_IDS <- c(1:12, 14:21, 23:77) # village IDs 13 and 22 are missing
-RAW_CSV_FOLDER <- "2010-0760_Data/Data/Raw_csv"
-
 for(i in VALID_VILLAGE_IDS){
   for(layer_name in c("money", "advice", "kerorice", "visit")){
     
@@ -577,7 +578,7 @@ for(i in VALID_VILLAGE_IDS){
 
     # Save the reporters
     reporters_file <- file.path(paste("village", i, "_", layer_name, "_reporters.csv", sep = ""))
-    write.csv(reporters, reporters_file, row.names = FALSE)
+    write.csv(data.frame(reporter=reporters), reporters_file, row.names = FALSE)
 
   }
 }

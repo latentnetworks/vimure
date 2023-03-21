@@ -1,6 +1,12 @@
 import os
 import pandas as pd
 
+# village IDs 13 and 22 are missing
+VALID_VILLAGE_IDS = [i for i in range(1, 77+1) if i != 13 and i != 22] 
+
+DEFAULT_METADATA_FILEPATH = "datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta" # nolint
+RAW_CSV_FOLDER = "2010-0760_Data/Data/Raw_csv"
+
 ties_layer_mapping={
     "borrowmoney": "money",
     "lendmoney": "money",
@@ -16,7 +22,7 @@ def get_karnataka_survey_data(village_id: int, tie_type: str,
                               indivinfo: pd.DataFrame,
                               ties_layer_mapping=ties_layer_mapping,
                               all_na_codes=["9999999", "5555555", "7777777", "0"],
-                              raw_csv_folder="2010-0760_Data/Data/Raw_csv"):
+                              raw_csv_folder=RAW_CSV_FOLDER):
     """
     Read the raw data for a given tie type and village id, 
     and return two dataframes: the edgelist and the list of respondents.
@@ -108,7 +114,7 @@ def get_karnataka_survey_data(village_id: int, tie_type: str,
     return edgelist, reporters
 
 def get_layer(village_id, layer_name, indivinfo, 
-              raw_csv_folder="2010-0760_Data/Data/Raw_csv"):
+              raw_csv_folder=RAW_CSV_FOLDER):
 
     tie_types = {
         "money": ["lendmoney", "borrowmoney"],
@@ -131,8 +137,6 @@ def get_layer(village_id, layer_name, indivinfo,
         reporters = reporters.union(reporters_)
 
     return edgelist, reporters
-
-DEFAULT_METADATA_FILEPATH = "datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta" # nolint
 
 def get_indivinfo(metadata_filepath=DEFAULT_METADATA_FILEPATH):
     indivinfo = pd.read_stata(metadata_filepath)
