@@ -281,7 +281,7 @@ ggsave("tutorial02_fig01.png", g, width=6, height=4, dpi=300)
 
 </details>
 
-![](/latest/tutorials/R/tutorial02_fig01.png){width=50%}
+![](/latest/tutorials/R/tutorial02_fig01.png){width=60%}
 
 
 ## Union vs. Intersection and the concept of Concordance
@@ -350,3 +350,8 @@ producing:
 Concordance is: 0.0146341463414634
 ```
 
+# 📦 Step 3: Use `vimure` package to run the model
+
+If you have already prepared your data (See 💻 [Tutorial 01](/latest/tutorials/R/tutorial01-data-preparation.qmd)), you can use the `vimure` package to run the model directly on your data.
+
+🚧 The remaining sections of this tutorial will be updated soon to mirror the equivalent [Python tutorial](/latest/tutorials/python/tutorial02-introduction-to-vimure.qmd).

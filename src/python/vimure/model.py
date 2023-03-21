@@ -20,8 +20,8 @@ from sklearn.exceptions import NotFittedError
 INF = 1e10
 DEFAULT_EPS = 1e-12
 DEFAULT_BIAS0 = 0.0
-DEFAULT_MAX_ITER = 20
-DEFAULT_NUM_REALISATIONS = 20
+DEFAULT_MAX_ITER = 500
+DEFAULT_NUM_REALISATIONS = 1
 
 
 class VimureModel(TransformerMixin, BaseEstimator):
@@ -107,12 +107,16 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 msg = "Ignoring unrecognised parameter %s." % extra_param
                 self.logger.warn(msg)
 
-        is_R_set = False
         if isinstance(X, pd.DataFrame):
             net_obj = read_from_edgelist(X)
             X = net_obj.X
-            R = net_obj.R
-            is_R_set = True
+            self.R = preprocess(net_obj.R)
+            
+            if "K" not in extra_params:
+                self.K = net_obj.K
+            else:
+                if extra_params["K"] is None:
+                    self.K = net_obj.K
 
         # If the network is undirected, then do not estimate the mutuality
         if self.undirected and not np.array_equal(
@@ -166,40 +170,43 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         self.L, self.N, self.M = X.shape[0], X.shape[1], X.shape[3]
 
-        if "K" in extra_params:
-            if extra_params["K"] is None:
-                self.K = np.max(X.vals) + 1
+        if self.K is None:
+            if "K" in extra_params:
+                if extra_params["K"] is None:
+                    self.K = np.max(X.vals) + 1
+
+                    # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
+                    msg = f"Parameter K was None. Defaulting to: {self.K}"
+                    warnings.warn(msg, UserWarning)
+                else:
+                    self.K = int(extra_params["K"])
+            else:
+
+                if isinstance(X, skt.sptensor):
+                    self.K = X.vals.max() + 1
+                else:
+                    self.K = int(X.max()) + 1
 
                 # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
                 msg = f"Parameter K was None. Defaulting to: {self.K}"
                 warnings.warn(msg, UserWarning)
+
+        if self.R is None:
+            if "R" in extra_params:
+                R = extra_params["R"]
+                if R.shape != (self.L, self.N, self.N, self.M):
+                    msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
+                    self.logger.error(msg)
+                    raise ValueError(msg)
             else:
-                self.K = int(extra_params["K"])
-        else:
+                msg = "Reporters Mask was not informed (parameter R). "
+                msg += "The model will assume that every reporter can report on any tie."
 
-            if isinstance(X, skt.sptensor):
-                self.K = X.vals.max() + 1
-            else:
-                self.K = int(X.max()) + 1
+                # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
+                warnings.warn(msg, UserWarning)
+                R = np.ones((self.L, self.N, self.N, self.M))
 
-            # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
-            msg = f"Parameter K was None. Defaulting to: {self.K}"
-            warnings.warn(msg, UserWarning)
-
-        if not is_R_set and "R" in extra_params:
-            R = extra_params["R"]
-            if R.shape != (self.L, self.N, self.N, self.M):
-                msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
-                self.logger.error(msg)
-                raise ValueError(msg)
-        else:
-            msg = "Reporters Mask was not informed (parameter R). "
-            msg += "The model will assume that every reporter can report on any tie."
-
-            # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
-            warnings.warn(msg, UserWarning)
-            R = np.ones((self.L, self.N, self.N, self.M))
-        self.R = preprocess(R)
+            self.R = preprocess(R)
 
         if "EPS" in extra_params:
             self.EPS = float(extra_params["EPS"])
@@ -1168,6 +1175,22 @@ class VimureModel(TransformerMixin, BaseEstimator):
             method = "rho_max"
 
         return methods[method](self, threshold)
+
+    def get_posterior_estimates(self):
+
+        if not hasattr(self, "rho_f"):
+            NotFittedError(
+                "This VimureModel instance is not fitted yet. "
+                "Call 'fit' with appropriate arguments before using this estimator"
+            )
+        
+        posterior_estimates = {
+            "rho": self.rho_f,
+            "theta": self.G_exp_theta_f,
+            "lambda": self.G_exp_lambda_f,
+            "nu": self.G_exp_nu_f
+        }
+        return posterior_estimates
 
     """
     UTILS

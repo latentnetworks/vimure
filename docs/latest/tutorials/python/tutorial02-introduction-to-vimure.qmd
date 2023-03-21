@@ -287,7 +287,7 @@ ggsave(g, "tutorial02_fig01.png", width=6, height=4, dpi=300)
 </details>
 
 
-![](/latest/tutorials/python/tutorial02_fig01.png){width=50%}
+![](/latest/tutorials/python/tutorial02_fig01.png){width=60%}
 
 ## Union vs. Intersection and the concept of Concordance
 
@@ -347,9 +347,9 @@ producing:
 Concordance is: 0.014634146341463415
 ```
 
-# 📦 Use `vimure` package to run the model
+# 📦 Step 3: Use `vimure` package to run the model
 
-If you have already prepared your data (See [Tutorial 01](/latest/tutorials/python/tutorial01-data-preparation.qmd)), you can use the `vimure` package to run the model directly on your data.
+If you have already prepared your data (See 💻 [Tutorial 01](/latest/tutorials/python/tutorial01-data-preparation.qmd)), you can use the `vimure` package to run the model directly on your data.
 
 ::: panel-tabset
 
@@ -360,7 +360,7 @@ import vimure as vm
 
 # Run the model
 model = vm.model.VimureModel()
-model.fit(edgelist, seed=1, num_realisations=1, max_iter=500)
+model.fit(edgelist)
 ```
 
 ## `igraph` object
@@ -370,7 +370,77 @@ import vimure as vm
 
 # Run the model
 model = vm.model.VimureModel()
-model.fit(g, seed=1, num_realisations=1, max_iter=500)
+model.fit(g)
 ```
 
 :::
+
+After which, you might be interested to look at the posterior estimates of the model parameters:
+
+```python
+# Returns a dictionary with the posterior estimates of the model parameters
+posterior_estimates = model.get_posterior_estimates()
+
+# Check which parameters were estimated
+posterior_estimates.keys()
+```
+
+```text
+dict_keys(['rho', 'theta', 'lambda', 'nu'])
+```
+
+We will look at what these mean in the next section.
+
+## Posteriors
+
+The four values you get from the `get_posterior_estimates()` method are the [geometric expectations](https://www.lesswrong.com/posts/DMxe4XKXnjyMEAAGw/the-geometric-expectation) of the distributions of the following parameters:
+
+| Parameter | Symbol | Description |
+|-----------|--------------|-------------|
+| `rho` | $\rho_{lijk}$ | The probability that a directed tie of weight $k-1$ exists between nodes $i$ and $j$ on a particular layer $l$|
+| `theta` | $\theta_{lm}$ | The "reliability" of a reporter $m$ on layer $l$|
+| `lambda` | $\lambda_{lk}$ | The latent contribution that $Y_l=k$ has on $\theta_{lm}$ |
+| `nu` | $\nu$ | The inferred mutuality for the network (latent equivalent to $\eta$)|
+
+: {tbl-colwidths="[10,10,80]"}
+
+Remember that the expected value of our model is:
+
+$$
+\mathbb{E} \left[X_{lijm}^{}|Y_{lij}^{} = k\right] = \theta_{lm}\lambda_{lk}^{}+\eta X_{ljim}^{}
+$$
+
+## Implicit assumptions
+
+The first think you might have noticed when you ran `model.fit()` were the warning messages:
+
+> ```UserWarning: The set of nodes was not informed, using ego and alter columns to infer nodes.```
+>
+> ```UserWarning: The set of reporters was not informed, assuming set(reporters) = set(nodes) and N = M.```
+>
+> ```UserWarning: Reporters Mask was not informed (parameter R). Parser will build it from reporter column, assuming a reporter can only report their own ties.```
+
+The messages are not errors; they are simply indications that the VIMuRe package has made some implicit assumptions when loading the data.  If you would like to set the nodes, reporters, and reporter mask explicitly, you can pass these values as arguments to the fit() method. For example:
+
+```python
+model.fit(edgelist, 
+          nodes=all_nodes, 
+          reporters=all_reporters, 
+          R=reporter_mask)
+```
+
+## A note on the reporter mask (`R`)
+
+While nodes and reporters are simple lists of strings, the reporter mask `R` is a multidimensional sparse logical array (a tensor) with dimensions $L \times N \times N \times N$. Here, `R[l, i, j, m]` indicates that reporter $m$ can report on the tie between $i$ and $j$ if the tie is belongs to layer $l$. 
+
+So, for example, if the survey design was such that reporters could only report on ties involving themselves, this implies in:
+
+\begin{cases}
+
+R_{lijm} = 1 & \text{if } i = m \text{ or } j = m \\
+R_{lijm} = 0 & \text{otherwise}.
+
+\end{cases}
+
+
+It's worth noting that the last dimension is $N$ instead of $M$. This is because the current implementation of the code assumes that all reporters are part of the network. The mathematical model, as described in [@de_bacco_latent_2023], is more flexible and supports an arbitrary set of reporters, whether they are a subset of nodes or not. However, we have not yet implemented this functionality in the code. Our survey designs have so far assumed that all reporters are part of the network, so this has not been a problem. If this is a feature you would like to see sonner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
