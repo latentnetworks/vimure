@@ -109,7 +109,7 @@ IGRAPH DNW- 324 624 --
 
 Let's take a closer look at how many nodes and edges we have in our data. We can also look at how many reporters we have in our data.
 
-## Number of nodes and edges
+## 2.1: Number of nodes and edges
 
 ::: panel-tabset
 
@@ -144,7 +144,7 @@ Number of edges: 625
 ```
 :::
 
-## Number of reporters
+## 2.2: Number of reporters
 
 ::: panel-tabset
 
@@ -191,9 +191,11 @@ len(reporters)
 
 If these twelve additional reporters are present in the data as either ego or alter nodes in the network, you can inform VIMuRe about them. However, if they are not included in either of these columns, an error will occur. Our current implementation does not support "external reporters" yet. If this is a feature you would like to see sonner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
 
+There is more to talk about how reporters are internally represented in VIMuRe. Read more about it on section [3.3: A note on the reporter mask (`R`)](#a-note-on-the-reporter-mask-r).
+
 :::
 
-## Average number of ties per reporter
+## 2.3: Average number of ties per reporter
 
 There are a couple of things to note about this dataset: the maximum number of name generators is four, and reporters can only report on ties that they are a part of (e.g., if a reporter is not a part of a tie, they cannot report on it). Because we are modeling double-sampled questions, each reporter can report a maximum of 8 ties.
 
@@ -289,7 +291,7 @@ ggsave(g, "tutorial02_fig01.png", width=6, height=4, dpi=300)
 
 ![](/latest/tutorials/python/tutorial02_fig01.png){width=60%}
 
-## Union vs. Intersection and the concept of Concordance
+## 2.4: Union vs. Intersection and the concept of Concordance
 
 Concordance is the proportion of the ties in the network that both reporters report. It measures the extent to which the two reporters agree about the network [@ready_measuring_2021]. It is calculated as follows:
 
@@ -386,21 +388,21 @@ posterior_estimates.keys()
 ```
 
 ```text
-dict_keys(['rho', 'theta', 'lambda', 'nu'])
+dict_keys(['nu', 'theta', 'lambda', 'rho'])
 ```
 
 We will look at what these mean in the next section.
 
-## Posteriors
+## 3.1: Posterior Estimates
 
 The four values you get from the `get_posterior_estimates()` method are the [geometric expectations](https://www.lesswrong.com/posts/DMxe4XKXnjyMEAAGw/the-geometric-expectation) of the distributions of the following parameters:
 
-| Parameter | Symbol | Description |
+| Parameter | Symbol       | Description |
 |-----------|--------------|-------------|
-| `rho` | $\rho_{lijk}$ | The probability that a directed tie of weight $k-1$ exists between nodes $i$ and $j$ on a particular layer $l$|
-| `theta` | $\theta_{lm}$ | The "reliability" of a reporter $m$ on layer $l$|
-| `lambda` | $\lambda_{lk}$ | The latent contribution that $Y_l=k$ has on $\theta_{lm}$ |
-| `nu` | $\nu$ | The inferred mutuality for the network (latent equivalent to $\eta$)|
+| `nu`      | $\nu$          | The inferred **mutuality** for the network (latent equivalent to $\eta$)|
+| `theta`   | $\theta_{lm}$  | The "reliability" of a reporter $m$ on layer $l$|
+| `lambda`  | $\lambda_{lk}$ | The latent contribution that $Y_l=k$ has on $\theta_{lm}$ |
+| `rho`     | $\rho_{lijk}$  | The probability that a directed tie of weight $k-1$ exists between nodes $i$ and $j$ on a particular layer $l$|
 
 : {tbl-colwidths="[10,10,80]"}
 
@@ -410,9 +412,299 @@ $$
 \mathbb{E} \left[X_{lijm}^{}|Y_{lij}^{} = k\right] = \theta_{lm}\lambda_{lk}^{}+\eta X_{ljim}^{}
 $$
 
-## Implicit assumptions
+where $X_{lijm}^{}$ is the observed value of the tie between nodes $i$ and $j$ reported by reporter $m$ on layer $l$ and $Y_{lij}^{}$ is the "ground truth" of the strength of the directed tie between nodes $i$ and $j$ on layer $l$.
 
-The first think you might have noticed when you ran `model.fit()` were the warning messages:
+In the subsections below, we will provide an explanation of $\nu$ and $\theta_{lm}$ parameters and how to reason about mutuality and "reliability" of reporters. $\rho$ and $\lambda$ are more technical and we will go into detail about them in a future tutorial. 
+
+**A quick note about $\rho$**
+
+If you want to extract a quick point estimate of the inferred network, you can simply take the expected value of $\rho$ for $k=1:
+
+```python
+# Expected value of rho for k=1
+rho = posterior_estimates['rho'][0,:,:,1]
+```
+
+The code above will return a $N \times N$ weighted adjacency matrix which can be thought of as the probability of a tie between individuals $i$ and $j$. More on that in the next tutorial.
+
+Now let's look at parameters $\nu$ and $\theta_{lm}$:
+
+### 3.1.1: Mutuality ($\nu$ or $\eta$)
+
+In our case study:
+
+```python
+posterior_estimates['nu']
+```
+
+```text
+0.6177802251078235
+```
+
+This indicates a large mutuality in the network. That is, if $i$ reports that $j$ comes to them for money, then $j$ is likely to report that $i$ comes to them as well.
+
+
+### 3.1.2: Reliability ($\theta_{lm}$)
+
+First let's look at the shape of the array:
+
+```python
+posterior_estimates['theta'].shape
+```
+
+```text
+(1, 324)
+```
+
+We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that there are 324 reporters in the network. 
+
+::: { .callout-note collapse="true"}
+
+## Another note on the number of reporters
+
+You might be wondering why there are so many reporters. After all, in Section [2.2: Number of reporters](#number-of-reporters), we calculated this number to be around 200! This is due to a technicality in the way the VIMuRe package handles the data. Our current implementation represents the total number of reporters, $M$ as $M = N$ (i.e. the number of nodes is equal to the number of reporters). 
+
+This is akin to saying each node has _the potential_ to be a reporter. But to control for which nodes are actually reporters, we use a binary mask, $R_{lijm}$, which is 1 if the node $m$ is a reporter on layer $l$ for the tie between nodes $i$ and $j$ and 0 otherwise. You can control how this mask is built by passing the `R` parameter to the `fit()` method. Read more about it on section [3.3: A note on the reporter mask (`R`)](#a-note-on-the-reporter-mask-r).
+
+Changing this is a priority for the next version of the package. But, as it is not a trivial change right now, we have decided to leave it as it is for now.
+
+:::
+
+**Ranking the reporters**
+
+Let's check which reporters have the highest $\theta$ values:
+
+<details><summary>Click to see the code</summary>
+
+```python
+# Get the node mapping: which node corresponds to which index in the array
+df_nodes = model.nodeNames
+
+# Which nodes are reporters?
+# Note: this assumes you have a `reporters` list from Tutorial 01
+# TODO: Check that the number of reporters is consistent
+id_reporters = df_nodes[df_nodes['name'].isin(reporters)]["id"].values
+
+# Get the reliability estimates for the reporters
+df_theta_reporters = pd.DataFrame({
+    "reporter_id": id_reporters,
+    "reporter_name": df_nodes.iloc[id_reporters]["name"].values,
+    "theta": posterior_estimates['theta'][0, id_reporters]
+})
+
+# Sort by reliability
+df_theta_reporters.sort_values(by="theta", ascending=False, inplace=True)
+
+df_theta_reporters.head()
+```
+</details>
+
+::: {style="width: 50%;"}
+
+|   reporter_id |   reporter_name |   theta |
+|--------------:|----------------:|--------:|
+|           124 |          113901 | 1.6657  |
+|            80 |          108801 | 1.66569 |
+|           102 |          110601 | 1.6086  |
+|           117 |          112801 | 1.60854 |
+|            54 |          105802 | 1.60854 |
+
+:::
+
+**How should we interpret the values?**
+
+The interpretation depends on both the mutuality of the network and the survey design. If the mutuality is high (as indicated by $\nu$ being closer to 1), reporters will tend to reciprocate the ties they report by default, and that reporters with high $\theta$ values (relative to the $\theta$ distribution) are likely "over-reporting" ties.
+
+To verify if this is the case for the network, let's examine the top reporter listed in the table above (113901).
+
+```python
+edgelist[edgelist["reporter"] == "113901"]
+```
+
+|    ego |   alter |   reporter | tie_type    | layer   |   weight |
+|-------:|--------:|-----------:|:------------|:--------|---------:|
+| 113901 |  **110201** |     113901 | lendmoney   | money   |        1 |
+| 113901 |  **114702** |     113901 | lendmoney   | money   |        1 |
+| **112901** |  113901 |     113901 | borrowmoney | money   |        1 |
+| **117301** |  113901 |     113901 | borrowmoney | money   |        1 |
+| **114101** |  113901 |     113901 | borrowmoney | money   |        1 |
+
+Reporter `113901` reports that `110201` and `114702` come to them for money and that they go to `112901`, `117301`, and `114101` for money. 
+
+But, we will notice that only 2 of these 5 nodes are reporters:
+
+```python
+[x for x in ["110201", "114702", "112901", "117301", "114101"] if x in reporters]
+```
+
+```text
+['114702', '117301']
+```
+
+That is, we cannot confirm these ties with other reporters (people were only asked about ties that involved themselves).
+
+On top of that, when we look at the reports made by the two reporters above, we see that none of them mention `113901`:
+
+```python
+edgelist[edgelist["reporter"].isin(["114702", "117301"])]
+```
+
+|    ego |   alter |   reporter | tie_type    | layer   |   weight |
+|-------:|--------:|-----------:|:------------|:--------|---------:|
+| 114702 |  111702 |     114702 | lendmoney   | money   |        1 |
+| 111702 |  114702 |     114702 | borrowmoney | money   |        1 |
+| 117301 |  107901 |     117301 | lendmoney   | money   |        1 |
+| 117301 |  116001 |     117301 | lendmoney   | money   |        1 |
+| 107901 |  117301 |     117301 | borrowmoney | money   |        1 |
+| 116001 |  117301 |     117301 | borrowmoney | money   |        1 |
+
+**What is the distribution of $\theta$ values?**
+
+Let's plot the distribution of $\theta$ values for the reporters:
+
+<details><summary>Click to see the code</summary>
+
+```python
+
+# plotnine is the python equivalent of ggplot2
+from plotnine import *
+
+# Plot the distribution of theta values
+g = (
+    ggplot(df_theta_reporters, aes(x="theta"))
+    + geom_histogram(bins=20)
+    # Make x labs a greek symbol
+    + labs(x=r"$\theta_m$", y="Count",
+           title="Distribution of theta values for reporters")
+    + theme_bw()
+)
+
+ggsave(g, "theta_reporters.png", width=7, height=4, dpi=300)
+```
+
+</details>
+
+![](figures/theta_reporters.png)
+
+**What does $\theta \approx 0$ represent in this example?**
+
+The huge peak at $\theta \approx 0$ represents the reporters who are not reporting most ties they are involved in. To make this point clearer, take a look at one of the reporters with $\theta \approx 0$ (117301):
+
+```python
+edgelist[edgelist["reporter"] == "117301"]
+```
+
+|    ego |   alter |   reporter | tie_type    | layer   |   weight |
+|-------:|--------:|-----------:|:------------|:--------|---------:|
+| 117301 |  107901 |     117301 | lendmoney   | money   |        1 |
+| 117301 |  116001 |     117301 | lendmoney   | money   |        1 |
+| 107901 |  117301 |     117301 | borrowmoney | money   |        1 |
+| 116001 |  117301 |     117301 | borrowmoney | money   |        1 |
+
+Now, if we search the edgelist, we will see that this node is reported by many other reporters:
+
+```python
+edgelist[(
+    ((edgelist["ego"] == "117301") | (edgelist["alter"] == "117301")) & 
+    (edgelist["reporter"] != "117301"))].sort_values(["reporter"])
+```
+
+::: {style="width: 50%;"}
+
+|    ego |   alter |   reporter | tie_type    | layer   |   weight |
+|-------:|--------:|-----------:|:------------|:--------|---------:|
+| 117301 |  103201 |     103201 | borrowmoney | money   |        1 |
+| 117301 |  103202 |     103202 | borrowmoney | money   |        1 |
+| 117301 |  105301 |     105301 | borrowmoney | money   |        1 |
+| 117301 |  105401 |     105401 | borrowmoney | money   |        1 |
+| 117301 |  105402 |     105402 | borrowmoney | money   |        1 |
+| 117301 |  105802 |     105802 | borrowmoney | money   |        1 |
+| 106701 |  117301 |     106701 | lendmoney   | money   |        1 |
+| 117301 |  108801 |     108801 | borrowmoney | money   |        1 |
+| 117301 |  109201 |     109201 | borrowmoney | money   |        1 |
+| 117301 |  109505 |     109505 | borrowmoney | money   |        1 |
+| 117301 |  113901 |     113901 | borrowmoney | money   |        1 |
+| 117301 |  113902 |     113902 | borrowmoney | money   |        1 |
+| 117301 |  114801 |     114801 | borrowmoney | money   |        1 |
+| 117301 |  115802 |     115802 | borrowmoney | money   |        1 |
+| 115802 |  117301 |     115802 | lendmoney   | money   |        1 |
+
+:::
+
+To avoid making inaccurate assumptions, it's important to refrain from categorically stating that a reporter with $\theta_m = 0$ is "under-reporting" ties. This is because the survey design can also impact how we interpret the results. For instance, in the Karnataka study, the name generators could only report a maximum of four ties per prompt. Therefore, in some cases, $\theta_m = 0$ might simply indicate that the reporter has reported all their available ties rather than deliberately withholding information.
+
+**What does $\theta \approx 1$ represent in this example?**
+
+There is a peak around $\theta \approx 1$, let's investigate what this means:
+
+```python
+df_theta_reporters[(
+    (df_theta_reporters["theta"] <= 1.05) & 
+    (df_theta_reporters["theta"] >= 0.95))]
+```
+
+::: {style="width: 50%;"}
+
+|   reporter_id |   reporter_name |    theta |
+|--------------:|----------------:|---------:|
+|           114 |          112601 | 1.03902  |
+|           123 |          113602 | 1.03532  |
+|           134 |          114802 | 1.02373  |
+|           316 |          106501 | 0.962386 |
+|           141 |          115809 | 0.96231  |
+|           317 |          106503 | 0.96216  |
+|            63 |          106704 | 0.962159 |
+|           318 |          108104 | 0.962158 |
+|           322 |          116301 | 0.962158 |
+|           314 |          104302 | 0.962158 |
+|           321 |          112604 | 0.962146 |
+|           319 |          108302 | 0.962143 |
+|           323 |          117105 | 0.962142 |
+|           136 |          115502 | 0.962142 |
+
+:::
+
+As an example, let's look at the reports made by `114802`:
+
+```python
+edgelist[edgelist["reporter"] == "114802"]
+```
+
+::: {style="width: 50%;"}
+
+|    ego |   alter |   reporter | tie_type    | layer   |   weight |
+|-------:|--------:|-----------:|:------------|:--------|---------:|
+| 114802 |  110202 |     114802 | lendmoney   | money   |        1 |
+| 110502 |  114802 |     114802 | borrowmoney | money   |        1 |
+| 110402 |  114802 |     114802 | borrowmoney | money   |        1 |
+| 110202 |  114802 |     114802 | borrowmoney | money   |        1 |
+
+:::
+
+Amonst the nodes reported, only `110502` is a reporter and it does not report any ties with `114802` (run `edgelist[edgelist["reporter"] == "110502"]` to verify this).
+
+Besides, another node (`113401`) reports ties with `114802`, but `114802` does not acknowledge any of these ties:
+
+```python
+edgelist[(
+    (edgelist["ego"] == "114802") | (edgelist["alter"] == "114802")) & 
+    (edgelist["reporter"] != "114802")].sort_values(["reporter"])
+```
+
+::: {style="width: 50%;"}
+
+|    ego |   alter |   reporter | tie_type    | layer   |   weight |
+|-------:|--------:|-----------:|:------------|:--------|---------:|
+| 113401 |  114802 |     113401 | lendmoney   | money   |        1 |
+| 114802 |  113401 |     113401 | borrowmoney | money   |        1 |
+
+:::
+
+Bear in mind that this other node (`113401`) has $\theta=0.000019$ and has not reported on several other ties. Which reporter is the most reliable? It is hard to say without knowing more about the survey design.
+
+## 3.2: Implicit assumptions
+
+You might have noticed the following warning messages when you ran `model.fit()`:
 
 > ```UserWarning: The set of nodes was not informed, using ego and alter columns to infer nodes.```
 >
@@ -420,7 +712,7 @@ The first think you might have noticed when you ran `model.fit()` were the warni
 >
 > ```UserWarning: Reporters Mask was not informed (parameter R). Parser will build it from reporter column, assuming a reporter can only report their own ties.```
 
-The messages are not errors; they are simply indications that the VIMuRe package has made some implicit assumptions when loading the data.  If you would like to set the nodes, reporters, and reporter mask explicitly, you can pass these values as arguments to the fit() method. For example:
+The messages are not errors; they are simply indications that the VIMuRe package has made some implicit assumptions when loading the data.  If you would like to set the nodes, reporters, and reporter mask _explicitly_, you can pass these values as arguments to the fit() method. For example:
 
 ```python
 model.fit(edgelist, 
@@ -429,7 +721,7 @@ model.fit(edgelist,
           R=reporter_mask)
 ```
 
-## A note on the reporter mask (`R`)
+## 3.3: A note on the reporter mask (`R`)
 
 While nodes and reporters are simple lists of strings, the reporter mask `R` is a multidimensional sparse logical array (a tensor) with dimensions $L \times N \times N \times N$. Here, `R[l, i, j, m]` indicates that reporter $m$ can report on the tie between $i$ and $j$ if the tie is belongs to layer $l$. 
 
@@ -442,5 +734,17 @@ R_{lijm} = 0 & \text{otherwise}.
 
 \end{cases}
 
+Depending on your survey design, you might want to construct `R` manually. For example, if all reporters were asked about all ties – regardless of whether they were involved in the ties or not – then `R` would be a multi-dimensional array of ones. We are planning a future tutorial on how to handle different survey designs.
 
-It's worth noting that the last dimension is $N$ instead of $M$. This is because the current implementation of the code assumes that all reporters are part of the network. The mathematical model, as described in [@de_bacco_latent_2023], is more flexible and supports an arbitrary set of reporters, whether they are a subset of nodes or not. However, we have not yet implemented this functionality in the code. Our survey designs have so far assumed that all reporters are part of the network, so this has not been a problem. If this is a feature you would like to see sonner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
+
+It's worth noting that currently the last dimension has size $N$ instead of $M$. This is because the current implementation of the code assumes that all reporters are part of the network. The mathematical model, as described in [@de_bacco_latent_2023], is more flexible and supports an arbitrary set of reporters, whether they are a subset of nodes or not. However, we have not yet implemented this functionality in the code. Our survey designs have so far assumed that all reporters are part of the network, so this has not been a problem. If this is a feature you would like to see sonner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
+
+# 4. Next steps
+
+Future tutorials will cover:
+
+- How to extract point estimates from the posterior distribution and visualise the resulting network
+- How to handle different survey designs
+- How to sample from the posterior distribution
+- (Advanced) Tweaking the optimization parameters
+- (Advanced) Understanding the convergence diagnostics

@@ -110,6 +110,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
         if isinstance(X, pd.DataFrame):
             net_obj = read_from_edgelist(X)
             X = net_obj.X
+
+            self.nodeNames = net_obj.nodeNames
             self.R = preprocess(net_obj.R)
             
             if "K" not in extra_params:
@@ -117,6 +119,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
             else:
                 if extra_params["K"] is None:
                     self.K = net_obj.K
+
+            
 
         # If the network is undirected, then do not estimate the mutuality
         if self.undirected and not np.array_equal(
@@ -1185,10 +1189,10 @@ class VimureModel(TransformerMixin, BaseEstimator):
             )
         
         posterior_estimates = {
-            "rho": self.rho_f,
+            "nu": self.G_exp_nu_f,
             "theta": self.G_exp_theta_f,
             "lambda": self.G_exp_lambda_f,
-            "nu": self.G_exp_nu_f
+            "rho": self.rho_f
         }
         return posterior_estimates
 
