@@ -34,7 +34,7 @@ import vimure as vm
 
 Here, we'll use the `VIMuRe` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1]. See 💻  [Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) for more details on how to prepare data for `VIMuRe`.
 
-We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship (i.e., we're asking $ego$ if they **go** to $alter$ for help, and also asking $alter$ if $ego$ **comes** to them for help). 
+We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship. If everyone in the network is being surveyed, then this should mean that we are eliciting information on a relationship twice (hence, "double sampling"): we're asking `ego` if they go to `alter` for help, and also asking `ego` if `alter` comes to them for help.
 
 Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will focus just on one tie type: the "visiting" relationship (based on two prompts: _"In your free time, whose house do you visit?" and "Who visits your house in his or her free time?"_). 
 
@@ -47,9 +47,9 @@ After our preprocessing, the input data takes the form of the dataset given belo
 - `ego`: generally the requester, who is also referred to as $i$ in [@de_bacco_latent_2023] (required ✔️)
 - `alter`: generally the giver, also referred to as $j$ in [@de_bacco_latent_2023] (required ✔️)
 - `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2023] (required ✔️)
-- `tie_type`: the prompt type that was given (optional)
-- `layer`: the tie type (optional)
-- `weight`: the weight of the edge (optional)
+- `tie_type`: the prompt type that was given, e.g., borrow money or lend money (optional)
+- `layer`: the relationship type, e.g., money (optional)
+- `weight`: the weight of the edge, e.g., the actual amount of money transferred (optional)
 
 Suppose we have a data frame `edgelist` of our village's data that looks like this:
 
@@ -74,14 +74,14 @@ edgelist.sample(n=10, random_state=1)
 
 ## Load `igraph` object
 
-Alternatively, you might have your data as a **directed** `igraph` object. In this case, you must ensure that the `igraph` object has the following attributes:
+Alternatively, you might have your data as a **directed** `igraph` object. In this case, you must ensure that the `igraph` object has the following **edge attributes**:
 
 - `reporter`: the person reporting on the tie, as referred to as $m$ in [@de_bacco_latent_2023] (required ✔️)
 - `tie_type`: the prompt type that was given (optional)
 - `layer`: the tie type (optional)
 - `weight`: the weight of the edge (optional)
 
-Note that the igraph function assumes that the first two columns in the data frame comprise the edge list (i.e., the $ego$ and $alter$ columns and treat all subsequent columns as edge attributes). 
+Note that the `igraph` function assumes that the first two columns in the data frame comprise the edge list (i.e., the $ego$ and $alter$ columns and treat all subsequent columns as edge attributes). 
 
 ```python
 import igraph as ig
@@ -197,7 +197,7 @@ There is more to talk about how reporters are internally represented in VIMuRe. 
 
 ## 2.3: Average number of ties per reporter
 
-There are a couple of things to note about this dataset: the maximum number of name generators is four, and reporters can only report on ties that they are a part of (e.g., if a reporter is not a part of a tie, they cannot report on it). Because we are modeling double-sampled questions, each reporter can report a maximum of 8 ties.
+There are a couple of things to note about this dataset: reporters could name a maximum of four alters for each question, and reporters can only report on ties that they are a part of (e.g., if a reporter is not part of a tie, they cannot report on it). Because we are modelling double-sampled questions, each reporter can report a maximum of 8 ties.
 
 Let's create a plot to visualise the distribution of the number of ties per reporter:
 
@@ -293,7 +293,7 @@ ggsave(g, "tutorial02_fig01.png", width=6, height=4, dpi=300)
 
 ## 2.4: Union vs. Intersection and the concept of Concordance
 
-Concordance is the proportion of the ties in the network that both reporters report. It measures the extent to which the two reporters agree about the network [@ready_measuring_2021]. It is calculated as follows:
+Concordance is the proportion of the ties in the network that both reporters report. It measures the extent to which the two reporters agree about the tie (see [@ready_measuring_2021] for a discussion of concordance in the Karnataka network data). It is calculated as follows:
 
 
 $$
@@ -401,7 +401,7 @@ The four values you get from the `get_posterior_estimates()` method are the [geo
 |-----------|--------------|-------------|
 | `nu`      | $\nu$          | The inferred **mutuality** for the network (latent equivalent to $\eta$)|
 | `theta`   | $\theta_{lm}$  | The "reliability" of a reporter $m$ on layer $l$|
-| `lambda`  | $\lambda_{lk}$ | The latent contribution that $Y_l=k$ has on $\theta_{lm}$ |
+| `lambda`  | $\lambda_{lk}$ | The latent contribution that $Y_l=k$ has on $\theta_{lm}$, where $k \in \{1, \ldots, K\}$ represents the weight of the tie. |
 | `rho`     | $\rho_{lijk}$  | The probability that a directed tie of weight $k-1$ exists between nodes $i$ and $j$ on a particular layer $l$|
 
 : {tbl-colwidths="[10,10,80]"}
@@ -414,11 +414,11 @@ $$
 
 where $X_{lijm}^{}$ is the observed value of the tie between nodes $i$ and $j$ reported by reporter $m$ on layer $l$ and $Y_{lij}^{}$ is the "ground truth" of the strength of the directed tie between nodes $i$ and $j$ on layer $l$.
 
-In the subsections below, we will provide an explanation of $\nu$ and $\theta_{lm}$ parameters and how to reason about mutuality and "reliability" of reporters. $\rho$ and $\lambda$ are more technical and we will go into detail about them in a future tutorial. 
+In the subsections below, we will provide an explanation of $\nu$ and $\theta_{lm}$ parameters and how to reason about the mutuality and "reliability" of reporters. $\rho$ and $\lambda$ are more technical and we will go into detail about them in a future tutorial. 
 
 **A quick note about $\rho$**
 
-If you want to extract a quick point estimate of the inferred network, you can simply take the expected value of $\rho$ for $k=1:
+If you want to extract a quick point estimate of the inferred network, you can simply take the expected value of $\rho$ for $k=1$:
 
 ```python
 # Expected value of rho for k=1
@@ -464,9 +464,9 @@ We only have one layer, so the first dimension is 1. The second dimension is the
 
 You might be wondering why there are so many reporters. After all, in Section [2.2: Number of reporters](#number-of-reporters), we calculated this number to be around 200! This is due to a technicality in the way the VIMuRe package handles the data. Our current implementation represents the total number of reporters, $M$ as $M = N$ (i.e. the number of nodes is equal to the number of reporters). 
 
-This is akin to saying each node has _the potential_ to be a reporter. But to control for which nodes are actually reporters, we use a binary mask, $R_{lijm}$, which is 1 if the node $m$ is a reporter on layer $l$ for the tie between nodes $i$ and $j$ and 0 otherwise. You can control how this mask is built by passing the `R` parameter to the `fit()` method. Read more about it on section [3.3: A note on the reporter mask (`R`)](#a-note-on-the-reporter-mask-r).
+This is akin to saying each node has _the potential_ to be a reporter. But to control for which nodes are actually reporters, we use a binary mask, $R_{lijm}$, which is 1 if the node $m$ is a reporter on layer $l$ for the tie between nodes $i$ and $j$ and 0 otherwise. You can control how this mask is built by passing the `R` parameter to the `fit()` method. Read more about it in section [3.3: A note on the reporter mask (`R`)](#a-note-on-the-reporter-mask-r).
 
-Changing this is a priority for the next version of the package. But, as it is not a trivial change right now, we have decided to leave it as it is for now.
+Changing this is a priority for the next version of the package. But, as it is not a trivial change, we have decided to leave it as it is for now.
 
 :::
 
@@ -513,7 +513,7 @@ df_theta_reporters.head()
 
 **How should we interpret the values?**
 
-The interpretation depends on both the mutuality of the network and the survey design. If the mutuality is high (as indicated by $\nu$ being closer to 1), reporters will tend to reciprocate the ties they report by default, and that reporters with high $\theta$ values (relative to the $\theta$ distribution) are likely "over-reporting" ties.
+The interpretation depends on both the mutuality of the network and the survey design. If the mutuality is high (as indicated by $\nu$ being closer to 1), reporters will tend to reciprocate the ties they report by default, and reporters with high $\theta$ values (relative to the $\theta$ distribution) are likely "over-reporting" ties.
 
 To verify if this is the case for the network, let's examine the top reporter listed in the table above (113901).
 
@@ -631,7 +631,7 @@ edgelist[(
 
 :::
 
-To avoid making inaccurate assumptions, it's important to refrain from categorically stating that a reporter with $\theta_m = 0$ is "under-reporting" ties. This is because the survey design can also impact how we interpret the results. For instance, in the Karnataka study, the name generators could only report a maximum of four ties per prompt. Therefore, in some cases, $\theta_m = 0$ might simply indicate that the reporter has reported all their available ties rather than deliberately withholding information.
+To avoid making inaccurate assumptions, it's important to refrain from categorically stating that a reporter with $\theta_m = 0$ is "under-reporting" ties. This is because the survey design can also impact how we interpret the results. For instance, in the Karnataka study, reporters could only report a maximum of four ties per prompt. Therefore, in some cases, $\theta_m = 0$ might simply indicate that the reporter has reported all their available ties or named all those that they see as salient, rather than deliberately withholding information.
 
 **What does $\theta \approx 1$ represent in this example?**
 
@@ -681,7 +681,7 @@ edgelist[edgelist["reporter"] == "114802"]
 
 :::
 
-Amonst the nodes reported, only `110502` is a reporter and it does not report any ties with `114802` (run `edgelist[edgelist["reporter"] == "110502"]` to verify this).
+Amongst the nodes reported, only `110502` is a reporter and it does not report any ties with `114802` (run `edgelist[edgelist["reporter"] == "110502"]` to verify this).
 
 Besides, another node (`113401`) reports ties with `114802`, but `114802` does not acknowledge any of these ties:
 
@@ -723,9 +723,9 @@ model.fit(edgelist,
 
 ## 3.3: A note on the reporter mask (`R`)
 
-While nodes and reporters are simple lists of strings, the reporter mask `R` is a multidimensional sparse logical array (a tensor) with dimensions $L \times N \times N \times N$. Here, `R[l, i, j, m]` indicates that reporter $m$ can report on the tie between $i$ and $j$ if the tie is belongs to layer $l$. 
+While nodes and reporters are simple lists of strings, the reporter mask `R` is a multidimensional sparse logical array (a tensor) with dimensions $L \times N \times N \times N$. Here, `R[l, i, j, m]` indicates that reporter $m$ can report on the tie between $i$ and $j$ if the tie belongs to layer $l$. 
 
-So, for example, if the survey design was such that reporters could only report on ties involving themselves, this implies in:
+So, for example, if the survey design was such that reporters could only report on ties involving themselves, this implies:
 
 \begin{cases}
 
@@ -737,7 +737,7 @@ R_{lijm} = 0 & \text{otherwise}.
 Depending on your survey design, you might want to construct `R` manually. For example, if all reporters were asked about all ties – regardless of whether they were involved in the ties or not – then `R` would be a multi-dimensional array of ones. We are planning a future tutorial on how to handle different survey designs.
 
 
-It's worth noting that currently the last dimension has size $N$ instead of $M$. This is because the current implementation of the code assumes that all reporters are part of the network. The mathematical model, as described in [@de_bacco_latent_2023], is more flexible and supports an arbitrary set of reporters, whether they are a subset of nodes or not. However, we have not yet implemented this functionality in the code. Our survey designs have so far assumed that all reporters are part of the network, so this has not been a problem. If this is a feature you would like to see sonner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
+It's worth noting that currently, the last dimension has size $N$ instead of $M$. This is because the current implementation of the code assumes that all reporters are part of the network. The mathematical model, as described in [@de_bacco_latent_2023], is more flexible and supports an arbitrary set of reporters, whether they are a subset of nodes or not. However, we have not yet implemented this functionality in the code. Our survey designs have so far assumed that all reporters are part of the network, so this has not been a problem. If this is a feature you would like to see sooner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
 
 # 4. Next steps
 
