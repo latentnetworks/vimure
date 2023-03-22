@@ -9,8 +9,6 @@ import pandas as pd
 import vimure as vm
 import sktensor as skt
 
-from typing import Any
-
 from . import karnataka_edgelist_vil1
 
 
@@ -527,7 +525,7 @@ class TestRealData:
     Using Karnataka data to test read_from_edgelist
     """
 
-    def test_not_inform_nodes_reporters(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
+    def test_not_inform_nodes_reporters(self, karnataka_edgelist_vil1):
         
         df, _, _ = karnataka_edgelist_vil1
 
@@ -588,7 +586,7 @@ class TestRealData:
             nodes_to = net_obj.R.subs[idxNodeTo][idx_reporting]
             assert np.logical_or(nodes_from == m, nodes_to == m).all(), msg % m
 
-    def test_inform_nodes_reporters(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
+    def test_inform_nodes_reporters(self, karnataka_edgelist_vil1):
         
         df, nodes, reporters = karnataka_edgelist_vil1
 

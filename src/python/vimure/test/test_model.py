@@ -1,4 +1,3 @@
-from typing import Any
 import pytest
 import logging
 
@@ -411,7 +410,7 @@ class TestInferredModel:
 
 class TestVimureRealData:
 
-    def test_internal_api(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
+    def test_internal_api(self, karnataka_edgelist_vil1):
     
         df, _, _ = karnataka_edgelist_vil1
 
@@ -425,7 +424,7 @@ class TestVimureRealData:
 
         check_final_parameters(model, net_obj)
 
-    def test_data_as_edgelist(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
+    def test_data_as_edgelist(self, karnataka_edgelist_vil1):
     
         df, _, _ = karnataka_edgelist_vil1
 

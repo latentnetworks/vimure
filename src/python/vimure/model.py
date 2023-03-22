@@ -174,7 +174,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         self.L, self.N, self.M = X.shape[0], X.shape[1], X.shape[3]
 
-        if self.K is None:
+        # If X was not passed as a DataFrame nor an igraph object...
+        if not hasattr(self, "K"):
             if "K" in extra_params:
                 if extra_params["K"] is None:
                     self.K = np.max(X.vals) + 1
@@ -195,7 +196,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 msg = f"Parameter K was None. Defaulting to: {self.K}"
                 warnings.warn(msg, UserWarning)
 
-        if self.R is None:
+        # If X was not passed as a DataFrame nor an igraph object...
+        if not hasattr(self, "R"):
             if "R" in extra_params:
                 R = extra_params["R"]
                 if R.shape != (self.L, self.N, self.N, self.M):
