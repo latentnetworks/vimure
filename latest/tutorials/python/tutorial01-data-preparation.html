@@ -237,6 +237,11 @@ div.csl-indent {
   <li><a href="#read-reports-per-relationship-type" id="toc-read-reports-per-relationship-type" class="nav-link" data-scroll-target="#read-reports-per-relationship-type">3.3 Read reports per relationship type</a></li>
   <li><a href="#pre-process-the-data-to-build-the-edge-list" id="toc-pre-process-the-data-to-build-the-edge-list" class="nav-link" data-scroll-target="#pre-process-the-data-to-build-the-edge-list">3.4. Pre-process the data to build the edge list</a></li>
   </ul></li>
+  <li><a href="#automating-the-process" id="toc-automating-the-process" class="nav-link" data-scroll-target="#automating-the-process">4. Automating the process</a>
+  <ul class="collapse">
+  <li><a href="#create-a-function-to-get-the-data-for-a-given-village-and-tie-type" id="toc-create-a-function-to-get-the-data-for-a-given-village-and-tie-type" class="nav-link" data-scroll-target="#create-a-function-to-get-the-data-for-a-given-village-and-tie-type">4.1. Create a function to get the data for a given village and tie type</a></li>
+  <li><a href="#getting-an-edgelist-per-layer" id="toc-getting-an-edgelist-per-layer" class="nav-link" data-scroll-target="#getting-an-edgelist-per-layer">4.2 Getting an edgelist per layer</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -284,61 +289,102 @@ Note
 </div>
 </div>
 <p>TLDR: By the end of this tutorial, you should produce a data frame in the following format:</p>
+<div style="width:60%;">
 <table class="table">
 <thead>
 <tr class="header">
-<th style="text-align: right;">respondent</th>
-<th style="text-align: right;">i</th>
-<th style="text-align: right;">j</th>
+<th style="text-align: right;">ego</th>
+<th style="text-align: right;">alter</th>
+<th style="text-align: right;">reporter</th>
 <th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
 <th style="text-align: right;">weight</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">100201</td>
-<td style="text-align: right;">107603</td>
-<td style="text-align: right;">100201</td>
+<td style="text-align: right;">103101</td>
+<td style="text-align: right;">103201</td>
+<td style="text-align: right;">103201</td>
 <td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">100202</td>
-<td style="text-align: right;">100201</td>
-<td style="text-align: right;">100202</td>
+<td style="text-align: right;">101201</td>
+<td style="text-align: right;">102901</td>
+<td style="text-align: right;">102901</td>
 <td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">100601</td>
-<td style="text-align: right;">101901</td>
-<td style="text-align: right;">100601</td>
-<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: right;">111904</td>
+<td style="text-align: right;">112602</td>
+<td style="text-align: right;">111904</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">100601</td>
-<td style="text-align: right;">102601</td>
-<td style="text-align: right;">100601</td>
+<td style="text-align: right;">113201</td>
+<td style="text-align: right;">104001</td>
+<td style="text-align: right;">104001</td>
 <td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">100601</td>
-<td style="text-align: right;">115501</td>
-<td style="text-align: right;">100601</td>
-<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: right;">101303</td>
+<td style="text-align: right;">115704</td>
+<td style="text-align: right;">101303</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">100602</td>
-<td style="text-align: right;">100501</td>
-<td style="text-align: right;">100602</td>
+<td style="text-align: right;">112901</td>
+<td style="text-align: right;">113601</td>
+<td style="text-align: right;">113601</td>
 <td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">104801</td>
+<td style="text-align: right;">104901</td>
+<td style="text-align: right;">104901</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">108803</td>
+<td style="text-align: right;">107503</td>
+<td style="text-align: right;">108803</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">102901</td>
+<td style="text-align: right;">103701</td>
+<td style="text-align: right;">103701</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">117202</td>
+<td style="text-align: right;">115504</td>
+<td style="text-align: right;">117202</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
 <td style="text-align: right;">1</td>
 </tr>
 </tbody>
 </table>
+</div>
 <section id="introduction" class="level1">
 <h1>Introduction</h1>
 <p>Before you start using <code>VIMuRe</code>, you need to prepare your data in a specific format. This tutorial will show you how to do that.</p>
@@ -354,12 +400,12 @@ Note
 <h1>Step 1: Download edgelist</h1>
 <p>Follow the steps below to download the data.</p>
 <ol type="1">
-<li>Click on [https://www.stanford.edu/~jacksonm/IndianVillagesDataFiles.zip) to download the dataset from Prof.&nbsp;<a href="https://web.stanford.edu/~jacksonm/">Matthew O. Jackson’s website</a> [^1]. This will download a file called <code>IndianVillagesDataFiles.zip</code> in your working directory.</li>
+<li>Click on <a href="https://www.stanford.edu/~jacksonm/IndianVillagesDataFiles.zip">this link</a> to download the dataset from Prof.&nbsp;<a href="https://web.stanford.edu/~jacksonm/">Matthew O. Jackson’s website</a> <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>. This will download a file called <code>IndianVillagesDataFiles.zip</code> in your working directory.</li>
 <li>Unzip the file. This will create a folder called <code>2010-0760_Data</code> in your working directory. 💡 Tip: you can use the <code>unzip()</code> function from within R to unzip the file.</li>
 </ol>
 <p>The folder structure should look like this:</p>
 <p><img src="../../../figures/tutorials/jackson_download_zipfile.png" class="img-fluid" alt="Screenshot of how folder structure should look like."></p>
-<p>The data we need is within that <code>Data/Raw_csv/</code> folder, and looks like this:</p>
+<p>The data we need is within that <code>Data/Raw_csv/</code> folder, and look like this:</p>
 <p><img src="../../../figures/tutorials/karnataka_raw_csvs.png" class="img-fluid"></p>
 </section>
 <section id="step-2-collect-individual-level-metadata" class="level1">
@@ -393,33 +439,46 @@ Note
 <section id="read-metadata" class="level2">
 <h2 class="anchored" data-anchor-id="read-metadata">3.1. Read metadata</h2>
 <p>Let’s first subset the individual-level metadata to keep only the relevant village:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Keep track of where the edgelist files are stored</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    RAW_CSV_FOLDER <span class="op">=</span> <span class="st">"2010-0760_Data/Data/Raw_csv"</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep track of where the edgelist files are stored</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>RAW_CSV_FOLDER <span class="op">=</span> <span class="st">"2010-0760_Data/Data/Raw_csv"</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Let's focus on just one village for now</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    selected_village <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's focus on just one village for now</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>selected_village <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter the individual-level metadata to keep only the relevant village</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> indivinfo[indivinfo[<span class="st">"village"</span>] <span class="op">==</span> <span class="dv">1</span>].copy()</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    resp[<span class="st">"didsurv"</span>] <span class="op">=</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter the individual-level metadata to keep only the relevant village</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>resp <span class="op">=</span> indivinfo[indivinfo[<span class="st">"village"</span>] <span class="op">==</span> <span class="dv">1</span>].copy()</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>resp[<span class="st">"didsurv"</span>] <span class="op">=</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>didsurv</code> column is a dummy variable that indicates whether the individual participated in the survey. We will need this information later to tell our Bayesian model who participated in the survey.</p>
+</div>
+</div>
 </section>
 <section id="read-village-data" class="level2">
 <h2 class="anchored" data-anchor-id="read-village-data">3.2. Read village data</h2>
 <p>Now, let’s read the <code>village_1.csv</code> file and merge it with the individual-level metadata:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>  village_file <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"village</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  indiv <span class="op">=</span> pd.read_csv(village_file, header <span class="op">=</span> <span class="va">None</span>, names<span class="op">=</span>[<span class="st">"hhid"</span>, <span class="st">"ppid"</span>, <span class="st">"gender"</span>, <span class="st">"age"</span>])</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>village_file <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"village</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>indiv <span class="op">=</span> pd.read_csv(village_file, header <span class="op">=</span> <span class="va">None</span>, names<span class="op">=</span>[<span class="st">"hhid"</span>, <span class="st">"ppid"</span>, <span class="st">"gender"</span>, <span class="st">"age"</span>])</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">## gender (1-Male, 2-Female)</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  indiv[<span class="st">"gender"</span>] <span class="op">=</span> indiv[<span class="st">"gender"</span>].<span class="bu">map</span>({<span class="dv">1</span>: <span class="st">"Male"</span>, <span class="dv">2</span>: <span class="st">"Female"</span>})</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">## gender (1-Male, 2-Female)</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>indiv[<span class="st">"gender"</span>] <span class="op">=</span> indiv[<span class="st">"gender"</span>].<span class="bu">map</span>({<span class="dv">1</span>: <span class="st">"Male"</span>, <span class="dv">2</span>: <span class="st">"Female"</span>})</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">## pre-process pid to match the format in the individual-level metadata</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  indiv[<span class="st">"ppid"</span>] <span class="op">=</span> indiv[<span class="st">"ppid"</span>].astype(<span class="bu">str</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  indiv[<span class="st">"hhid"</span>] <span class="op">=</span> indiv[<span class="st">"hhid"</span>].astype(<span class="bu">str</span>)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  indiv[<span class="st">"pid"</span>] <span class="op">=</span>  indiv.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="ss">f'</span><span class="sc">{</span>x[<span class="st">"hhid"</span>]<span class="sc">}{</span><span class="dv">0</span> <span class="cf">if</span> <span class="bu">len</span>(x[<span class="st">"ppid"</span>]) <span class="op">!=</span> <span class="dv">2</span> <span class="cf">else</span> <span class="va">None</span><span class="sc">}{</span>x[<span class="st">"ppid"</span>]<span class="sc">}</span><span class="ss">'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">## pre-process pid to match the format in the individual-level metadata</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>indiv[<span class="st">"ppid"</span>] <span class="op">=</span> indiv[<span class="st">"ppid"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>indiv[<span class="st">"hhid"</span>] <span class="op">=</span> indiv[<span class="st">"hhid"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>indiv[<span class="st">"pid"</span>] <span class="op">=</span>  indiv.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="ss">f'</span><span class="sc">{</span>x[<span class="st">"hhid"</span>]<span class="sc">}{</span><span class="dv">0</span> <span class="cf">if</span> <span class="bu">len</span>(x[<span class="st">"ppid"</span>]) <span class="op">!=</span> <span class="dv">2</span> <span class="cf">else</span> <span class="st">""</span><span class="sc">}{</span>x[<span class="st">"ppid"</span>]<span class="sc">}</span><span class="ss">'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">## Select only the relevant columns</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  selected_cols <span class="op">=</span> [<span class="st">"pid"</span>, <span class="st">"resp_status"</span>, <span class="st">"religion"</span>, <span class="st">"caste"</span>, <span class="st">"didsurv"</span>]</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  indiv <span class="op">=</span> pd.merge(indiv, resp[selected_cols], on<span class="op">=</span><span class="st">"pid"</span>, how<span class="op">=</span><span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">## Select only the relevant columns</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>selected_cols <span class="op">=</span> [<span class="st">"pid"</span>, <span class="st">"resp_status"</span>, <span class="st">"religion"</span>, <span class="st">"caste"</span>, <span class="st">"didsurv"</span>]</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>indiv <span class="op">=</span> pd.merge(indiv, resp[selected_cols], on<span class="op">=</span><span class="st">"pid"</span>, how<span class="op">=</span><span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Which produces a dataframe that looks like this:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">indiv.head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <table class="table">
@@ -517,27 +576,27 @@ Note
 <h2 class="anchored" data-anchor-id="read-reports-per-relationship-type">3.3 Read reports per relationship type</h2>
 <p>The survey that produced this data collected information on a number of different types of relationships, four of which were “double sampled” (i.e., asked about in two ways, who people <strong>go</strong> to for that type of support, and who <strong>comes</strong> to them). Specifically, they asked about borrowing and receiving money, giving and receiving advice, borrowing and lending household items like kerosene and rice, and visiting and receiving guests. These distinct questions are represented in the data files with the following names:</p>
 <ul>
+<li>lendmoney,</li>
 <li>borrowmoney,</li>
-<li>receivemoney,</li>
+<li>giveadvice,</li>
 <li>helpdecision,</li>
-<li>receiveadvice,</li>
-<li>keroricego,</li>
 <li>keroricecome,</li>
-<li>visitgo,</li>
+<li>keroricego,</li>
 <li>visitcome</li>
+<li>visitgo</li>
 </ul>
-<p>Each of these relationships is stored in a separate file. For example, the file <code>borrowmoney1.csv</code> contains information on who reported borrowing money from whom in village 1.</p>
+<p>Each of these relationships is stored in a separate file. For example, the file <code>lendmoney1.csv</code> contains information on who reported lending money to whom in village 1.</p>
 <p>We can read each of these files using the <code>pd.read_csv()</code> function. For example:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>filepath_borrowmoney <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"borrowmoney</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>borrowmoney <span class="op">=</span> pd.read_csv(filepath_borrowmoney, header<span class="op">=</span><span class="va">None</span>, na_values<span class="op">=</span>ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>filepath_lendmoney <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"lendmoney</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>lendmoney <span class="op">=</span> pd.read_csv(filepath_lendmoney, header<span class="op">=</span><span class="va">None</span>, na_values<span class="op">=</span>ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The <code>ALL_NA_CODES</code> variable is a vector of all the codes that, after inspection, we identified were used to represent missing values in the data:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ALL_NA_CODES <span class="op">=</span> [<span class="st">"9999999"</span>, <span class="st">"5555555"</span>, <span class="st">"7777777"</span>, <span class="st">"0"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>What the data looks like</strong></p>
+<p><strong>What the data look like</strong></p>
 <p>The data is stored here as a node list, but it will need to be further pre-processed as an edge list:</p>
+<div style="width:60%;">
 <table class="table">
 <thead>
 <tr class="header">
-<th style="text-align: right;"></th>
 <th style="text-align: right;">0</th>
 <th style="text-align: right;">1</th>
 <th style="text-align: right;">2</th>
@@ -551,7 +610,6 @@ Note
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0</td>
 <td style="text-align: right;">100201</td>
 <td style="text-align: right;">107603</td>
 <td style="text-align: right;">nan</td>
@@ -563,9 +621,8 @@ Note
 <td style="text-align: right;">nan</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">100202</td>
-<td style="text-align: right;">100201</td>
+<td style="text-align: right;">102902</td>
 <td style="text-align: right;">nan</td>
 <td style="text-align: right;">nan</td>
 <td style="text-align: right;">nan</td>
@@ -575,11 +632,10 @@ Note
 <td style="text-align: right;">nan</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">2</td>
 <td style="text-align: right;">100601</td>
 <td style="text-align: right;">101901</td>
 <td style="text-align: right;">102601</td>
-<td style="text-align: right;">115501</td>
+<td style="text-align: right;">nan</td>
 <td style="text-align: right;">nan</td>
 <td style="text-align: right;">nan</td>
 <td style="text-align: right;">nan</td>
@@ -587,7 +643,6 @@ Note
 <td style="text-align: right;">nan</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">3</td>
 <td style="text-align: right;">100602</td>
 <td style="text-align: right;">100501</td>
 <td style="text-align: right;">101902</td>
@@ -599,7 +654,6 @@ Note
 <td style="text-align: right;">nan</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">4</td>
 <td style="text-align: right;">100701</td>
 <td style="text-align: right;">100801</td>
 <td style="text-align: right;">102101</td>
@@ -610,30 +664,20 @@ Note
 <td style="text-align: right;">nan</td>
 <td style="text-align: right;">nan</td>
 </tr>
-<tr class="even">
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">100702</td>
-<td style="text-align: right;">100801</td>
-<td style="text-align: right;">104001</td>
-<td style="text-align: right;">nan</td>
-<td style="text-align: right;">nan</td>
-<td style="text-align: right;">nan</td>
-<td style="text-align: right;">nan</td>
-<td style="text-align: right;">nan</td>
-<td style="text-align: right;">nan</td>
-</tr>
 </tbody>
 </table>
+</div>
 <p>Each row represents reports made by a single individual; the first number is the <code>pid</code> (the “person identifier”) of the individual who reported the relationship, whereas the remaining however many numbers listed in the same row are the <code>pid</code>s of the individuals who were reported to be involved in the relationship.</p>
 </section>
 <section id="pre-process-the-data-to-build-the-edge-list" class="level2">
 <h2 class="anchored" data-anchor-id="pre-process-the-data-to-build-the-edge-list">3.4. Pre-process the data to build the edge list</h2>
 <p>We want the network data to be in the following format, plus a few additional columns:</p>
+<div style="width:20%;">
 <table class="table">
 <thead>
 <tr class="header">
-<th style="text-align: right;">i</th>
-<th style="text-align: right;">j</th>
+<th style="text-align: right;">ego</th>
+<th style="text-align: right;">alter</th>
 </tr>
 </thead>
 <tbody>
@@ -679,197 +723,503 @@ Note
 </tr>
 </tbody>
 </table>
+</div>
 <p>To achieve this, we will need to <a href="https://pandas.pydata.org/docs/user_guide/reshaping.html#pivot-tables">pivot</a> the data.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>tie_type <span class="op">=</span> <span class="st">"borrowmoney"</span></span>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>tie_type <span class="op">=</span> <span class="st">"lendmoney"</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Example with the borrowmoney data</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.melt(borrowmoney, id_vars<span class="op">=</span>[<span class="dv">0</span>]).dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Example with the lendmoney data</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>edgelist_lendmoney <span class="op">=</span> pd.melt(lendmoney, id_vars<span class="op">=</span>[<span class="dv">0</span>]).dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This produces a bogus <code>variable</code> column, which we can drop. We should also rename the columns to something more meaningful. It is <strong>important</strong> that we add a <code>respondent</code> column. This will be the <code>pid</code> of the individual who reported the relationship.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.drop(columns<span class="op">=</span><span class="st">"variable"</span>)<span class="op">\</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>       .rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">"i"</span>, <span class="st">"value"</span>: <span class="st">"j"</span>})<span class="op">\</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>       .assign(respondent<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="st">"i"</span>])</span>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>edgelist_lendmoney <span class="op">=</span> edgelist_lendmoney.drop(columns<span class="op">=</span><span class="st">"variable"</span>)<span class="op">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>       .rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">"ego"</span>, <span class="st">"value"</span>: <span class="st">"alter"</span>})<span class="op">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>       .assign(reporter<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="st">"ego"</span>])</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's also add a column for the tie type</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.assign(tie_type<span class="op">=</span>tie_type)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>edgelist_lendmoney <span class="op">=</span> edgelist_lendmoney.assign(tie_type<span class="op">=</span>tie_type)</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Let's add a weight column too</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.assign(weight<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Now, if the question was “Did you borrow money from anyone?”, then the <code>i</code> column should be the respondent, and the <code>j</code> column should be the person who was reported to have borrowed money from the respondent. However, if the question was “Did anyone borrow money from you?”, then the <code>i</code> column should be the person who was reported to have borrowed money from the respondent, and the <code>j</code> column should be the respondent. We can use the <code>tie_type</code> variable to determine which of these two scenarios applies.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> tie_type <span class="kw">in</span> [<span class="st">"borrowmoney"</span>, <span class="st">"keroricego"</span>, <span class="st">"visitgo"</span>]:</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.rename(columns<span class="op">=</span>{<span class="st">"i"</span>: <span class="st">"j"</span>, <span class="st">"j"</span>: <span class="st">"i"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Let’s reorder the columns to guarantee we can <code>rbind</code> the data frames of all relationship tipes together later.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">"respondent"</span>, <span class="st">"i"</span>, <span class="st">"j"</span>, <span class="st">"tie_type"</span>, <span class="st">"weight"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>which produces the following data frame:</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>edgelist_lendmoney <span class="op">=</span> edgelist_lendmoney.assign(weight<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>producing <code>edgelist_lendmoney.head()</code>:</p>
+<div style="width:50%;">
 <table class="table">
 <thead>
 <tr class="header">
-<th style="text-align: right;"></th>
-<th style="text-align: right;">respondent</th>
-<th style="text-align: right;">i</th>
-<th style="text-align: right;">j</th>
+<th style="text-align: right;">ego</th>
+<th style="text-align: right;">alter</th>
+<th style="text-align: right;">reporter</th>
 <th style="text-align: left;">tie_type</th>
 <th style="text-align: right;">weight</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: right;">0</td>
 <td style="text-align: right;">100201</td>
 <td style="text-align: right;">107603</td>
 <td style="text-align: right;">100201</td>
-<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">lendmoney</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">1</td>
 <td style="text-align: right;">100202</td>
-<td style="text-align: right;">100201</td>
+<td style="text-align: right;">102902</td>
 <td style="text-align: right;">100202</td>
-<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">lendmoney</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">2</td>
 <td style="text-align: right;">100601</td>
 <td style="text-align: right;">101901</td>
 <td style="text-align: right;">100601</td>
-<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">lendmoney</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="even">
-<td style="text-align: right;">3</td>
 <td style="text-align: right;">100602</td>
 <td style="text-align: right;">100501</td>
 <td style="text-align: right;">100602</td>
-<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">lendmoney</td>
 <td style="text-align: right;">1</td>
 </tr>
 <tr class="odd">
-<td style="text-align: right;">4</td>
 <td style="text-align: right;">100701</td>
 <td style="text-align: right;">100801</td>
 <td style="text-align: right;">100701</td>
-<td style="text-align: left;">borrowmoney</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="even">
-<td style="text-align: right;">5</td>
-<td style="text-align: right;">100702</td>
-<td style="text-align: right;">100801</td>
-<td style="text-align: right;">100702</td>
-<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">lendmoney</td>
 <td style="text-align: right;">1</td>
 </tr>
 </tbody>
 </table>
-<p><strong>The above is the format we want the data to be in! This format will make it easier to work with <code>VIMuRe</code>.</strong></p>
-<p>Use the full pre-processing script below to pre-process all the data for all tie types and save it to a single <code>vil1_edges.csv</code> file. We also save the <code>indiv</code> data frame to a <code>vil1_meta.csv</code> file.</p>
+</div>
+<p>So far, we only added <code>tie_type = "lendmoney"</code> to the data frame, but to make full use of VIMuRe, we also need to add the “flipped question” to the data frame, which in this case is <code>tie_type = "borrowmoney"</code>. This is because the survey asked two different questions about borrowing and receiving money. <strong>The process is the same as before, except that we need to flip the <code>ego</code> and <code>alter</code> columns at the end.</strong></p>
+<p>There are also some other data cleaning steps that we need to perform: remove self-loops, remove duplicates and keep only reports made by registered reporters. We will do all of that inside a function in the next section, to make it easier to re-use.</p>
+</section>
+</section>
+<section id="automating-the-process" class="level1">
+<h1>4. Automating the process</h1>
+<section id="create-a-function-to-get-the-data-for-a-given-village-and-tie-type" class="level2">
+<h2 class="anchored" data-anchor-id="create-a-function-to-get-the-data-for-a-given-village-and-tie-type">4.1. Create a function to get the data for a given village and tie type</h2>
+<p>This function will also take care of the data cleaning steps that we described in the previous section. Importantly, it will also map the double-sampled tie types to the layer names we will use in VIMuRe.</p>
+<details>
+<summary>
+Click here to expand the code for the <code>get_karnataka_survey_data()</code> function
+</summary>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_karnataka_survey_data(village_id: <span class="bu">int</span>, tie_type: <span class="bu">str</span>,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                              indivinfo: pd.DataFrame,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                              ties_layer_mapping<span class="op">=</span>{</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"borrowmoney"</span>: <span class="st">"money"</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"lendmoney"</span>: <span class="st">"money"</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"giveadvice"</span>: <span class="st">"advice"</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"helpdecision"</span>: <span class="st">"advice"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"keroricego"</span>: <span class="st">"kerorice"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"keroricecome"</span>: <span class="st">"kerorice"</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"visitgo"</span>: <span class="st">"visit"</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"visitcome"</span>: <span class="st">"visit"</span>,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                              },</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                              all_na_codes<span class="op">=</span>[<span class="st">"9999999"</span>, <span class="st">"5555555"</span>, <span class="st">"7777777"</span>, <span class="st">"0"</span>],</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                              raw_csv_folder<span class="op">=</span>RAW_CSV_FOLDER):</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="co">    Read the raw data for a given tie type and village id, </span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a><span class="co">    and return two dataframes: the edgelist and the list of respondents.</span></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a><span class="co">    village_id : int</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a><span class="co">        The village id, between 1 and 10.</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a><span class="co">    tie_type : str</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a><span class="co">        The tie type</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a><span class="co">    indivinfo : pd.DataFrame</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a><span class="co">        The individual-level metadata</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a><span class="co">    all_na_codes : list, optional</span></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="co">        The list of codes that should be interpreted as missing values, by default ["9999999", "5555555", "7777777", "0"]</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a><span class="co">    raw_csv_folder : str, optional</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a><span class="co">        The path to the folder containing the raw csv files, by default "2010-0760_Data/Data/Raw_csv"</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a><span class="co">    edgelist : pd.DataFrame</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a><span class="co">        The edgelist</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a><span class="co">    respondents : list</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a><span class="co">        The respondent metadata</span></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter the individual-level metadata to keep only the relevant village</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> indivinfo[indivinfo[<span class="st">"village"</span>] <span class="op">==</span> village_id].copy()</span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>    resp[<span class="st">"didsurv"</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a>    village_file <span class="op">=</span> os.path.join(raw_csv_folder, <span class="ss">f"village</span><span class="sc">{</span>village_id<span class="sc">}</span><span class="ss">.csv"</span>)</span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>    metadata <span class="op">=</span> pd.read_csv(village_file, header <span class="op">=</span> <span class="va">None</span>, names<span class="op">=</span>[<span class="st">"hhid"</span>, <span class="st">"ppid"</span>, <span class="st">"gender"</span>, <span class="st">"age"</span>])</span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>    <span class="co">## gender (1-Male, 2-Female)</span></span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>    metadata[<span class="st">"gender"</span>] <span class="op">=</span> metadata[<span class="st">"gender"</span>].<span class="bu">map</span>({<span class="dv">1</span>: <span class="st">"Male"</span>, <span class="dv">2</span>: <span class="st">"Female"</span>})</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a>    <span class="co">## pre-process pid to match the format in the individual-level metadata</span></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a>    metadata[<span class="st">"ppid"</span>] <span class="op">=</span> metadata[<span class="st">"ppid"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a>    metadata[<span class="st">"hhid"</span>] <span class="op">=</span> metadata[<span class="st">"hhid"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>    metadata[<span class="st">"pid"</span>] <span class="op">=</span>  metadata.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="ss">f'</span><span class="sc">{</span>x[<span class="st">"hhid"</span>]<span class="sc">}{</span><span class="dv">0</span> <span class="cf">if</span> <span class="bu">len</span>(x[<span class="st">"ppid"</span>]) <span class="op">!=</span> <span class="dv">2</span> <span class="cf">else</span> <span class="st">""</span><span class="sc">}{</span>x[<span class="st">"ppid"</span>]<span class="sc">}</span><span class="ss">'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>    <span class="co">## Select only the relevant columns</span></span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>    selected_cols <span class="op">=</span> [<span class="st">"pid"</span>, <span class="st">"resp_status"</span>, <span class="st">"religion"</span>, <span class="st">"caste"</span>, <span class="st">"didsurv"</span>]</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>    metadata <span class="op">=</span> pd.merge(metadata, resp[selected_cols], on<span class="op">=</span><span class="st">"pid"</span>, how<span class="op">=</span><span class="st">"left"</span>)</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Read the raw data</span></span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>    filepath <span class="op">=</span> os.path.join(raw_csv_folder, <span class="ss">f"</span><span class="sc">{</span>tie_type<span class="sc">}{</span>village_id<span class="sc">}</span><span class="ss">.csv"</span>)</span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>    df_raw <span class="op">=</span> pd.read_csv(filepath, header<span class="op">=</span><span class="va">None</span>, na_values<span class="op">=</span>all_na_codes, dtype<span class="op">=</span><span class="bu">str</span>)</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Example with the data</span></span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> pd.melt(df_raw, id_vars<span class="op">=</span>[<span class="dv">0</span>]).dropna()</span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist.drop(columns<span class="op">=</span><span class="st">"variable"</span>)<span class="op">\</span></span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a>          .rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">"ego"</span>, <span class="st">"value"</span>: <span class="st">"alter"</span>})<span class="op">\</span></span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>          .assign(reporter<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="st">"ego"</span>])</span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Let's also add a column for the tie type</span></span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist.assign(tie_type<span class="op">=</span>tie_type)</span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Let's add a weight column too</span></span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist.assign(weight<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If the question was "Did you borrow money from anyone?", then we need to flip the ego and alter columns</span></span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> tie_type <span class="kw">in</span> [<span class="st">"borrowmoney"</span>, <span class="st">"helpdecision"</span>, <span class="st">"keroricego"</span>, <span class="st">"visitgo"</span>]:</span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a>        edgelist <span class="op">=</span> edgelist.rename(columns<span class="op">=</span>{<span class="st">"ego"</span>: <span class="st">"alter"</span>, <span class="st">"alter"</span>: <span class="st">"ego"</span>})</span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a>    edgelist[<span class="st">"layer"</span>] <span class="op">=</span> edgelist[<span class="st">"tie_type"</span>].<span class="bu">map</span>(ties_layer_mapping)</span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Reorder the columns to make it easier to read</span></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist[[<span class="st">"ego"</span>, <span class="st">"alter"</span>, <span class="st">"reporter"</span>, <span class="st">"tie_type"</span>, <span class="st">"layer"</span>, <span class="st">"weight"</span>]]</span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>    <span class="co">#### Further pre-processing steps ####</span></span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Who could actually report on the ties?</span></span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a>    reporters <span class="op">=</span> <span class="bu">set</span>(metadata[metadata[<span class="st">"didsurv"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"pid"</span>])</span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>    nodes <span class="op">=</span> reporters.union(<span class="bu">set</span>(edgelist[<span class="st">"ego"</span>])).union(<span class="bu">set</span>(edgelist[<span class="st">"alter"</span>]))</span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Only keep reports made by those who were MARKED as reporters in metadata CSV</span></span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist[edgelist[<span class="st">"reporter"</span>].isin(reporters)].copy()</span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove self-loops</span></span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist[edgelist[<span class="st">"ego"</span>] <span class="op">!=</span> edgelist[<span class="st">"alter"</span>]].copy()</span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove duplicates</span></span>
+<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a>    edgelist.drop_duplicates(inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> edgelist, reporters</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</section>
+<section id="getting-an-edgelist-per-layer" class="level2">
+<h2 class="anchored" data-anchor-id="getting-an-edgelist-per-layer">4.2 Getting an edgelist per layer</h2>
+<p>Each double-sampled tie type is mapped to a layer in VIMuRe. The mapping can be seen in the function we created above and is also shown below.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ties_layer_mapping<span class="op">=</span>{</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"borrowmoney"</span>: <span class="st">"money"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lendmoney"</span>: <span class="st">"money"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"giveadvice"</span>: <span class="st">"advice"</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"helpdecision"</span>: <span class="st">"advice"</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"keroricego"</span>: <span class="st">"kerorice"</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"keroricecome"</span>: <span class="st">"kerorice"</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"visitgo"</span>: <span class="st">"visit"</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"visitcome"</span>: <span class="st">"visit"</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Therefore, to get the edgelist for, say the <code>money</code> layer, we need to combine the <code>borrowmoney</code> and <code>lendmoney</code> tie types. We can do this by using the <code>get_karnataka_survey_data</code> function we created above.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the edgelist for the money layer</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>edgelist_lendmoney, respondents <span class="op">=\</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  get_karnataka_survey_data(village_id<span class="op">=</span><span class="dv">1</span>, tie_type<span class="op">=</span><span class="st">"lendmoney"</span>, indivinfo<span class="op">=</span>indivinfo)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>edgelist_borrowmoney, _ <span class="op">=</span> <span class="op">\</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  get_karnataka_survey_data(village_id<span class="op">=</span><span class="dv">1</span>, tie_type<span class="op">=</span><span class="st">"borrowmoney"</span>, indivinfo<span class="op">=</span>indivinfo)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>edgelist_money <span class="op">=</span> pd.concat([edgelist_lendmoney, edgelist_borrowmoney], axis<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>which now gives us all the edges for the <code>money</code> layer:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>edgelist_money.sample(n<span class="op">=</span><span class="dv">10</span>, random_state<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div style="width:60%;">
+<table class="table">
+<colgroup>
+<col style="width: 7%">
+<col style="width: 12%">
+<col style="width: 13%">
+<col style="width: 18%">
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;"></th>
+<th style="text-align: right;">ego</th>
+<th style="text-align: right;">alter</th>
+<th style="text-align: right;">reporter</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">235</td>
+<td style="text-align: right;">103101</td>
+<td style="text-align: right;">103201</td>
+<td style="text-align: right;">103201</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">229</td>
+<td style="text-align: right;">101201</td>
+<td style="text-align: right;">102901</td>
+<td style="text-align: right;">102901</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">130</td>
+<td style="text-align: right;">111904</td>
+<td style="text-align: right;">112602</td>
+<td style="text-align: right;">111904</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">113201</td>
+<td style="text-align: right;">104001</td>
+<td style="text-align: right;">104001</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">14</td>
+<td style="text-align: right;">101303</td>
+<td style="text-align: right;">115704</td>
+<td style="text-align: right;">101303</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">345</td>
+<td style="text-align: right;">112901</td>
+<td style="text-align: right;">113601</td>
+<td style="text-align: right;">113601</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">50</td>
+<td style="text-align: right;">104801</td>
+<td style="text-align: right;">104901</td>
+<td style="text-align: right;">104901</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">108803</td>
+<td style="text-align: right;">107503</td>
+<td style="text-align: right;">108803</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">241</td>
+<td style="text-align: right;">102901</td>
+<td style="text-align: right;">103701</td>
+<td style="text-align: right;">103701</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">198</td>
+<td style="text-align: right;">117202</td>
+<td style="text-align: right;">115504</td>
+<td style="text-align: right;">117202</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>The above is the format we want the data to be in! This format will make it easier to work with <code>VIMuRe</code>.</strong> Although, only the <code>ego</code>, <code>alter</code>, <code>reporter</code> columns are required. The <code>tie_type</code>, <code>layer</code> and <code>weight</code> columns are optional, but useful to have.</p>
+<p>Use the full pre-processing script below to pre-process all the data for all tie types and save it to a single <code>vil1_money.csv</code> file. We also save the <code>reporters</code> list to, as a data frame, to a <code>vil1_money_reporters.csv</code> file.</p>
 <details>
 <summary>
 Click to see full pre-processing script
 </summary>
-<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># village IDs 13 and 22 are missing</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>VALID_VILLAGE_IDS <span class="op">=</span> [i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">77</span><span class="op">+</span><span class="dv">1</span>) <span class="cf">if</span> i <span class="op">!=</span> <span class="dv">13</span> <span class="kw">and</span> i <span class="op">!=</span> <span class="dv">22</span>] </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># codes for missing values</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>ALL_NA_CODES <span class="op">=</span> [<span class="st">"9999999"</span>, <span class="st">"5555555"</span>, <span class="st">"7777777"</span>, <span class="st">"0"</span>] </span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>RAW_CSV_FOLDER <span class="op">=</span> <span class="st">"2010-0760_Data/Data/Raw_csv"</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> VALID_VILLAGE_IDS:</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  selected_village <span class="op">=</span> i</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="co">## Read in the files that include details of each individual and of each sharing unit</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  resp <span class="op">=</span> indivinfo[indivinfo[<span class="st">"village"</span>] <span class="op">==</span> selected_village].copy()</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  resp[<span class="st">"didsurv"</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  village_file <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"village</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  indiv <span class="op">=</span> pd.read_csv(village_file, header<span class="op">=</span><span class="va">None</span>, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  indiv.columns <span class="op">=</span> [<span class="st">"hhid"</span>, <span class="st">"ppid"</span>, <span class="st">"gender"</span>, <span class="st">"age"</span>]</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>  indiv[<span class="st">"age"</span>] <span class="op">=</span> indiv[<span class="st">"age"</span>].astype(<span class="bu">int</span>)</span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="co">## gender (1-Male, 2-Female)</span></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  indiv[<span class="st">"gender"</span>] <span class="op">=</span> indiv[<span class="st">"gender"</span>].<span class="bu">map</span>({<span class="st">"1"</span>: <span class="st">"Male"</span>, <span class="st">"2"</span>: <span class="st">"Female"</span>})</span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  indiv[<span class="st">"pid"</span>] <span class="op">=</span> indiv.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="ss">f'</span><span class="sc">{</span>x[<span class="st">"hhid"</span>]<span class="sc">}{</span>x[<span class="st">"ppid"</span>]<span class="sc">}</span><span class="ss">'</span> </span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>                                        <span class="cf">if</span> <span class="bu">len</span>(x[<span class="st">"ppid"</span>]) <span class="op">==</span> <span class="dv">2</span> </span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>                                        <span class="cf">else</span> <span class="ss">f'</span><span class="sc">{</span>x[<span class="st">"hhid"</span>]<span class="sc">}</span><span class="ss">0</span><span class="sc">{</span>x[<span class="st">"ppid"</span>]<span class="sc">}</span><span class="ss">'</span>,</span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>                                        axis<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  <span class="co">## Select only the relevant columns</span></span>
-<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  selected_cols <span class="op">=</span> [<span class="st">"pid"</span>, <span class="st">"resp_status"</span>, <span class="st">"religion"</span>, <span class="st">"caste"</span>, <span class="st">"didsurv"</span>]</span>
-<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  indiv <span class="op">=</span> pd.merge(indiv, resp[selected_cols], on<span class="op">=</span><span class="st">"pid"</span>)</span>
-<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>  <span class="co">## Read in the files that include details on each relationship</span></span>
-<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>  filepath_borrowmoney <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"borrowmoney</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>  borrowmoney <span class="op">=</span> pd.read_csv(filepath_borrowmoney, header <span class="op">=</span> <span class="va">None</span>, na_values <span class="op">=</span> ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>  filepath_receivemoney <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"lendmoney</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>  receivemoney <span class="op">=</span> pd.read_csv(filepath_receivemoney, header <span class="op">=</span> <span class="va">None</span>, na_values <span class="op">=</span> ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a>  filepath_giveadvice <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"giveadvice</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>  receiveadvice <span class="op">=</span> pd.read_csv(filepath_giveadvice, header <span class="op">=</span> <span class="va">None</span>, na_values <span class="op">=</span> ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>  filepath_helpdecision <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"helpdecision</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>  helpdecision <span class="op">=</span> pd.read_csv(filepath_helpdecision, header <span class="op">=</span> <span class="va">None</span>, na_values <span class="op">=</span> ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a>  filepath_keroricecome <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"keroricecome</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>  keroricecome <span class="op">=</span> pd.read_csv(filepath_keroricecome, header <span class="op">=</span> <span class="va">None</span>, na_values <span class="op">=</span> ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>  filepath_keroricego <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"keroricego</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>  keroricego <span class="op">=</span> pd.read_csv(filepath_keroricego, header <span class="op">=</span> <span class="va">None</span>, na_values <span class="op">=</span> ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>  filepath_visitcome <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"visitcome</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a>  visitcome <span class="op">=</span> pd.read_csv(filepath_visitcome, header <span class="op">=</span> <span class="va">None</span>, na_values <span class="op">=</span> ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>  filepath_visitgo <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"visitgo</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a>  visitgo <span class="op">=</span> pd.read_csv(filepath_visitgo, header <span class="op">=</span> <span class="va">None</span>, na_values <span class="op">=</span> ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span>
-<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>  tietypes <span class="op">&lt;-</span> {<span class="st">"borrowmoney"</span>: borrowmoney,</span>
-<span id="cb14-62"><a href="#cb14-62" aria-hidden="true" tabindex="-1"></a>               <span class="st">"receivemoney"</span>: receivemoney,</span>
-<span id="cb14-63"><a href="#cb14-63" aria-hidden="true" tabindex="-1"></a>               <span class="st">"helpdecision"</span>: helpdecision,</span>
-<span id="cb14-64"><a href="#cb14-64" aria-hidden="true" tabindex="-1"></a>               <span class="st">"receiveadvice"</span>: receiveadvice,</span>
-<span id="cb14-65"><a href="#cb14-65" aria-hidden="true" tabindex="-1"></a>               <span class="st">"keroricego"</span>: keroricego,</span>
-<span id="cb14-66"><a href="#cb14-66" aria-hidden="true" tabindex="-1"></a>               <span class="st">"keroricecome"</span>: keroricecome,</span>
-<span id="cb14-67"><a href="#cb14-67" aria-hidden="true" tabindex="-1"></a>               <span class="st">"visitgo"</span>: visitgo,</span>
-<span id="cb14-68"><a href="#cb14-68" aria-hidden="true" tabindex="-1"></a>               <span class="st">"visitcome"</span>: visitcome}</span>
-<span id="cb14-69"><a href="#cb14-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-70"><a href="#cb14-70" aria-hidden="true" tabindex="-1"></a>  edges <span class="op">=</span> []</span>
-<span id="cb14-71"><a href="#cb14-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-72"><a href="#cb14-72" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> selected_tie_type, df_tie <span class="kw">in</span> tietypes.items():</span>
-<span id="cb14-73"><a href="#cb14-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-74"><a href="#cb14-74" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.melt(df_tie, id_vars<span class="op">=</span>[<span class="dv">0</span>]).dropna()</span>
-<span id="cb14-75"><a href="#cb14-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-76"><a href="#cb14-76" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.drop(columns<span class="op">=</span><span class="st">"variable"</span>)<span class="op">\</span></span>
-<span id="cb14-77"><a href="#cb14-77" aria-hidden="true" tabindex="-1"></a>       .rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">"i"</span>, <span class="st">"value"</span>: <span class="st">"j"</span>})<span class="op">\</span></span>
-<span id="cb14-78"><a href="#cb14-78" aria-hidden="true" tabindex="-1"></a>       .assign(respondent<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="st">"i"</span>])</span>
-<span id="cb14-79"><a href="#cb14-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-80"><a href="#cb14-80" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Let's also add a column for the tie type</span></span>
-<span id="cb14-81"><a href="#cb14-81" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.assign(tie_type<span class="op">=</span>selected_tie_type)</span>
-<span id="cb14-82"><a href="#cb14-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-83"><a href="#cb14-83" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Let's add a weight column too</span></span>
-<span id="cb14-84"><a href="#cb14-84" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df.assign(weight<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb14-85"><a href="#cb14-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> tie_type <span class="kw">in</span> [<span class="st">"borrowmoney"</span>, <span class="st">"keroricego"</span>, <span class="st">"visitgo"</span>]:</span>
-<span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a>      df <span class="op">=</span> df.rename(columns<span class="op">=</span>{<span class="st">"i"</span>: <span class="st">"j"</span>, <span class="st">"j"</span>: <span class="st">"i"</span>})</span>
-<span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> df[[<span class="st">"respondent"</span>, <span class="st">"i"</span>, <span class="st">"j"</span>, <span class="st">"tie_type"</span>, <span class="st">"weight"</span>]]</span>
-<span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a>    edges.append(df)</span>
-<span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>  edges <span class="op">=</span> pd.concat(edges)</span>
-<span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a>  edges.to_csv(<span class="ss">f"vil</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">_edges.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a>  indiv.to_csv(<span class="ss">f"vil</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">_meta.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># village IDs 13 and 22 are missing</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>VALID_VILLAGE_IDS <span class="op">=</span> [i <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">77</span><span class="op">+</span><span class="dv">1</span>) <span class="cf">if</span> i <span class="op">!=</span> <span class="dv">13</span> <span class="kw">and</span> i <span class="op">!=</span> <span class="dv">22</span>] </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>RAW_CSV_FOLDER <span class="op">=</span> <span class="st">"2010-0760_Data/Data/Raw_csv"</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>ties_layer_mapping<span class="op">=</span>{</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"borrowmoney"</span>: <span class="st">"money"</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lendmoney"</span>: <span class="st">"money"</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"giveadvice"</span>: <span class="st">"advice"</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"giveadvice"</span>: <span class="st">"advice"</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"keroricego"</span>: <span class="st">"kerorice"</span>,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"keroricecome"</span>: <span class="st">"kerorice"</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"visitgo"</span>: <span class="st">"visit"</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"visitcome"</span>: <span class="st">"visit"</span>,</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_karnataka_survey_data(village_id: <span class="bu">int</span>, tie_type: <span class="bu">str</span>,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>                              indivinfo: pd.DataFrame,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>                              ties_layer_mapping<span class="op">=</span>ties_layer_mapping,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>                              all_na_codes<span class="op">=</span>[<span class="st">"9999999"</span>, <span class="st">"5555555"</span>, <span class="st">"7777777"</span>, <span class="st">"0"</span>],</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>                              raw_csv_folder<span class="op">=</span>RAW_CSV_FOLDER):</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a><span class="co">    Read the raw data for a given tie type and village id, </span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="co">    and return two dataframes: the edgelist and the list of respondents.</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="co">    village_id : int</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a><span class="co">        The village id, between 1 and 10.</span></span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a><span class="co">    tie_type : str</span></span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a><span class="co">        The tie type</span></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a><span class="co">    indivinfo : pd.DataFrame</span></span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a><span class="co">        The individual-level metadata</span></span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a><span class="co">    all_na_codes : list, optional</span></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a><span class="co">        The list of codes that should be interpreted as missing values, by default ["9999999", "5555555", "7777777", "0"]</span></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a><span class="co">    raw_csv_folder : str, optional</span></span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a><span class="co">        The path to the folder containing the raw csv files, by default "2010-0760_Data/Data/Raw_csv"</span></span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a><span class="co">    edgelist : pd.DataFrame</span></span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a><span class="co">        The edgelist</span></span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a><span class="co">    respondents : list</span></span>
+<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a><span class="co">        The respondent metadata</span></span>
+<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Filter the individual-level metadata to keep only the relevant village</span></span>
+<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> indivinfo[indivinfo[<span class="st">"village"</span>] <span class="op">==</span> village_id].copy()</span>
+<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>    resp[<span class="st">"didsurv"</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a>    village_file <span class="op">=</span> os.path.join(raw_csv_folder, <span class="ss">f"village</span><span class="sc">{</span>village_id<span class="sc">}</span><span class="ss">.csv"</span>)</span>
+<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a>    metadata <span class="op">=</span> pd.read_csv(village_file, header <span class="op">=</span> <span class="va">None</span>, names<span class="op">=</span>[<span class="st">"hhid"</span>, <span class="st">"ppid"</span>, <span class="st">"gender"</span>, <span class="st">"age"</span>])</span>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a>    <span class="co">## gender (1-Male, 2-Female)</span></span>
+<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a>    metadata[<span class="st">"gender"</span>] <span class="op">=</span> metadata[<span class="st">"gender"</span>].<span class="bu">map</span>({<span class="dv">1</span>: <span class="st">"Male"</span>, <span class="dv">2</span>: <span class="st">"Female"</span>})</span>
+<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>    <span class="co">## pre-process pid to match the format in the individual-level metadata</span></span>
+<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a>    metadata[<span class="st">"ppid"</span>] <span class="op">=</span> metadata[<span class="st">"ppid"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a>    metadata[<span class="st">"hhid"</span>] <span class="op">=</span> metadata[<span class="st">"hhid"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a>    metadata[<span class="st">"pid"</span>] <span class="op">=</span>  metadata.<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="ss">f'</span><span class="sc">{</span>x[<span class="st">"hhid"</span>]<span class="sc">}{</span><span class="dv">0</span> <span class="cf">if</span> <span class="bu">len</span>(x[<span class="st">"ppid"</span>]) <span class="op">!=</span> <span class="dv">2</span> <span class="cf">else</span> <span class="st">""</span><span class="sc">}{</span>x[<span class="st">"ppid"</span>]<span class="sc">}</span><span class="ss">'</span>, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a>    <span class="co">## Select only the relevant columns</span></span>
+<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a>    selected_cols <span class="op">=</span> [<span class="st">"pid"</span>, <span class="st">"resp_status"</span>, <span class="st">"religion"</span>, <span class="st">"caste"</span>, <span class="st">"didsurv"</span>]</span>
+<span id="cb15-70"><a href="#cb15-70" aria-hidden="true" tabindex="-1"></a>    metadata <span class="op">=</span> pd.merge(metadata, resp[selected_cols], on<span class="op">=</span><span class="st">"pid"</span>, how<span class="op">=</span><span class="st">"left"</span>)</span>
+<span id="cb15-71"><a href="#cb15-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-72"><a href="#cb15-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Read the raw data</span></span>
+<span id="cb15-73"><a href="#cb15-73" aria-hidden="true" tabindex="-1"></a>    filepath <span class="op">=</span> os.path.join(raw_csv_folder, <span class="ss">f"</span><span class="sc">{</span>tie_type<span class="sc">}{</span>village_id<span class="sc">}</span><span class="ss">.csv"</span>)</span>
+<span id="cb15-74"><a href="#cb15-74" aria-hidden="true" tabindex="-1"></a>    df_raw <span class="op">=</span> pd.read_csv(filepath, header<span class="op">=</span><span class="va">None</span>, na_values<span class="op">=</span>all_na_codes, dtype<span class="op">=</span><span class="bu">str</span>)</span>
+<span id="cb15-75"><a href="#cb15-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-76"><a href="#cb15-76" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Example with the data</span></span>
+<span id="cb15-77"><a href="#cb15-77" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> pd.melt(df_raw, id_vars<span class="op">=</span>[<span class="dv">0</span>]).dropna()</span>
+<span id="cb15-78"><a href="#cb15-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-79"><a href="#cb15-79" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist.drop(columns<span class="op">=</span><span class="st">"variable"</span>)<span class="op">\</span></span>
+<span id="cb15-80"><a href="#cb15-80" aria-hidden="true" tabindex="-1"></a>          .rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">"ego"</span>, <span class="st">"value"</span>: <span class="st">"alter"</span>})<span class="op">\</span></span>
+<span id="cb15-81"><a href="#cb15-81" aria-hidden="true" tabindex="-1"></a>          .assign(reporter<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="st">"ego"</span>])</span>
+<span id="cb15-82"><a href="#cb15-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-83"><a href="#cb15-83" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Let's also add a column for the tie type</span></span>
+<span id="cb15-84"><a href="#cb15-84" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist.assign(tie_type<span class="op">=</span>tie_type)</span>
+<span id="cb15-85"><a href="#cb15-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-86"><a href="#cb15-86" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Let's add a weight column too</span></span>
+<span id="cb15-87"><a href="#cb15-87" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist.assign(weight<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb15-88"><a href="#cb15-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-89"><a href="#cb15-89" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If the question was "Did you borrow money from anyone?", then we need to flip the ego and alter columns</span></span>
+<span id="cb15-90"><a href="#cb15-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> tie_type <span class="kw">in</span> [<span class="st">"borrowmoney"</span>, <span class="st">"helpdecision"</span>, <span class="st">"keroricego"</span>, <span class="st">"visitgo"</span>]:</span>
+<span id="cb15-91"><a href="#cb15-91" aria-hidden="true" tabindex="-1"></a>        edgelist <span class="op">=</span> edgelist.rename(columns<span class="op">=</span>{<span class="st">"ego"</span>: <span class="st">"alter"</span>, <span class="st">"alter"</span>: <span class="st">"ego"</span>})</span>
+<span id="cb15-92"><a href="#cb15-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-93"><a href="#cb15-93" aria-hidden="true" tabindex="-1"></a>    edgelist[<span class="st">"layer"</span>] <span class="op">=</span> edgelist[<span class="st">"tie_type"</span>].<span class="bu">map</span>(ties_layer_mapping)</span>
+<span id="cb15-94"><a href="#cb15-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-95"><a href="#cb15-95" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Reorder the columns to make it easier to read</span></span>
+<span id="cb15-96"><a href="#cb15-96" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist[[<span class="st">"ego"</span>, <span class="st">"alter"</span>, <span class="st">"reporter"</span>, <span class="st">"tie_type"</span>, <span class="st">"layer"</span>, <span class="st">"weight"</span>]]</span>
+<span id="cb15-97"><a href="#cb15-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-98"><a href="#cb15-98" aria-hidden="true" tabindex="-1"></a>    <span class="co">#### Further pre-processing steps ####</span></span>
+<span id="cb15-99"><a href="#cb15-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-100"><a href="#cb15-100" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Who could actually report on the ties?</span></span>
+<span id="cb15-101"><a href="#cb15-101" aria-hidden="true" tabindex="-1"></a>    reporters <span class="op">=</span> <span class="bu">set</span>(metadata[metadata[<span class="st">"didsurv"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"pid"</span>])</span>
+<span id="cb15-102"><a href="#cb15-102" aria-hidden="true" tabindex="-1"></a>    nodes <span class="op">=</span> reporters.union(<span class="bu">set</span>(edgelist[<span class="st">"ego"</span>])).union(<span class="bu">set</span>(edgelist[<span class="st">"alter"</span>]))</span>
+<span id="cb15-103"><a href="#cb15-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-104"><a href="#cb15-104" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Only keep reports made by those who were MARKED as reporters in metadata CSV</span></span>
+<span id="cb15-105"><a href="#cb15-105" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist[edgelist[<span class="st">"reporter"</span>].isin(reporters)].copy()</span>
+<span id="cb15-106"><a href="#cb15-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-107"><a href="#cb15-107" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove self-loops</span></span>
+<span id="cb15-108"><a href="#cb15-108" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> edgelist[edgelist[<span class="st">"ego"</span>] <span class="op">!=</span> edgelist[<span class="st">"alter"</span>]].copy()</span>
+<span id="cb15-109"><a href="#cb15-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-110"><a href="#cb15-110" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove duplicates</span></span>
+<span id="cb15-111"><a href="#cb15-111" aria-hidden="true" tabindex="-1"></a>    edgelist.drop_duplicates(inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-112"><a href="#cb15-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-113"><a href="#cb15-113" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> edgelist, reporters</span>
+<span id="cb15-114"><a href="#cb15-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-115"><a href="#cb15-115" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_layer(village_id, layer_name, indivinfo, </span>
+<span id="cb15-116"><a href="#cb15-116" aria-hidden="true" tabindex="-1"></a>              raw_csv_folder<span class="op">=</span>RAW_CSV_FOLDER):</span>
+<span id="cb15-117"><a href="#cb15-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-118"><a href="#cb15-118" aria-hidden="true" tabindex="-1"></a>    tie_types <span class="op">=</span> {</span>
+<span id="cb15-119"><a href="#cb15-119" aria-hidden="true" tabindex="-1"></a>        <span class="st">"money"</span>: [<span class="st">"lendmoney"</span>, <span class="st">"borrowmoney"</span>],</span>
+<span id="cb15-120"><a href="#cb15-120" aria-hidden="true" tabindex="-1"></a>        <span class="st">"advice"</span>: [<span class="st">"giveadvice"</span>, <span class="st">"helpdecision"</span>],</span>
+<span id="cb15-121"><a href="#cb15-121" aria-hidden="true" tabindex="-1"></a>        <span class="st">"kerorice"</span>: [<span class="st">"keroricego"</span>, <span class="st">"keroricecome"</span>],</span>
+<span id="cb15-122"><a href="#cb15-122" aria-hidden="true" tabindex="-1"></a>        <span class="st">"visit"</span>: [<span class="st">"visitgo"</span>, <span class="st">"visitcome"</span>],</span>
+<span id="cb15-123"><a href="#cb15-123" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb15-124"><a href="#cb15-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-125"><a href="#cb15-125" aria-hidden="true" tabindex="-1"></a>    selected_tie_types <span class="op">=</span> tie_types[layer_name]</span>
+<span id="cb15-126"><a href="#cb15-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-127"><a href="#cb15-127" aria-hidden="true" tabindex="-1"></a>    edgelist <span class="op">=</span> pd.DataFrame()</span>
+<span id="cb15-128"><a href="#cb15-128" aria-hidden="true" tabindex="-1"></a>    reporters <span class="op">=</span> <span class="bu">set</span>()</span>
+<span id="cb15-129"><a href="#cb15-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-130"><a href="#cb15-130" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> tie_type <span class="kw">in</span> selected_tie_types:</span>
+<span id="cb15-131"><a href="#cb15-131" aria-hidden="true" tabindex="-1"></a>        edgelist_, reporters_ <span class="op">=</span> get_karnataka_survey_data(village_id<span class="op">=</span>village_id, </span>
+<span id="cb15-132"><a href="#cb15-132" aria-hidden="true" tabindex="-1"></a>                                                            tie_type<span class="op">=</span>tie_type, </span>
+<span id="cb15-133"><a href="#cb15-133" aria-hidden="true" tabindex="-1"></a>                                                            indivinfo<span class="op">=</span>indivinfo,</span>
+<span id="cb15-134"><a href="#cb15-134" aria-hidden="true" tabindex="-1"></a>                                                            raw_csv_folder<span class="op">=</span>raw_csv_folder)</span>
+<span id="cb15-135"><a href="#cb15-135" aria-hidden="true" tabindex="-1"></a>        edgelist <span class="op">=</span> pd.concat([edgelist, edgelist_])</span>
+<span id="cb15-136"><a href="#cb15-136" aria-hidden="true" tabindex="-1"></a>        reporters <span class="op">=</span> reporters.union(reporters_)</span>
+<span id="cb15-137"><a href="#cb15-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-138"><a href="#cb15-138" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> edgelist, reporters</span>
+<span id="cb15-139"><a href="#cb15-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-140"><a href="#cb15-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-141"><a href="#cb15-141" aria-hidden="true" tabindex="-1"></a>indivinfo <span class="op">=</span> pd.read_stata(<span class="st">"datav4.0/Data/2. Demographics and Outcomes/individual_characteristics.dta"</span>)</span>
+<span id="cb15-142"><a href="#cb15-142" aria-hidden="true" tabindex="-1"></a>indivinfo.drop_duplicates(subset<span class="op">=</span>[<span class="st">"pid"</span>], inplace<span class="op">=</span><span class="va">True</span>) <span class="co">## one individual (6109803) is repeated twice.</span></span>
+<span id="cb15-143"><a href="#cb15-143" aria-hidden="true" tabindex="-1"></a>indivinfo[<span class="st">"pid"</span>] <span class="op">=</span> indivinfo[<span class="st">"pid"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb15-144"><a href="#cb15-144" aria-hidden="true" tabindex="-1"></a>indivinfo[<span class="st">"hhid"</span>] <span class="op">=</span> indivinfo[<span class="st">"hhid"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb15-145"><a href="#cb15-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-146"><a href="#cb15-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-147"><a href="#cb15-147" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> VALID_VILLAGE_IDS:</span>
+<span id="cb15-148"><a href="#cb15-148" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> layer_name <span class="kw">in</span> [<span class="st">"money"</span>, <span class="st">"advice"</span>, <span class="st">"kerorice"</span>, <span class="st">"visit"</span>]:</span>
+<span id="cb15-149"><a href="#cb15-149" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="ss">f"Processing village </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-150"><a href="#cb15-150" aria-hidden="true" tabindex="-1"></a>      edgelist, reporters <span class="op">=</span> get_layer(village_id<span class="op">=</span>i, </span>
+<span id="cb15-151"><a href="#cb15-151" aria-hidden="true" tabindex="-1"></a>                                        layer_name<span class="op">=</span>layer_name, </span>
+<span id="cb15-152"><a href="#cb15-152" aria-hidden="true" tabindex="-1"></a>                                        indivinfo<span class="op">=</span>indivinfo, </span>
+<span id="cb15-153"><a href="#cb15-153" aria-hidden="true" tabindex="-1"></a>                                        raw_csv_folder<span class="op">=</span>RAW_CSV_FOLDER)</span>
+<span id="cb15-154"><a href="#cb15-154" aria-hidden="true" tabindex="-1"></a>      edgelist.to_csv(<span class="ss">f"vil</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>layer_name<span class="sc">}</span><span class="ss">.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb15-155"><a href="#cb15-155" aria-hidden="true" tabindex="-1"></a>      <span class="co"># save reporters to a separate file</span></span>
+<span id="cb15-156"><a href="#cb15-156" aria-hidden="true" tabindex="-1"></a>      pd.DataFrame({<span class="st">"reporter"</span>: <span class="bu">list</span>(reporters)}).to_csv(<span class="ss">f"vil</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>layer_name<span class="sc">}</span><span class="ss">_reporters.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb15-157"><a href="#cb15-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-158"><a href="#cb15-158" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Done with village </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-159"><a href="#cb15-159" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 
 
 </details></section>
 </section>
+
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-banerjee_diffusion_2013-1" class="csl-entry" role="doc-biblioentry">
@@ -881,7 +1231,12 @@ Banerjee, Abhijit, Arun G. Chandrasekhar, Esther Duflo, and Matthew O. Jackson. 
 <div id="ref-de_bacco_latent_2023" class="csl-entry" role="doc-biblioentry">
 De Bacco, Caterina, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Gabriela Lima Borges, Diego Baptista, Tracy Sweet, et al. 2023. <span>“Latent Network Models to Account for Noisy, Multiply Reported Social Network Data.”</span> <em>Journal of the Royal Statistical Society Series A: Statistics in Society</em>, February, qnac004. <a href="https://doi.org/10.1093/jrsssa/qnac004">https://doi.org/10.1093/jrsssa/qnac004</a>.
 </div>
-</div></section></div></main> <!-- /main -->
+</div></section><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Note that the authors provide a different version of the network data on Harvard Dataverse <span class="citation" data-cites="banerjee_diffusion_2013-1">(<a href="#ref-banerjee_diffusion_2013-1" role="doc-biblioref">Banerjee et al. 2013a</a>)</span>. However, we will use the raw version provided by Prof.&nbsp;Jackson in this tutorial, as the version of the Dataverse has already had some pre-processing (importantly, they have made the adjacency matrices symmetric), while the version provided by Prof.&nbsp;Jackson gives the original node list. We will use the Harvard Dataverse files just for the metadata.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
