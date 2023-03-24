@@ -72,7 +72,6 @@ class TestReadFromEdgelist:
     """
 
     ### Tests for error messages and warnings when input is not of the expected type
-
     def test_non_dataframe_input(self):
         """
         Tests that the function raises an error when the input is not a dataframe

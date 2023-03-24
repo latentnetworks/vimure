@@ -112,6 +112,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
             X = net_obj.X
 
             self.nodeNames = net_obj.nodeNames
+            self.layerNames = net_obj.layerNames
             self.R = preprocess(net_obj.R)
             
             if "K" not in extra_params:

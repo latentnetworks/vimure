@@ -36,7 +36,34 @@ Here, we'll use the `VIMuRe` package to model social networks from a village in 
 
 We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship. If everyone in the network is being surveyed, then this should mean that we are eliciting information on a relationship twice (hence, "double sampling"): we're asking `ego` if they go to `alter` for help, and also asking `ego` if `alter` comes to them for help.
 
-Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will focus just on one tie type: the "visiting" relationship (based on two prompts: _"In your free time, whose house do you visit?" and "Who visits your house in his or her free time?"_). 
+Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will use all four layers to model the latent network structure. The four layers are:
+
+- `money`: money lending and borrowing
+- `advice`: advice giving and receiving
+- `visit`: visiting and being visited
+- `kerorice`: lending and borrowing of household items
+
+We stored all the data in a single data frame, `edgelist`.
+
+<details><summary>Click to see the code we used</summary>
+
+```python
+# Here we are using the get_layer() function defined in Tutorial 01
+
+edgelist_money, reporters_money = get_layer(1, "money", get_indivinfo(METADATA_FILE), raw_csv_folder=RAW_CSV_FOLDER)
+edgelist_visit, reporters_visit = get_layer(1, "visit", get_indivinfo(METADATA_FILE), raw_csv_folder=RAW_CSV_FOLDER)
+edgelist_advice, reporters_advice = get_layer(1, "advice", get_indivinfo(METADATA_FILE), raw_csv_folder=RAW_CSV_FOLDER)
+edgelist_kerorice, reporters_kerorice = get_layer(1, "kerorice", get_indivinfo(METADATA_FILE), raw_csv_folder=RAW_CSV_FOLDER)
+
+edgelist = pd.concat([edgelist_money, edgelist_visit, edgelist_advice, edgelist_kerorice])
+del edgelist_money, edgelist_visit, edgelist_advice, edgelist_kerorice
+
+reporters = reporters_money.union(reporters_visit).union(reporters_advice).union(reporters_kerorice)
+del reporters_money, reporters_visit, reporters_advice, reporters_kerorice
+
+# The code below should help you confirm that all reporters appear in the edgelist:
+reporters.difference(set(edgelist.reporter)) # This should return an empty set
+```
 
 ::: panel-tabset
 
@@ -57,18 +84,18 @@ Suppose we have a data frame `edgelist` of our village's data that looks like th
 edgelist.sample(n=10, random_state=1)
 ```
 
-|    ego |   alter |   reporter | tie_type    | layer   |   weight |
-|-------:|--------:|-----------:|:------------|:--------|---------:|
-| 103101 |  103201 |     103201 | borrowmoney | money   |        1 |
-| 101201 |  102901 |     102901 | borrowmoney | money   |        1 |
-| 111904 |  112602 |     111904 | lendmoney   | money   |        1 |
-| 113201 |  104001 |     104001 | borrowmoney | money   |        1 |
-| 101303 |  115704 |     101303 | lendmoney   | money   |        1 |
-| 112901 |  113601 |     113601 | borrowmoney | money   |        1 |
-| 104801 |  104901 |     104901 | borrowmoney | money   |        1 |
-| 108803 |  107503 |     108803 | lendmoney   | money   |        1 |
-| 102901 |  103701 |     103701 | borrowmoney | money   |        1 |
-| 117202 |  115504 |     117202 | lendmoney   | money   |        1 |
+|    ego |   alter |   reporter | tie_type     | layer    |   weight |
+|-------:|--------:|-----------:|:-------------|:---------|---------:|
+| 107303 |  107307 |     107307 | helpdecision | advice   |        1 |
+| 116402 |  115702 |     116402 | keroricecome | kerorice |        1 |
+| 103202 |  117301 |     103202 | giveadvice   | advice   |        1 |
+| 116201 |  110401 |     116201 | keroricecome | kerorice |        1 |
+| 114606 |  109701 |     109701 | keroricego   | kerorice |        1 |
+| 101302 |  116201 |     101302 | visitcome    | visit    |        1 |
+| 111204 |  110701 |     111204 | lendmoney    | money    |        1 |
+| 108304 |  111502 |     108304 | keroricecome | kerorice |        1 |
+| 117301 |  113901 |     113901 | borrowmoney  | money    |        1 |
+| 106201 |  116105 |     106201 | keroricecome | kerorice |        1 |
 
 : A typical data input for `VIMuRe`
 
@@ -98,7 +125,7 @@ print(G.summary())
 which gives us the following output:
 
 ```python
-IGRAPH DNW- 324 624 -- 
+IGRAPH DNW- 417 2690 -- 
 + attr: name (v), layer (e), reporter (e), tie_type (e), weight (e)
 ```
 
@@ -125,8 +152,8 @@ print(f"Number of edges: {len(edgelist)}")
 which yields:
 
 ```text
-Number of nodes: 324
-Number of edges: 624
+Number of nodes: 417
+Number of edges: 2690
 ```
 
 ## `igraph` object
@@ -139,8 +166,8 @@ print(f"Number of edges: {G.ecount()}")
 which yields:
 
 ```text
-Number of nodes: 324
-Number of edges: 625
+Number of nodes: 417
+Number of edges: 2690
 ```
 :::
 
@@ -156,44 +183,22 @@ print(f"Number of reporters: {len(reporters)}")
 ```
 
 ```text
-Number of reporters: 191
+Number of reporters: 203
 ```
 
 ## `igraph` object
 
 ```r
-reporters = set(g.es["reporter"])
+reporters = set(G.es["reporter"])
 print(f"Number of reporters: {len(reporters)}")
 ```
 
 ```text
-Number of reporters:  191 
+Number of reporters:  203 
 ```
 
 :::
 
-::: {.callout-note collapse="false"}
-
-When running VIMuRe, if you do not inform the full list of reporters, VIMuRe will implicitly assume that only reporters who appeared in the `reporter` column (or in the igraph's edge attribute of the same name) were interviewed. That is, if you just pass the data frame or `igraph` object as above, VIMuRe will assume that there were 191 reporters.
-
-However, if you followed 💻 [Tutorial 01](/latest/tutorials/python/tutorial01-data-preparation.qmd), you might notice that at the end, you have 12 more reporters:
-
-```r
-# After running:
-edgelist, reporters <- get_layer(...)
-
-len(reporters)
-```
-
-```text
-203
-```
-
-If these twelve additional reporters are present in the data as either ego or alter nodes in the network, you can inform VIMuRe about them. However, if they are not included in either of these columns, an error will occur. Our current implementation does not support "external reporters" yet. If this is a feature you would like to see sonner, let us know by adding a [discussion](https://github.com/latentnetworks/vimure/discussions) on GitHub.
-
-There is more to talk about how reporters are internally represented in VIMuRe. Read more about it on section [3.3: A note on the reporter mask (`R`)](#a-note-on-the-reporter-mask-r).
-
-:::
 
 ## 2.3: Average number of ties per reporter
 
@@ -209,13 +214,13 @@ Let's create a plot to visualise the distribution of the number of ties per repo
 # Create a plot_df to summarise the number of ties per reporter
 
 plot_df = (
-    edgelist.groupby(['tie_type', 'reporter'])
+    edgelist.groupby(['layer', 'tie_type', 'reporter'])
     .size()
     .reset_index(name='n_ties')
-    .groupby(['n_ties', 'tie_type'])
+    .groupby(['n_ties', 'tie_type', 'layer'])
     .size()
     .reset_index(name='n_reporters')
-    .sort_values(['n_ties', 'tie_type'])
+    .sort_values(["layer",  "n_ties", "tie_type"])
 )
 ```
 
@@ -225,15 +230,15 @@ plot_df = (
 # Create a plot_df to summarise the number of ties per reporter
 
 plot_df = (
-    pd.DataFrame({attr: G.es[attr] for attr in ["reporter", "tie_type"]})
-    .groupby("reporter")
+    pd.DataFrame({attr: G.es[attr] for attr in ["reporter", "tie_type", "layer"]})
+    .groupby(["reporter", "layer"])
     .apply(lambda x: x["tie_type"].value_counts())
     .reset_index(name="n_ties")
-    .rename(columns={"level_1": "tie_type"})
-    .groupby(["n_ties", "tie_type"])
+    .rename(columns={"level_2": "tie_type"})
+    .groupby(["n_ties", "tie_type", "layer"])
     .size()
     .reset_index(name="n_reporters")
-    .sort_values(["n_ties", "tie_type"])
+    .sort_values(["layer",  "n_ties", "tie_type"])
 )
 ```
 
@@ -241,55 +246,124 @@ plot_df = (
 
 producing the following table:
 
+::: panel-tabset
+
+## Layer advice
+
 ::: {style="width:50%"}
 
-|   n_ties | tie_type    |   n_reporters |
-|---------:|:------------|--------------:|
-|        1 | borrowmoney |            57 |
-|        1 | lendmoney   |            66 |
-|        2 | borrowmoney |            92 |
-|        2 | lendmoney   |            86 |
-|        3 | borrowmoney |            31 |
-|        3 | lendmoney   |            16 |
-|        4 | borrowmoney |             1 |
+|   n_ties | tie_type     | layer   |   n_reporters |
+|---------:|:-------------|:--------|--------------:|
+|        1 | giveadvice   | advice  |           115 |
+|        1 | helpdecision | advice  |           104 |
+|        2 | giveadvice   | advice  |            45 |
+|        2 | helpdecision | advice  |            73 |
+|        3 | giveadvice   | advice  |             6 |
+|        3 | helpdecision | advice  |            13 |
+|        4 | giveadvice   | advice  |             1 |
+|        4 | helpdecision | advice  |             2 |
 
 :::
 
-Or, alternatively as a bar plot:
+## Layer kerorice
+
+::: {style="width:50%"}
+
+|   n_ties | tie_type     | layer    |   n_reporters |
+|---------:|:-------------|:---------|--------------:|
+|        1 | keroricecome | kerorice |            41 |
+|        1 | keroricego   | kerorice |            42 |
+|        2 | keroricecome | kerorice |            99 |
+|        2 | keroricego   | kerorice |           100 |
+|        3 | keroricecome | kerorice |            45 |
+|        3 | keroricego   | kerorice |            40 |
+|        4 | keroricecome | kerorice |             2 |
+|        4 | keroricego   | kerorice |             4 |
+
+:::
+
+## Layer money
+
+::: {style="width:50%"}
+
+|   n_ties | tie_type    | layer   |   n_reporters |
+|---------:|:------------|:--------|--------------:|
+|        1 | borrowmoney | money   |            57 |
+|        1 | lendmoney   | money   |            66 |
+|        2 | borrowmoney | money   |            92 |
+|        2 | lendmoney   | money   |            86 |
+|        3 | borrowmoney | money   |            31 |
+|        3 | lendmoney   | money   |            16 |
+|        4 | borrowmoney | money   |             1 |
+
+:::
+
+## Layer visit
+
+::: {style="width:50%"}
+
+|   n_ties | tie_type   | layer   |   n_reporters |
+|---------:|:-----------|:--------|--------------:|
+|        1 | visitcome  | visit   |            45 |
+|        1 | visitgo    | visit   |            36 |
+|        2 | visitcome  | visit   |            84 |
+|        2 | visitgo    | visit   |            67 |
+|        3 | visitcome  | visit   |            39 |
+|        3 | visitgo    | visit   |            38 |
+|        4 | visitcome  | visit   |            11 |
+|        4 | visitgo    | visit   |            31 |
+:::
+
+:::
+
+Alternatively as a bar plot:
 
 <details><summary>Click to show plot code</summary>
 
 ```python
 from plotnine import *
 
+plot_df["tie_type"] = pd.Categorical(plot_df["tie_type"], 
+                                     categories=["visitgo", "visitcome", 
+                                                 "keroricego", "keroricecome", 
+                                                 "borrowmoney", "lendmoney",
+                                                 "helpdecision", "giveadvice"])
+
+plot_df["layer"] = pd.Categorical(plot_df["layer"], categories=["advice", "money", "kerorice", "visit"])
 
 g = (
-    ggplot(plot_df, aes(x = "n_ties", y="n_reporters", fill="tie_type")) +
+    ggplot(plot_df, aes(x = "tie_type", y="n_reporters", fill="layer")) +
     geom_col() +
-
-    scale_fill_manual(values = {"borrowmoney": "#1f77b4", "lendmoney": "#ff7f0e"},
-                    labels = ["Who borrows money from you?", "Who did you lend money to?"]) +
     coord_flip() +
 
-    # Keep the x-axis (y-axis after coord_flip) in descending order
-    scale_x_reverse() +
+    facet_grid("n_ties ~ .", labeller="label_both") +
 
     theme_bw() +
     theme(legend_position = "bottom",
         legend_box_spacing = 0.5) +
-    labs(x = "Number of ties per reporter", 
-        y = "Number of reporters",
-        fill = "Prompt type")
+    labs(x = "Number of ties reported for this prompt", 
+         y = "Number of reporters",
+         fill = "Layer")
 )
 
-ggsave(g, "tutorial02_fig01.png", width=6, height=4, dpi=300)
+ggsave(g, "tutorial02_fig01.png", width=6, height=8, dpi=300)
 
 ```
 
 </details>
 
 
-![](/latest/tutorials/python/tutorial02_fig01.png){width=60%}
+![](/latest/tutorials/python/tutorial02_fig01.png){width=75%}
+
+::: {.callout-caution collapse="false"}
+
+## Important
+
+Note that the plot above only represents the reports made by the 203 nodes that appear in the `reporter` column. Given that the total number of nodes in the network is 417, either some nodes did not report on any ties, or they were not interviewed at all. 
+
+VIMuRe will consider all nodes in the network, even if they are not present in the `reporter` column. If you want to restrict your analysis to include only the network of reporters, you must filter the edge list before proceeding.
+
+:::
 
 ## 2.4: Union vs. Intersection and the concept of Concordance
 
@@ -351,7 +425,7 @@ Concordance is: 0.014634146341463415
 
 # 📦 Step 3: Use `vimure` package to run the model
 
-If you have already prepared your data (See 💻 [Tutorial 01](/latest/tutorials/python/tutorial01-data-preparation.qmd)), you can use the `vimure` package to run the model directly on your data.
+Now that you have prepared your data, you can use `vimure` to run the model:
 
 ::: panel-tabset
 
@@ -425,7 +499,7 @@ If you want to extract a quick point estimate of the inferred network, you can s
 rho = posterior_estimates['rho'][0,:,:,1]
 ```
 
-The code above will return a $N \times N$ weighted adjacency matrix which can be thought of as the probability of a tie between individuals $i$ and $j$. More on that in the next tutorial.
+The code above will return a $N \times N$ weighted adjacency matrix which can be thought of as the probability of a tie between individuals $i$ and $j$ on layer $l = 0$ (). More on that in the next tutorial.
 
 Now let's look at parameters $\nu$ and $\theta_{lm}$:
 
@@ -443,20 +517,21 @@ posterior_estimates['nu']
 
 This indicates a large mutuality in the network. That is, if $i$ reports that $j$ comes to them for money, then $j$ is likely to report that $i$ comes to them as well.
 
+This is a network-wide parameter and encompasses all layers. If you have reasons to believe mutuality varies across layers, you have to re-run the model for each layer separately.
 
 ### 3.1.2: Reliability ($\theta_{lm}$)
 
-First let's look at the shape of the array:
+First, let's look at the shape of the array:
 
 ```python
 posterior_estimates['theta'].shape
 ```
 
 ```text
-(1, 324)
+(4, 417)
 ```
 
-We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that there are 324 reporters in the network. 
+We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that there are 417 reporters in the network. 
 
 ::: { .callout-note collapse="true"}
 
@@ -503,11 +578,11 @@ df_theta_reporters.head()
 
 |   reporter_id |   reporter_name |   theta |
 |--------------:|----------------:|--------:|
-|           124 |          113901 | 1.6657  |
-|            80 |          108801 | 1.66569 |
-|           102 |          110601 | 1.6086  |
-|           117 |          112801 | 1.60854 |
-|            54 |          105802 | 1.60854 |
+|           120 |          113302 | 1.56319 |
+|           124 |          113901 | 1.53006 |
+|            97 |          109902 | 1.48193 |
+|            92 |          109505 | 1.4819  |
+|            56 |          105902 | 1.48187 |
 
 :::
 
@@ -515,19 +590,74 @@ df_theta_reporters.head()
 
 The interpretation depends on both the mutuality of the network and the survey design. If the mutuality is high (as indicated by $\nu$ being closer to 1), reporters will tend to reciprocate the ties they report by default, and reporters with high $\theta$ values (relative to the $\theta$ distribution) are likely "over-reporting" ties.
 
-To verify if this is the case for the network, let's examine the top reporter listed in the table above (113901).
+To verify if this is the case for the network, let's examine the top reporter listed in the table above (113302).
 
 ```python
-edgelist[edgelist["reporter"] == "113901"]
+edgelist[edgelist["reporter"] == "113302"]
 ```
 
-|    ego |   alter |   reporter | tie_type    | layer   |   weight |
-|-------:|--------:|-----------:|:------------|:--------|---------:|
-| 113901 |  **110201** |     113901 | lendmoney   | money   |        1 |
-| 113901 |  **114702** |     113901 | lendmoney   | money   |        1 |
-| **112901** |  113901 |     113901 | borrowmoney | money   |        1 |
-| **117301** |  113901 |     113901 | borrowmoney | money   |        1 |
-| **114101** |  113901 |     113901 | borrowmoney | money   |        1 |
+::: panel-tabset
+
+## Layer advice
+
+::: {style="width:50%"}
+
+|    ego |   alter |   reporter | tie_type     | layer    |   weight |
+|-------:|--------:|-----------:|:-------------|:---------|---------:|
+| 113302 |  110502 |     113302 | giveadvice   | advice   |        1 |
+| 113302 |  113102 |     113302 | giveadvice   | advice   |        1 |
+| 105701 |  113302 |     113302 | helpdecision | advice   |        1 |
+| 110501 |  113302 |     113302 | helpdecision | advice   |        1 |
+| 113601 |  113302 |     113302 | helpdecision | advice   |        1 |
+| 113301 |  113302 |     113302 | helpdecision | advice   |        1 |
+
+:::
+
+## Layer kerorice
+
+::: {style="width:50%"}
+
+|    ego |   alter |   reporter | tie_type     | layer    |   weight |
+|-------:|--------:|-----------:|:-------------|:---------|---------:|
+| 113102 |  113302 |     113302 | keroricego   | kerorice |        1 |
+| 117303 |  113302 |     113302 | keroricego   | kerorice |        1 |
+| 110901 |  113302 |     113302 | keroricego   | kerorice |        1 |
+| 113302 |  110902 |     113302 | keroricecome | kerorice |        1 |
+| 113302 |  113102 |     113302 | keroricecome | kerorice |        1 |
+
+:::
+
+## Layer money
+
+::: {style="width:50%"}
+
+|    ego |   alter |   reporter | tie_type     | layer    |   weight |
+|-------:|--------:|-----------:|:-------------|:---------|---------:|
+| 113302 |  117303 |     113302 | lendmoney    | money    |        1 |
+| 113302 |  110901 |     113302 | lendmoney    | money    |        1 |
+| 105701 |  113302 |     113302 | borrowmoney  | money    |        1 |
+| 117303 |  113302 |     113302 | borrowmoney  | money    |        1 |
+| 110901 |  113302 |     113302 | borrowmoney  | money    |        1 |
+
+:::
+
+## Layer visit
+
+::: {style="width:50%"}
+
+|    ego |   alter |   reporter | tie_type     | layer    |   weight |
+|-------:|--------:|-----------:|:-------------|:---------|---------:|
+| 113102 |  113302 |     113302 | visitgo      | visit    |        1 |
+| 113401 |  113302 |     113302 | visitgo      | visit    |        1 |
+| 112202 |  113302 |     113302 | visitgo      | visit    |        1 |
+| 113702 |  113302 |     113302 | visitgo      | visit    |        1 |
+| 113302 |  112202 |     113302 | visitcome    | visit    |        1 |
+| 113302 |  113102 |     113302 | visitcome    | visit    |        1 |
+| 113302 |  113702 |     113302 | visitcome    | visit    |        1 |
+:::
+
+:::
+
 
 Reporter `113901` reports that `110201` and `114702` come to them for money and that they go to `112901`, `117301`, and `114101` for money. 
 

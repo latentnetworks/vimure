@@ -119,6 +119,9 @@ class RealNetwork(BaseNetwork):
         if "nodeNames" in kwargs:
             self.nodeNames = pd.DataFrame(kwargs["nodeNames"].items(), columns = ["id", "name"])
 
+        if "layerNames" in kwargs:
+            self.layerNames = kwargs["layerNames"]
+
         def __repr__(self):
             return f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, K={self.K}, number_ties={self.X.vals.sum()})"
 
@@ -290,7 +293,7 @@ def read_from_edgelist(
         warnings.warn(msg, UserWarning)
 
     # TODO: For future users, we might want to keep track of nodeName2Id too (nodeId2Name)
-    network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, nodeNames=nodeId2Name, **kwargs)
+    network = RealNetwork(X=X, R=R, L=L, N=N, M=M, K=K, nodeNames=nodeId2Name, layerNames=layers, **kwargs)
     return network
 
 def read_from_csv(

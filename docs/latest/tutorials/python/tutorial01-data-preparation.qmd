@@ -454,7 +454,7 @@ ties_layer_mapping={
     "borrowmoney": "money",
     "lendmoney": "money",
     "giveadvice": "advice",
-    "giveadvice": "advice",
+    "helpdecision": "advice",
     "keroricego": "kerorice",
     "keroricecome": "kerorice",
     "visitgo": "visit",
