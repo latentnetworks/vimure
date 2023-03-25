@@ -27,3 +27,16 @@ def karnataka_edgelist_vil1():
     df.rename(columns={"Ego": "ego", "Alter": "alter"}, inplace=True)
     yield df, nodes, reporters
 
+@pytest.fixture()
+def karnataka_edgelist_vil1_money():
+
+    import sys
+    sys.path.insert(0, "notebooks/python/experiments/")
+
+    from karnataka import read_village_data # type: ignore
+    df, nodes, reporters = read_village_data("vil1", 
+                                             filter_layer="money",
+                                             data_folder="data/input/india_microfinance/formatted/")
+    df.rename(columns={"Ego": "ego", "Alter": "alter"}, inplace=True)
+    yield df, nodes, reporters
+

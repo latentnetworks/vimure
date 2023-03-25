@@ -42,7 +42,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         mutuality: bool = True,
         convergence_tol: float = 0.1,
         decision: int = 1,
-        verbose: bool = True,
+        verbose: bool = False,
     ):
         """
         Parameters
@@ -181,7 +181,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 if extra_params["K"] is None:
                     self.K = np.max(X.vals) + 1
 
-                    # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
                     msg = f"Parameter K was None. Defaulting to: {self.K}"
                     warnings.warn(msg, UserWarning)
                 else:
@@ -193,7 +192,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 else:
                     self.K = int(X.max()) + 1
 
-                # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
                 msg = f"Parameter K was None. Defaulting to: {self.K}"
                 warnings.warn(msg, UserWarning)
 
@@ -209,7 +207,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 msg = "Reporters Mask was not informed (parameter R). "
                 msg += "The model will assume that every reporter can report on any tie."
 
-                # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
                 warnings.warn(msg, UserWarning)
                 R = np.ones((self.L, self.N, self.N, self.M))
 
@@ -256,8 +253,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 self.logger.error(msg)
                 raise ValueError(msg % (self.L, self.M))
 
-            warn_msg = "Ignoring theta_prior since full alpha_theta and beta_theta tensors were informed"
-            self.logger.debug(warn_msg)
+            if self.verbose:
+                warn_msg = "Ignoring theta_prior since full alpha_theta and beta_theta tensors were informed"
+                self.logger.debug(warn_msg)
 
         else:
             if type(theta_prior) is not tuple or len(theta_prior) != 2:
@@ -299,8 +297,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 self.logger.error(msg)
                 raise ValueError(msg)
 
-            warn_msg = "Ignoring lambda_prior since full alpha_lambda and beta_lambda tensors were informed"
-            self.logger.debug(warn_msg)
+            if self.verbose:
+                warn_msg = "Ignoring lambda_prior since full alpha_lambda and beta_lambda tensors were informed"
+                self.logger.debug(warn_msg)
 
         else:
             if type(lambda_prior) is not tuple or len(lambda_prior) != 2:
@@ -367,7 +366,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
         self.rho_f, self.G_exp_theta_f, self.G_exp_lambda_f, self.G_exp_nu_f, self.maxL
         """
 
-        self.logger.debug("Checking user parameters passed to the VimureModel.fit()")
+        if self.verbose:
+            self.logger.debug("Checking user parameters passed to the VimureModel.fit()")
         self.__check_fit_params(
             X=X,
             theta_prior=theta_prior,
@@ -386,7 +386,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         for r in range(self.num_realisations):
 
-            self.logger.debug("Initializing priors")
+            if self.verbose:
+                self.logger.debug("Initializing priors")
             if r < 5:  # the first 5 runs are with bias = 0
                 self._set_rho_prior()
             else:
@@ -462,7 +463,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         # TODO: Allow self.rho_prior to be skt.sptensor if a user prefers sparse tensors.
 
-        self.logger.debug("Setting priors on rho")
+        if self.verbose:
+            self.logger.debug("Setting priors on rho")
         # TODO: Make pr_rho sparse
         pr_rho = np.zeros((self.L, self.N, self.N, self.K))
         if self.rho_prior is None:
@@ -1045,7 +1047,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         if coincide > self.decision:
             reached_convergence = True
 
-        if iter == 1 or iter % 10 == 0 or iter == self.max_iter:
+        if (iter == 1 or iter % 10 == 0 or iter == self.max_iter) and self.verbose:
             msg = f"Realisation {r:2} | Iter {iter:4} | ELBO value: {elbo:6.12f} | "
             msg += f"Reached convergence: {reached_convergence}"
             self.logger.debug(msg)

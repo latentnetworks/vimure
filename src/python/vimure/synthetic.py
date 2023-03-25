@@ -28,7 +28,7 @@ DEFAULT_EXP_OUT = 2.5
 DEFAULT_ETA = 0.5
 DEFAULT_AVG_DEGREE = 2
 
-module_logger = setup_logging("vm.synthetic")
+module_logger = setup_logging("vm.synthetic", False)
 
 def transpose_ij(M):
     """
@@ -82,7 +82,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         Q: int = None,
         seed: int = None,
         theta: np.ndarray = None,
-        verbose: bool = True,
+        verbose: bool = False,
     ):
         """
         Any object inhereted from BaseSyntheticNetwork will have a ground truth network Y.

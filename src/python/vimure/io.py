@@ -23,7 +23,7 @@ DEFAULT_SEED = 10
 """
 SETUP
 """
-module_logger = setup_logging("vm.io")
+module_logger = setup_logging("vm.io", False)
 
 ### Classes ###
 

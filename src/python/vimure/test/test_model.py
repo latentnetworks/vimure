@@ -6,14 +6,11 @@ import numpy as np
 import pandas as pd
 import vimure as vm
 
-from . import karnataka_edgelist_vil1
 from sklearn.metrics import f1_score
 
-from . import karnataka_edgelist_vil1, suppress_stdout_stderr
-
+from . import karnataka_edgelist_vil1_money, suppress_stdout_stderr
 
 logger = logging.getLogger("vm.test.test_model")
-logger.setLevel(logging.DEBUG)
 
 def check_final_parameters(model, net_obj):
 
@@ -80,7 +77,8 @@ class TestVimureWithRandomNetworks:
 
         logger.debug("Starting VimureModel")
         model = vm.model.VimureModel()
-        model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
+        with suppress_stdout_stderr():
+            model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
 
         check_final_parameters(model, gt_network)
 
@@ -105,13 +103,15 @@ class TestVimureWithRandomNetworks:
 
         logger.debug("Starting VimureModel without providing R")
         model = vm.model.VimureModel()
-        with pytest.warns(UserWarning):
-            model.fit(gt_network.X, K=gt_network.K)
+        with suppress_stdout_stderr():
+            with pytest.warns(UserWarning):
+                model.fit(gt_network.X, K=gt_network.K)
 
         logger.debug("Starting VimureModel without providing K")
         model = vm.model.VimureModel()
-        with pytest.warns(UserWarning):
-            model.fit(gt_network.X, R=gt_network.R)
+        with suppress_stdout_stderr():
+            with pytest.warns(UserWarning):
+                model.fit(gt_network.X, R=gt_network.R)
 
     def test_vimure_model_extreme_scenarios_over_reporting(self):
         """
@@ -165,18 +165,19 @@ class TestVimureWithRandomNetworks:
         alpha_lambda = lambda_k_GT * beta_lambda
 
         model = vm.model.VimureModel(mutuality=True, verbose=True)
-        model.fit(
-            gt_network.X,
-            K=K,
-            seed=seed,
-            theta_prior=(0.1, 0.1),
-            eta_prior=(0.5, 1),
-            alpha_lambda=alpha_lambda,
-            beta_lambda=beta_lambda,
-            num_realisations=2,
-            max_iter=21,
-            R=gt_network.R,
-        )
+        with suppress_stdout_stderr():
+            model.fit(
+                gt_network.X,
+                K=K,
+                seed=seed,
+                theta_prior=(0.1, 0.1),
+                eta_prior=(0.5, 1),
+                alpha_lambda=alpha_lambda,
+                beta_lambda=beta_lambda,
+                num_realisations=2,
+                max_iter=21,
+                R=gt_network.R,
+            )
 
         Y_true = gt_network.Y.toarray()[0].flatten()
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
@@ -235,18 +236,19 @@ class TestVimureWithRandomNetworks:
         alpha_lambda = lambda_k_GT * beta_lambda
 
         model = vm.model.VimureModel(mutuality=True, verbose=True)
-        model.fit(
-            gt_network.X.toarray(),
-            K=K,
-            seed=seed,
-            theta_prior=(0.1, 0.1),
-            eta_prior=(0.5, 1),
-            alpha_lambda=alpha_lambda,
-            beta_lambda=beta_lambda,
-            num_realisations=2,
-            max_iter=21,
-            R=gt_network.R.toarray(),
-        )
+        with suppress_stdout_stderr():
+            model.fit(
+                gt_network.X.toarray(),
+                K=K,
+                seed=seed,
+                theta_prior=(0.1, 0.1),
+                eta_prior=(0.5, 1),
+                alpha_lambda=alpha_lambda,
+                beta_lambda=beta_lambda,
+                num_realisations=2,
+                max_iter=21,
+                R=gt_network.R.toarray(),
+            )
 
         Y_true = gt_network.Y.toarray()[0].flatten()
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
@@ -305,18 +307,19 @@ class TestVimureWithRandomNetworks:
         alpha_lambda = lambda_k_GT * beta_lambda
 
         model = vm.model.VimureModel(mutuality=True, verbose=True)
-        model.fit(
-            gt_network.X,
-            K=K,
-            seed=seed,
-            theta_prior=(0.1, 0.1),
-            eta_prior=(0.5, 1),
-            alpha_lambda=alpha_lambda,
-            beta_lambda=beta_lambda,
-            num_realisations=2,
-            max_iter=21,
-            R=gt_network.R,
-        )
+        with suppress_stdout_stderr():
+            model.fit(
+                gt_network.X,
+                K=K,
+                seed=seed,
+                theta_prior=(0.1, 0.1),
+                eta_prior=(0.5, 1),
+                alpha_lambda=alpha_lambda,
+                beta_lambda=beta_lambda,
+                num_realisations=2,
+                max_iter=21,
+                R=gt_network.R,
+            )
 
         Y_true = gt_network.Y.toarray()[0].flatten()
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
@@ -329,23 +332,24 @@ class TestVimureWithReadData:
     Tests the model with real data
     """
 
-    def test_inform_nodes_reporters(self, karnataka_edgelist_vil1: tuple[pd.DataFrame, set[Any], set[Any]]):
-        df, nodes, reporters = karnataka_edgelist_vil1
+    def test_inform_nodes_reporters(self, karnataka_edgelist_vil1_money: tuple[pd.DataFrame, set[Any], set[Any]]):
+        df, nodes, reporters = karnataka_edgelist_vil1_money
 
         with pytest.warns(None) as record:
             net_obj = vm.io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
 
         model = vm.model.VimureModel(mutuality=True, verbose=True)
-        model.fit(
-            net_obj.X,
-            K=2,
-            seed=1,
-            theta_prior=(0.1, 0.1),
-            eta_prior=(0.5, 1),
-            num_realisations=2,
-            max_iter=21,
-            R=net_obj.R,
-        )
+        with suppress_stdout_stderr():
+            model.fit(
+                net_obj.X,
+                K=2,
+                seed=1,
+                theta_prior=(0.1, 0.1),
+                eta_prior=(0.5, 1),
+                num_realisations=2,
+                max_iter=21,
+                R=net_obj.R,
+            )
 
 
 class TestInferredModel:
@@ -355,13 +359,14 @@ class TestInferredModel:
         cls.synth_net.build_X(flag_self_reporter=True)
 
         cls.model = vm.model.VimureModel()
-        cls.model.fit(
-            cls.synth_net.X,
-            K=cls.synth_net.K,
-            R=cls.synth_net.R,
-            num_realisations=1,
-            max_iter=500,
-        )
+        with suppress_stdout_stderr():
+            cls.model.fit(
+                cls.synth_net.X,
+                K=cls.synth_net.K,
+                R=cls.synth_net.R,
+                num_realisations=1,
+                max_iter=500,
+            )
 
         cls.model_mutuality = vm.model.VimureModel(mutuality=True)
         cls.model_mutuality.fit(
@@ -434,11 +439,12 @@ class TestInferredModel:
         for y in Y:
             self.check_output(y, self.model_mutuality)
 
+
 class TestVimureRealData:
 
-    def test_internal_api(self, karnataka_edgelist_vil1):
+    def test_internal_api(self, karnataka_edgelist_vil1_money):
     
-        df, _, _ = karnataka_edgelist_vil1
+        df, _, _ = karnataka_edgelist_vil1_money
 
         with pytest.warns(None) as record:
             net_obj = vm.io.read_from_edgelist(df, K=2)
@@ -450,9 +456,9 @@ class TestVimureRealData:
 
         check_final_parameters(model, net_obj)
 
-    def test_data_as_edgelist(self, karnataka_edgelist_vil1):
+    def test_data_as_edgelist(self, karnataka_edgelist_vil1_money):
     
-        df, _, _ = karnataka_edgelist_vil1
+        df, _, _ = karnataka_edgelist_vil1_money
 
         # Run model directly with a pandas dataframe
         model = vm.model.VimureModel()

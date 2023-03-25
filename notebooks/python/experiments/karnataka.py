@@ -35,7 +35,7 @@ def read_village_data(
     },
     data_folder: str = DATA_INPUT_FOLDER,
     print_details: bool = True,
-    filter_layer: str = None,
+    filter_layer: str = ""
 ):
     """
     IMPORTANT: Here we assume that only the people who actually appears as reporters
@@ -69,7 +69,7 @@ def read_village_data(
     else:
         edgelist["layer"] = edgelist["type"]
 
-    if filter_layer is not None:
+    if filter_layer != "":
         edgelist = edgelist[edgelist["layer"] == filter_layer].copy()
 
     respondents = set(metadata[metadata["didsurv"] == 1]["pid"])
