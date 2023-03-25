@@ -322,10 +322,21 @@ def read_from_csv(
     net_obj = read_from_edgelist(df, **kwargs)
     return net_obj
 
-
-def parse_igraph_object(G, **kwargs):
+def read_from_igraph(G, **kwargs):
     """
+    Reads an igraph object and returns a RealNetwork object
+
+    Parameters
+    ----------
+    G : igraph.Graph
+        An igraph object
+    **kwargs:
+        Any other parameters to be sent to read_from_edgelist
     
+    Returns
+    -------
+    RealNetwork
+        A RealNetwork object
     """
 
     # get the edgelist as a list of tuples
@@ -340,15 +351,15 @@ def parse_igraph_object(G, **kwargs):
     for attr in edge_attrs[0]:
         df[attr] = [edge[attr] for edge in edge_attrs]
 
-    df = df.rename(columns={"source":"Ego", "target":"Alter"})\
-        .assign(ego=lambda x: G.vs[x.Ego]["name"], 
-                target=lambda x: G.vs[x.Alter]["name"])
+    df = df.rename(columns={"source":"ego", "target":"alter"})\
+        .assign(ego=lambda x: G.vs[x.ego]["name"], 
+                alter=lambda x: G.vs[x.alter]["name"])
     
     return read_from_edgelist(df, **kwargs)
 
 def parse_graph_from_networkx(G, **kwargs):
     df = nx.to_pandas_edgelist(G)
-    return parse_graph_from_edgelist(df, **kwargs)
+    return read_from_edgelist(df, **kwargs)
 
 ### Utility functions ###
 

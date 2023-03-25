@@ -5,11 +5,12 @@ import warnings
 
 import numpy as np
 import pandas as pd
+import igraph as ig
 import sktensor as skt
 import scipy.special as sp
 from scipy.stats import poisson
 
-from .io import read_from_edgelist
+from .io import read_from_edgelist, read_from_igraph
 from .log import setup_logging
 from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_threshold
 
@@ -107,8 +108,13 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 msg = "Ignoring unrecognised parameter %s." % extra_param
                 self.logger.warn(msg)
 
-        if isinstance(X, pd.DataFrame):
-            net_obj = read_from_edgelist(X)
+        if isinstance(X, pd.DataFrame) or isinstance(X, ig.Graph):
+
+            if isinstance(X, pd.DataFrame):
+                net_obj = read_from_edgelist(X)
+            else:
+                net_obj = read_from_igraph(X)
+
             X = net_obj.X
 
             self.nodeNames = net_obj.nodeNames
@@ -120,9 +126,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
             else:
                 if extra_params["K"] is None:
                     self.K = net_obj.K
-
             
-
         # If the network is undirected, then do not estimate the mutuality
         if self.undirected and not np.array_equal(
             X, np.transpose(X, axes=(0, 2, 1, 3))
