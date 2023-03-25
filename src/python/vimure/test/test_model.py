@@ -1,6 +1,7 @@
 from typing import Any
 import pytest
 import logging
+
 import numpy as np
 import pandas as pd
 import vimure as vm
@@ -8,53 +9,55 @@ import vimure as vm
 from . import karnataka_edgelist_vil1
 from sklearn.metrics import f1_score
 
+from . import karnataka_edgelist_vil1, suppress_stdout_stderr
+
+
 logger = logging.getLogger("vm.test.test_model")
 logger.setLevel(logging.DEBUG)
 
+def check_final_parameters(model, net_obj):
+
+    """Latent Variables - Parameter rho"""
+    assert model.rho is not None
+    assert type(model.rho) == np.ndarray
+    assert model.rho.shape == (net_obj.L, net_obj.N, net_obj.N, net_obj.K)
+    assert model.rho.sum() != 0, "Model returned a trivial solution"
+
+    """Latent Variables - Parameter gamma - shape & rate"""
+    assert model.gamma_shp is not None
+    assert type(model.gamma_shp) == np.ndarray
+    assert model.gamma_shp.shape == (net_obj.L, net_obj.M)
+    assert model.gamma_shp.sum() > 0
+
+    assert model.gamma_rte is not None
+    assert type(model.gamma_rte) == np.ndarray
+    assert model.gamma_rte.shape == (net_obj.L, net_obj.M)
+    assert model.gamma_rte.sum() > 0
+
+    """Latent Variables - Parameter phi - shape & rate"""
+    assert model.phi_shp is not None
+    assert type(model.phi_shp) == np.ndarray
+    assert model.phi_shp.shape == (net_obj.L, net_obj.K)
+    assert model.phi_shp.sum() > 0
+
+    assert model.phi_rte is not None
+    assert type(model.phi_rte) == np.ndarray
+    assert model.phi_rte.shape == (net_obj.L, net_obj.K)
+    assert model.phi_rte.sum() > 0
+
+    """Latent Variables - Parameter nu - shape & rate"""
+    assert model.nu_shp is not None
+    assert type(model.nu_shp) == np.float64
+    assert model.nu_shp >= 0
+
+    assert model.nu_rte is not None
+    assert type(model.nu_rte) == np.float64
+    assert model.nu_rte >= 0
 
 class TestVimureWithRandomNetworks:
     """
     Tests of the VimureModel class
     """
-
-    def check_final_parameters(self, model, synth_net):
-
-        """Latent Variables - Parameter rho"""
-        assert model.rho is not None
-        assert type(model.rho) == np.ndarray
-        assert model.rho.shape == (synth_net.L, synth_net.N, synth_net.N, synth_net.K)
-        assert model.rho.sum() != 0, "Model returned a trivial solution"
-
-        """Latent Variables - Parameter gamma - shape & rate"""
-        assert model.gamma_shp is not None
-        assert type(model.gamma_shp) == np.ndarray
-        assert model.gamma_shp.shape == (synth_net.L, synth_net.M)
-        assert model.gamma_shp.sum() > 0
-
-        assert model.gamma_rte is not None
-        assert type(model.gamma_rte) == np.ndarray
-        assert model.gamma_rte.shape == (synth_net.L, synth_net.M)
-        assert model.gamma_rte.sum() > 0
-
-        """Latent Variables - Parameter phi - shape & rate"""
-        assert model.phi_shp is not None
-        assert type(model.phi_shp) == np.ndarray
-        assert model.phi_shp.shape == (synth_net.L, synth_net.K)
-        assert model.phi_shp.sum() > 0
-
-        assert model.phi_rte is not None
-        assert type(model.phi_rte) == np.ndarray
-        assert model.phi_rte.shape == (synth_net.L, synth_net.K)
-        assert model.phi_rte.sum() > 0
-
-        """Latent Variables - Parameter nu - shape & rate"""
-        assert model.nu_shp is not None
-        assert type(model.nu_shp) == np.float64
-        assert model.nu_shp >= 0
-
-        assert model.nu_rte is not None
-        assert type(model.nu_rte) == np.float64
-        assert model.nu_rte >= 0
 
     def test_vimure_model_with_standard_sbm(self):
         """
@@ -79,7 +82,7 @@ class TestVimureWithRandomNetworks:
         model = vm.model.VimureModel()
         model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
 
-        self.check_final_parameters(model, gt_network)
+        check_final_parameters(model, gt_network)
 
     def test_vimure_model_issues_appropriate_warnings(self):
         """
@@ -430,3 +433,36 @@ class TestInferredModel:
         
         for y in Y:
             self.check_output(y, self.model_mutuality)
+
+class TestVimureRealData:
+
+    def test_internal_api(self, karnataka_edgelist_vil1):
+    
+        df, _, _ = karnataka_edgelist_vil1
+
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_edgelist(df, K=2)
+
+        model = vm.model.VimureModel()
+
+        with suppress_stdout_stderr():
+            model.fit(net_obj.X, K=net_obj.K, R=net_obj.R)
+
+        check_final_parameters(model, net_obj)
+
+    def test_data_as_edgelist(self, karnataka_edgelist_vil1):
+    
+        df, _, _ = karnataka_edgelist_vil1
+
+        # Run model directly with a pandas dataframe
+        model = vm.model.VimureModel()
+        with suppress_stdout_stderr():
+            model.fit(df, 
+                      seed=1,
+                      num_realisations=1,
+                      max_iter=500)
+
+        # Read in data as an edgelist to compare
+        with pytest.warns(None) as record:
+            net_obj = vm.io.read_from_edgelist(df, K=2)
+        check_final_parameters(model, net_obj)
