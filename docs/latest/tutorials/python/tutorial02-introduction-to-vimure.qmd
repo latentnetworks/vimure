@@ -547,7 +547,7 @@ Changing this is a priority for the next version of the package. But, as it is n
 
 **Ranking the reporters**
 
-Let's check which reporters have the highest $\theta$ values:
+Let's check which reporters have the highest $\theta_l \times \lambda_{k=1}$ values:
 
 <details><summary>Click to see the code</summary>
 
@@ -560,44 +560,46 @@ df_nodes = model.nodeNames
 # TODO: Check that the number of reporters is consistent
 id_reporters = df_nodes[df_nodes['name'].isin(reporters)]["id"].values
 
-# Get the reliability estimates for the reporters
-df_theta_reporters = pd.DataFrame({
-    "reporter_id": id_reporters,
-    "reporter_name": df_nodes.iloc[id_reporters]["name"].values
-})
+df_lambda_k1 = pd.DataFrame(dict(layer=model.layerNames, lambda_k1=posterior_estimates['lambda'][:,1]))
 
 # Add the theta values
-theta_layer_cols = [f"theta_{layer}" for layer in model.layerNames]
+df_theta_reporters = [
+    (layer_name, reporter_id, df_nodes['name'].iloc[reporter_id], posterior_estimates['theta'][l, reporter_id] * df_lambda_k1['lambda_k1'].iloc[l])
+    for reporter_id in id_reporters
+    for l, layer_name in enumerate(model.layerNames)]
 
-theta_per_layer = pd.DataFrame(posterior_estimates['theta'].T, 
-                               columns=theta_layer_cols)
+df_theta_reporters = \
+    pd.DataFrame(df_theta_reporters, 
+                 columns=['layer', 'reporter_id', 'reporter_name', 'theta_scaled'])
 
-df_theta_reporters = pd.concat([df_theta_reporters, theta_per_layer], axis=1)
-df_theta_reporters['reporter_id'] = df_theta_reporters['reporter_id'].astype(pd.Int64Dtype())
-
-# Sort by reliability
-df_theta_reporters.sort_values(by=theta_layer_cols, ascending=False, inplace=True)
-
-df_theta_reporters.head()
+# Sort by reliability (scaled by lambda_k=1)
+df_theta_reporters\
+    .pivot(index=['reporter_id', 'reporter_name'], 
+           columns=['layer'], 
+           values=['theta_scaled'])\
+    .droplevel(0, axis=1)\
+    .reset_index()\
+    .sort_values(by=model.layerNames, ascending=False)\
+    .head()
 ```
 </details>
 
 ::: {style="width: 50%;"}
 
-|   reporter_id |   reporter_name |   theta_advice |   theta_kerorice |   theta_money |   theta_visit |
-|--------------:|----------------:|---------------:|-----------------:|--------------:|--------------:|
-|           120 |          113302 |        1.56308 |      2.06044     |   0.99434     |      0.502956 |
-|           124 |          113901 |        1.52996 |      2.28673     |   1.87973     |      1.6035   |
-|            97 |          109902 |        1.48183 |      2.20819     |   3.36878e-05 |      1.53681  |
-|            92 |          109505 |        1.4818  |      3.61538e-05 |   1.81555     |      2.06534  |
-|            56 |          105902 |        1.48178 |      3.55888e-05 |   0.992002    |      0.895679 |
+|   reporter_id |   reporter_name |   advice |    kerorice |       money |    visit |
+|--------------:|----------------:|---------:|------------:|------------:|---------:|
+|           120 |          113302 | 0.897073 | 0.73975     | 0.459182    | 0.209975 |
+|           124 |          113901 | 0.878063 | 0.820995    | 0.868054    | 0.669433 |
+|            97 |          109902 | 0.850442 | 0.792795    | 1.55569e-05 | 0.641589 |
+|            92 |          109505 | 0.850422 | 1.29801e-05 | 0.838414    | 0.86224  |
+|            56 |          105902 | 0.850409 | 1.27773e-05 | 0.458103    | 0.37393  |
 :::
 
 **How should we interpret the values?**
 
 The interpretation depends on both the mutuality of the network and the survey design. If the mutuality is high (as indicated by $\nu$ being closer to 1), reporters will tend to reciprocate the ties they report by default, and reporters with high $\theta$ values (relative to the $\theta$ distribution) are likely "over-reporting" ties.
 
-To verify if this is the case for the network, let's examine the top reporter listed in the table above (113302).
+To verify if this is the case for our network, let's examine the top reporter listed in the table above (113302).
 
 ```python
 edgelist[edgelist["reporter"] == "113302"]
@@ -706,17 +708,28 @@ Let's plot the distribution of $\theta$ values for the reporters:
 # plotnine is the python equivalent of ggplot2
 from plotnine import *
 
-# Plot the distribution of theta values
-g = (
-    ggplot(df_theta_reporters, aes(x="theta"))
-    + geom_histogram(bins=20)
-    # Make x labs a greek symbol
-    + labs(x=r"$\theta_m$", y="Count",
-           title="Distribution of theta values for reporters")
-    + theme_bw()
-)
+plot_df = df_theta_reporters.copy()
 
-ggsave(g, "theta_reporters.png", width=7, height=4, dpi=300)
+COLORS =  ['#E69F25', '#5CB4E4', '#069F72', '#F1E545', '#0773B2', '#CC79A8']
+
+g = (ggplot(plot_df,  aes(x="theta_scaled", fill="layer")) +
+     geom_histogram(binwidth=0.1, color="#212121") +
+     theme_bw() + 
+     facet_grid("layer ~ .", scales="free_y") +
+     scale_fill_manual(values=COLORS, guide=False) +
+     theme(figure_size=(6, 3),
+           axis_text_x=element_text(size=10),
+           axis_text_y=element_text(size=10),
+           panel_grid_minor=element_blank(),
+           panel_grid_major=element_blank(),           
+           strip_background = element_blank(),
+           strip_text_x = element_text(size=10),
+           axis_title=element_text(size=16)) +
+     scale_x_continuous(name=r"$\theta \times \lambda_{k=1}$", breaks=np.arange(0, 1.1, 0.1), limits=(0, 1.1)) +
+     scale_y_continuous(name="Count", breaks=np.arange(0, 60, 10), limits=(0, 50)) +
+     ggtitle(r"Reliability distribution across layers ($\theta_l \times \lambda_{k=1}$)"))
+
+ggsave(g, "theta_reporters.png", width=7, height=9, dpi=300)
 ```
 
 </details>
