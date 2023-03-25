@@ -339,7 +339,7 @@ class TestVimureWithReadData:
     Tests the model with real data
     """
 
-    def test_inform_nodes_reporters(self, karnataka_edgelist_vil1_money: tuple[pd.DataFrame, set[Any], set[Any]]):
+    def test_inform_nodes_reporters(self, karnataka_edgelist_vil1_money):
         df, nodes, reporters = karnataka_edgelist_vil1_money
 
         with pytest.warns(None) as record:
