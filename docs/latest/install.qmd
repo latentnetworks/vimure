@@ -114,7 +114,7 @@ Install the latest `vimure` (v0.1) with the following command:
 pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
 ```
 
-This Python package was tested on Python >= 3.6, and it is expected to work fine in all OSes.
+This Python package was tested on Python >= 3.8, and it is expected to work fine in all OSes.
 
 Read more about the Python setup for development [here](https://github.com/latentnetworks/vimure/blob/develop/src/python/README.md).
 

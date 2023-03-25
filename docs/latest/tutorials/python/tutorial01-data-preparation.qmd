@@ -231,7 +231,7 @@ tie_type = "lendmoney"
 edgelist_lendmoney = pd.melt(lendmoney, id_vars=[0]).dropna()
 ```
 
-This produces a bogus `variable` column, which we can drop. We should also rename the columns to something more meaningful. It is **important** that we add a `respondent` column. This will be the `pid` of the individual who reported the relationship.
+This produces a bogus `variable` column, which we can drop. We should also rename the columns to something more meaningful. It is **important** that we add a `reporter` column. This will be the `pid` of the individual who reported the relationship.
 
 ```python
 edgelist_lendmoney = edgelist_lendmoney.drop(columns="variable")\
@@ -454,7 +454,7 @@ ties_layer_mapping={
     "borrowmoney": "money",
     "lendmoney": "money",
     "giveadvice": "advice",
-    "giveadvice": "advice",
+    "helpdecision": "advice",
     "keroricego": "kerorice",
     "keroricecome": "kerorice",
     "visitgo": "visit",

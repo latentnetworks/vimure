@@ -1,8 +1,0 @@
----
-title: "💻 **Tutorial 02**: Introduction to VIMuRe in Python"
-subtitle: "VIMuRe v0.1.0 (latest)."
-categories: [basics, python]
-description: "<span style='color:var(--bs-warning)'>🚧 **This tutorial is still under construction.** 🚧</span>"
----
-
-Would you like to help translating the [R tutorial](/latest/tutorials/R/tutorial01-data-preparation.qmd) to python? Please [contact us](https://github.com/latentnetworks/vimure/discussions)!

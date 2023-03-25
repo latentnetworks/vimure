@@ -1,4 +1,8 @@
-"""Logging setup"""
+"""Logging setup
+
+# Refactor this to use the logging module
+
+"""
 import sys
 import logging
 
@@ -20,7 +24,6 @@ def setup_logging(logger_name=__name__, verbose=True):
 
     # create console handler with a higher log level
     ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
 
     # create formatter and add it to the handlers
     formatter = logging.Formatter(
@@ -32,8 +35,10 @@ def setup_logging(logger_name=__name__, verbose=True):
 
     if verbose:
         logger.setLevel(logging.DEBUG)
+        ch.setLevel(logging.DEBUG)
     else:
         logger.setLevel(logging.INFO)
+        ch.setLevel(logging.INFO)
 
     if not logger.handlers:
         logger.addHandler(ch)

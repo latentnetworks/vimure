@@ -1,15 +1,16 @@
 """Inference model"""
 import sys
-import math
 import time
 import warnings
 
 import numpy as np
 import pandas as pd
+import igraph as ig
 import sktensor as skt
 import scipy.special as sp
 from scipy.stats import poisson
 
+from .io import read_from_edgelist, read_from_igraph
 from .log import setup_logging
 from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_threshold
 
@@ -20,8 +21,8 @@ from sklearn.exceptions import NotFittedError
 INF = 1e10
 DEFAULT_EPS = 1e-12
 DEFAULT_BIAS0 = 0.0
-DEFAULT_MAX_ITER = 20
-DEFAULT_NUM_REALISATIONS = 20
+DEFAULT_MAX_ITER = 500
+DEFAULT_NUM_REALISATIONS = 1
 
 
 class VimureModel(TransformerMixin, BaseEstimator):
@@ -42,7 +43,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         mutuality: bool = True,
         convergence_tol: float = 0.1,
         decision: int = 1,
-        verbose: bool = True,
+        verbose: bool = False,
     ):
         """
         Parameters
@@ -81,7 +82,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
     def __check_fit_params(
         self,
-        X: np.ndarray,
+        X,
         lambda_prior=(10.0, 10.0),
         theta_prior=(0.1, 0.1),
         eta_prior=(0.5, 1.0),
@@ -107,6 +108,25 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 msg = "Ignoring unrecognised parameter %s." % extra_param
                 self.logger.warn(msg)
 
+        if isinstance(X, pd.DataFrame) or isinstance(X, ig.Graph):
+
+            if isinstance(X, pd.DataFrame):
+                net_obj = read_from_edgelist(X)
+            else:
+                net_obj = read_from_igraph(X)
+
+            X = net_obj.X
+
+            self.nodeNames = net_obj.nodeNames
+            self.layerNames = net_obj.layerNames
+            self.R = preprocess(net_obj.R)
+            
+            if "K" not in extra_params:
+                self.K = net_obj.K
+            else:
+                if extra_params["K"] is None:
+                    self.K = net_obj.K
+            
         # If the network is undirected, then do not estimate the mutuality
         if self.undirected and not np.array_equal(
             X, np.transpose(X, axes=(0, 2, 1, 3))
@@ -159,40 +179,42 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         self.L, self.N, self.M = X.shape[0], X.shape[1], X.shape[3]
 
-        if "K" in extra_params:
-            if extra_params["K"] is None:
-                self.K = np.max(X.vals) + 1
+        # If X was not passed as a DataFrame nor an igraph object...
+        if not hasattr(self, "K"):
+            if "K" in extra_params:
+                if extra_params["K"] is None:
+                    self.K = np.max(X.vals) + 1
 
-                # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
+                    msg = f"Parameter K was None. Defaulting to: {self.K}"
+                    warnings.warn(msg, UserWarning)
+                else:
+                    self.K = int(extra_params["K"])
+            else:
+
+                if isinstance(X, skt.sptensor):
+                    self.K = X.vals.max() + 1
+                else:
+                    self.K = int(X.max()) + 1
+
                 msg = f"Parameter K was None. Defaulting to: {self.K}"
                 warnings.warn(msg, UserWarning)
+
+        # If X was not passed as a DataFrame nor an igraph object...
+        if not hasattr(self, "R"):
+            if "R" in extra_params:
+                R = extra_params["R"]
+                if R.shape != (self.L, self.N, self.N, self.M):
+                    msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
+                    self.logger.error(msg)
+                    raise ValueError(msg)
             else:
-                self.K = int(extra_params["K"])
-        else:
+                msg = "Reporters Mask was not informed (parameter R). "
+                msg += "The model will assume that every reporter can report on any tie."
 
-            if isinstance(X, skt.sptensor):
-                self.K = X.vals.max() + 1
-            else:
-                self.K = int(X.max()) + 1
+                warnings.warn(msg, UserWarning)
+                R = np.ones((self.L, self.N, self.N, self.M))
 
-            # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
-            msg = f"Parameter K was None. Defaulting to: {self.K}"
-            warnings.warn(msg, UserWarning)
-
-        if "R" in extra_params:
-            R = extra_params["R"]
-            if R.shape != (self.L, self.N, self.N, self.M):
-                msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
-                self.logger.error(msg)
-                raise ValueError(msg)
-        else:
-            msg = "Reporters Mask was not informed (parameter R). "
-            msg += "The model will assume that every reporter can report on any tie."
-
-            # logger.warning() vs warnings.warn() https://stackoverflow.com/a/14762106/843365
-            warnings.warn(msg, UserWarning)
-            R = np.ones((self.L, self.N, self.N, self.M))
-        self.R = preprocess(R)
+            self.R = preprocess(R)
 
         if "EPS" in extra_params:
             self.EPS = float(extra_params["EPS"])
@@ -235,8 +257,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 self.logger.error(msg)
                 raise ValueError(msg % (self.L, self.M))
 
-            warn_msg = "Ignoring theta_prior since full alpha_theta and beta_theta tensors were informed"
-            self.logger.debug(warn_msg)
+            if self.verbose:
+                warn_msg = "Ignoring theta_prior since full alpha_theta and beta_theta tensors were informed"
+                self.logger.debug(warn_msg)
 
         else:
             if type(theta_prior) is not tuple or len(theta_prior) != 2:
@@ -278,8 +301,9 @@ class VimureModel(TransformerMixin, BaseEstimator):
                 self.logger.error(msg)
                 raise ValueError(msg)
 
-            warn_msg = "Ignoring lambda_prior since full alpha_lambda and beta_lambda tensors were informed"
-            self.logger.debug(warn_msg)
+            if self.verbose:
+                warn_msg = "Ignoring lambda_prior since full alpha_lambda and beta_lambda tensors were informed"
+                self.logger.debug(warn_msg)
 
         else:
             if type(lambda_prior) is not tuple or len(lambda_prior) != 2:
@@ -306,7 +330,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
     def fit(
         self,
-        X: np.ndarray,
+        X,
         theta_prior=(0.1, 0.1),
         lambda_prior=(10.0, 10.0),
         eta_prior=(0.5, 1.0),
@@ -346,7 +370,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
         self.rho_f, self.G_exp_theta_f, self.G_exp_lambda_f, self.G_exp_nu_f, self.maxL
         """
 
-        self.logger.debug("Checking user parameters passed to the VimureModel.fit()")
+        if self.verbose:
+            self.logger.debug("Checking user parameters passed to the VimureModel.fit()")
         self.__check_fit_params(
             X=X,
             theta_prior=theta_prior,
@@ -365,7 +390,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         for r in range(self.num_realisations):
 
-            self.logger.debug("Initializing priors")
+            if self.verbose:
+                self.logger.debug("Initializing priors")
             if r < 5:  # the first 5 runs are with bias = 0
                 self._set_rho_prior()
             else:
@@ -441,7 +467,8 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         # TODO: Allow self.rho_prior to be skt.sptensor if a user prefers sparse tensors.
 
-        self.logger.debug("Setting priors on rho")
+        if self.verbose:
+            self.logger.debug("Setting priors on rho")
         # TODO: Make pr_rho sparse
         pr_rho = np.zeros((self.L, self.N, self.N, self.K))
         if self.rho_prior is None:
@@ -1024,7 +1051,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         if coincide > self.decision:
             reached_convergence = True
 
-        if iter == 1 or iter % 10 == 0 or iter == self.max_iter:
+        if (iter == 1 or iter % 10 == 0 or iter == self.max_iter) and self.verbose:
             msg = f"Realisation {r:2} | Iter {iter:4} | ELBO value: {elbo:6.12f} | "
             msg += f"Reached convergence: {reached_convergence}"
             self.logger.debug(msg)
@@ -1161,6 +1188,22 @@ class VimureModel(TransformerMixin, BaseEstimator):
             method = "rho_max"
 
         return methods[method](self, threshold)
+
+    def get_posterior_estimates(self):
+
+        if not hasattr(self, "rho_f"):
+            NotFittedError(
+                "This VimureModel instance is not fitted yet. "
+                "Call 'fit' with appropriate arguments before using this estimator"
+            )
+        
+        posterior_estimates = {
+            "nu": self.G_exp_nu_f,
+            "theta": self.G_exp_theta_f,
+            "lambda": self.G_exp_lambda_f,
+            "rho": self.rho_f
+        }
+        return posterior_estimates
 
     """
     UTILS
