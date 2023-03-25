@@ -65,6 +65,8 @@ del reporters_money, reporters_visit, reporters_advice, reporters_kerorice
 reporters.difference(set(edgelist.reporter)) # This should return an empty set
 ```
 
+</details>
+
 ::: panel-tabset
 
 ## Load Data Frame
@@ -420,7 +422,7 @@ print("Concordance is:", G_intersection.ecount() / G_union.ecount())
 producing:
 
 ```text
-Concordance is: 0.014634146341463415
+Concordance is: 0.2002262443438914
 ```
 
 # 📦 Step 3: Use `vimure` package to run the model
@@ -446,10 +448,12 @@ import vimure as vm
 
 # Run the model
 model = vm.model.VimureModel()
-model.fit(g)
+model.fit(G)
 ```
 
 :::
+
+(_If you rather see what the model is doing, you can set `verbose=True` in the `fit()` method_)
 
 After which, you might be interested to look at the posterior estimates of the model parameters:
 
@@ -499,7 +503,7 @@ If you want to extract a quick point estimate of the inferred network, you can s
 rho = posterior_estimates['rho'][0,:,:,1]
 ```
 
-The code above will return a $N \times N$ weighted adjacency matrix which can be thought of as the probability of a tie between individuals $i$ and $j$ on layer $l = 0$ (). More on that in the next tutorial.
+The code above will return a $N \times N$ weighted adjacency matrix which can be thought of as the probability of a tie between individuals $i$ and $j$ on layer $l = 0$ (Tutorial 03 will go into more detail about how to interpret the $\rho$ parameter.)
 
 Now let's look at parameters $\nu$ and $\theta_{lm}$:
 
@@ -519,9 +523,9 @@ This indicates a large mutuality in the network. That is, if $i$ reports that $j
 
 This is a network-wide parameter and encompasses all layers. If you have reasons to believe mutuality varies across layers, you have to re-run the model for each layer separately.
 
-### 3.1.2: Reliability ($\theta_{lm}$)
+### 3.1.2: Under-reporting vs over-reporting: a combination of ($\theta_{lm} \times \lambda_{lk}$)
 
-First, let's look at the shape of the array:
+First, let's look at the shape of the $\theta$ array:
 
 ```python
 posterior_estimates['theta'].shape
@@ -533,11 +537,25 @@ posterior_estimates['theta'].shape
 
 We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that there are 417 reporters in the network. 
 
+This parameter, combined with $\lambda_{lk}$ represents the "reliability" of a reporter $m$ on layer $l$: 
+
+```python
+posterior_estimates['lambda'].shape
+```
+
+```text
+(4, 2)
+```
+
+The first dimension is the number of layers $l$, and the second dimension is the strength of the tie, which in this case can assume the values $k \in \{0, 1\}$. We only have two possible values for $k$ because that is the default setting for the `VimureModel` class. If you want to model more than two possible values for $k$, you can set the `K` parameter when running the fit function: `model.fit(..., K=3)`. 
+
+Combined, these two parameters indicate the probability that a reporter will _tend_ to report ties, in general, for a given layer (recall the expected value of the VIMuRe model shown in Section [3.1: Posterior Estimates](#posterior-estimates)). Loosely speaking, we can think of this value as the "reliability" of a reporter on a given layer.
+
 ::: { .callout-note collapse="true"}
 
 ## Another note on the number of reporters
 
-You might be wondering why there are so many reporters. After all, in Section [2.2: Number of reporters](#number-of-reporters), we calculated this number to be around 200! This is due to a technicality in the way the VIMuRe package handles the data. Our current implementation represents the total number of reporters, $M$ as $M = N$ (i.e. the number of nodes is equal to the number of reporters). 
+You might be wondering why there are so many reporters, 417. After all, in Section [2.2: Number of reporters](#number-of-reporters), we calculated this number to be around 200! This is due to a technicality in the way the VIMuRe package handles the data. Our current implementation represents the total number of reporters, $M$ as $M = N$ (i.e. the number of nodes is equal to the number of reporters). 
 
 This is akin to saying each node has _the potential_ to be a reporter. But to control for which nodes are actually reporters, we use a binary mask, $R_{lijm}$, which is 1 if the node $m$ is a reporter on layer $l$ for the tie between nodes $i$ and $j$ and 0 otherwise. You can control how this mask is built by passing the `R` parameter to the `fit()` method. Read more about it in section [3.3: A note on the reporter mask (`R`)](#a-note-on-the-reporter-mask-r).
 
@@ -545,9 +563,9 @@ Changing this is a priority for the next version of the package. But, as it is n
 
 :::
 
-**Ranking the reporters**
+**How are reporters' "reliability" distributed across layers?**
 
-Let's check which reporters have the highest $\theta_l \times \lambda_{k=1}$ values:
+Let's check which reporters have the highest "reliability" values, and plot the values for each layer:
 
 <details><summary>Click to see the code</summary>
 
@@ -557,7 +575,6 @@ df_nodes = model.nodeNames
 
 # Which nodes are reporters?
 # Note: this assumes you have a `reporters` list from Tutorial 01
-# TODO: Check that the number of reporters is consistent
 id_reporters = df_nodes[df_nodes['name'].isin(reporters)]["id"].values
 
 df_lambda_k1 = pd.DataFrame(dict(layer=model.layerNames, lambda_k1=posterior_estimates['lambda'][:,1]))
@@ -582,124 +599,8 @@ df_theta_reporters\
     .sort_values(by=model.layerNames, ascending=False)\
     .head()
 ```
+
 </details>
-
-::: {style="width: 50%;"}
-
-|   reporter_id |   reporter_name |   advice |    kerorice |       money |    visit |
-|--------------:|----------------:|---------:|------------:|------------:|---------:|
-|           120 |          113302 | 0.897073 | 0.73975     | 0.459182    | 0.209975 |
-|           124 |          113901 | 0.878063 | 0.820995    | 0.868054    | 0.669433 |
-|            97 |          109902 | 0.850442 | 0.792795    | 1.55569e-05 | 0.641589 |
-|            92 |          109505 | 0.850422 | 1.29801e-05 | 0.838414    | 0.86224  |
-|            56 |          105902 | 0.850409 | 1.27773e-05 | 0.458103    | 0.37393  |
-:::
-
-**How should we interpret the values?**
-
-The interpretation depends on both the mutuality of the network and the survey design. If the mutuality is high (as indicated by $\nu$ being closer to 1), reporters will tend to reciprocate the ties they report by default, and reporters with high $\theta$ values (relative to the $\theta$ distribution) are likely "over-reporting" ties.
-
-To verify if this is the case for our network, let's examine the top reporter listed in the table above (113302).
-
-```python
-edgelist[edgelist["reporter"] == "113302"]
-```
-
-::: panel-tabset
-
-## Layer advice
-
-::: {style="width:50%"}
-
-|    ego |   alter |   reporter | tie_type     | layer    |   weight |
-|-------:|--------:|-----------:|:-------------|:---------|---------:|
-| 113302 |  110502 |     113302 | giveadvice   | advice   |        1 |
-| 113302 |  113102 |     113302 | giveadvice   | advice   |        1 |
-| 105701 |  113302 |     113302 | helpdecision | advice   |        1 |
-| 110501 |  113302 |     113302 | helpdecision | advice   |        1 |
-| 113601 |  113302 |     113302 | helpdecision | advice   |        1 |
-| 113301 |  113302 |     113302 | helpdecision | advice   |        1 |
-
-:::
-
-## Layer kerorice
-
-::: {style="width:50%"}
-
-|    ego |   alter |   reporter | tie_type     | layer    |   weight |
-|-------:|--------:|-----------:|:-------------|:---------|---------:|
-| 113102 |  113302 |     113302 | keroricego   | kerorice |        1 |
-| 117303 |  113302 |     113302 | keroricego   | kerorice |        1 |
-| 110901 |  113302 |     113302 | keroricego   | kerorice |        1 |
-| 113302 |  110902 |     113302 | keroricecome | kerorice |        1 |
-| 113302 |  113102 |     113302 | keroricecome | kerorice |        1 |
-
-:::
-
-## Layer money
-
-::: {style="width:50%"}
-
-|    ego |   alter |   reporter | tie_type     | layer    |   weight |
-|-------:|--------:|-----------:|:-------------|:---------|---------:|
-| 113302 |  117303 |     113302 | lendmoney    | money    |        1 |
-| 113302 |  110901 |     113302 | lendmoney    | money    |        1 |
-| 105701 |  113302 |     113302 | borrowmoney  | money    |        1 |
-| 117303 |  113302 |     113302 | borrowmoney  | money    |        1 |
-| 110901 |  113302 |     113302 | borrowmoney  | money    |        1 |
-
-:::
-
-## Layer visit
-
-::: {style="width:50%"}
-
-|    ego |   alter |   reporter | tie_type     | layer    |   weight |
-|-------:|--------:|-----------:|:-------------|:---------|---------:|
-| 113102 |  113302 |     113302 | visitgo      | visit    |        1 |
-| 113401 |  113302 |     113302 | visitgo      | visit    |        1 |
-| 112202 |  113302 |     113302 | visitgo      | visit    |        1 |
-| 113702 |  113302 |     113302 | visitgo      | visit    |        1 |
-| 113302 |  112202 |     113302 | visitcome    | visit    |        1 |
-| 113302 |  113102 |     113302 | visitcome    | visit    |        1 |
-| 113302 |  113702 |     113302 | visitcome    | visit    |        1 |
-:::
-
-:::
-
-
-Reporter `113901` reports that `110201` and `114702` come to them for money and that they go to `112901`, `117301`, and `114101` for money. 
-
-But, we will notice that only 2 of these 5 nodes are reporters:
-
-```python
-[x for x in ["110201", "114702", "112901", "117301", "114101"] if x in reporters]
-```
-
-```text
-['114702', '117301']
-```
-
-That is, we cannot confirm these ties with other reporters (people were only asked about ties that involved themselves).
-
-On top of that, when we look at the reports made by the two reporters above, we see that none of them mention `113901`:
-
-```python
-edgelist[edgelist["reporter"].isin(["114702", "117301"])]
-```
-
-|    ego |   alter |   reporter | tie_type    | layer   |   weight |
-|-------:|--------:|-----------:|:------------|:--------|---------:|
-| 114702 |  111702 |     114702 | lendmoney   | money   |        1 |
-| 111702 |  114702 |     114702 | borrowmoney | money   |        1 |
-| 117301 |  107901 |     117301 | lendmoney   | money   |        1 |
-| 117301 |  116001 |     117301 | lendmoney   | money   |        1 |
-| 107901 |  117301 |     117301 | borrowmoney | money   |        1 |
-| 116001 |  117301 |     117301 | borrowmoney | money   |        1 |
-
-**What is the distribution of $\theta$ values?**
-
-Let's plot the distribution of $\theta$ values for the reporters:
 
 <details><summary>Click to see the code</summary>
 
@@ -736,121 +637,95 @@ ggsave(g, "theta_reporters.png", width=7, height=9, dpi=300)
 
 ![](figures/theta_reporters.png)
 
-**What does $\theta \approx 0$ represent in this example?**
 
-The huge peak at $\theta \approx 0$ represents the reporters who are not reporting most ties they are involved in. To make this point clearer, take a look at one of the reporters with $\theta \approx 0$ (117301):
+**How should we interpret the values?**
 
-```python
-edgelist[edgelist["reporter"] == "117301"]
-```
+The interpretation depends on both the mutuality of the network and the survey design. If the mutuality is high (as indicated by $\nu$ being closer to 1), reporters will naturally tend to reciprocate the ties they report, by default, thus reporters with high $\theta$ values (relative to the $\theta$ distribution) are likely "over-reporting" ties.
 
-|    ego |   alter |   reporter | tie_type    | layer   |   weight |
-|-------:|--------:|-----------:|:------------|:--------|---------:|
-| 117301 |  107901 |     117301 | lendmoney   | money   |        1 |
-| 117301 |  116001 |     117301 | lendmoney   | money   |        1 |
-| 107901 |  117301 |     117301 | borrowmoney | money   |        1 |
-| 116001 |  117301 |     117301 | borrowmoney | money   |        1 |
+Let's investigate this a bit further by checking the ties reported by a top reporter (113302) in the advice layer:
 
-Now, if we search the edgelist, we will see that this node is reported by many other reporters:
+::: panel-tabset
 
-```python
-edgelist[(
-    ((edgelist["ego"] == "117301") | (edgelist["alter"] == "117301")) & 
-    (edgelist["reporter"] != "117301"))].sort_values(["reporter"])
-```
 
-::: {style="width: 50%;"}
+## Reporters ranked by advice "reliability"
 
-|    ego |   alter |   reporter | tie_type    | layer   |   weight |
-|-------:|--------:|-----------:|:------------|:--------|---------:|
-| 117301 |  103201 |     103201 | borrowmoney | money   |        1 |
-| 117301 |  103202 |     103202 | borrowmoney | money   |        1 |
-| 117301 |  105301 |     105301 | borrowmoney | money   |        1 |
-| 117301 |  105401 |     105401 | borrowmoney | money   |        1 |
-| 117301 |  105402 |     105402 | borrowmoney | money   |        1 |
-| 117301 |  105802 |     105802 | borrowmoney | money   |        1 |
-| 106701 |  117301 |     106701 | lendmoney   | money   |        1 |
-| 117301 |  108801 |     108801 | borrowmoney | money   |        1 |
-| 117301 |  109201 |     109201 | borrowmoney | money   |        1 |
-| 117301 |  109505 |     109505 | borrowmoney | money   |        1 |
-| 117301 |  113901 |     113901 | borrowmoney | money   |        1 |
-| 117301 |  113902 |     113902 | borrowmoney | money   |        1 |
-| 117301 |  114801 |     114801 | borrowmoney | money   |        1 |
-| 117301 |  115802 |     115802 | borrowmoney | money   |        1 |
-| 115802 |  117301 |     115802 | lendmoney   | money   |        1 |
+::: {style="width: 100%;font-size:0.85em"}
+
+|   reporter_id |   reporter_name |   advice |    kerorice |       money |    visit |
+|--------------:|----------------:|---------:|------------:|------------:|---------:|
+|           120 |          113302 | 0.897073 | 0.73975     | 0.459182    | 0.209975 |
+|           124 |          113901 | 0.878063 | 0.820995    | 0.868054    | 0.669433 |
+|            97 |          109902 | 0.850442 | 0.792795    | 1.55569e-05 | 0.641589 |
+|            92 |          109505 | 0.850422 | 1.29801e-05 | 0.838414    | 0.86224  |
+|            56 |          105902 | 0.850409 | 1.27773e-05 | 0.458103    | 0.37393  |
+
+: {tbl-colwidths="[10,10, 20, 20, 20, 20]"}
 
 :::
 
-To avoid making inaccurate assumptions, it's important to refrain from categorically stating that a reporter with $\theta_m = 0$ is "under-reporting" ties. This is because the survey design can also impact how we interpret the results. For instance, in the Karnataka study, reporters could only report a maximum of four ties per prompt. Therefore, in some cases, $\theta_m = 0$ might simply indicate that the reporter has reported all their available ties or named all those that they see as salient, rather than deliberately withholding information.
-
-**What does $\theta \approx 1$ represent in this example?**
-
-There is a peak around $\theta \approx 1$, let's investigate what this means:
-
-```python
-df_theta_reporters[(
-    (df_theta_reporters["theta"] <= 1.05) & 
-    (df_theta_reporters["theta"] >= 0.95))]
-```
-
-::: {style="width: 50%;"}
-
-|   reporter_id |   reporter_name |    theta |
-|--------------:|----------------:|---------:|
-|           114 |          112601 | 1.03902  |
-|           123 |          113602 | 1.03532  |
-|           134 |          114802 | 1.02373  |
-|           316 |          106501 | 0.962386 |
-|           141 |          115809 | 0.96231  |
-|           317 |          106503 | 0.96216  |
-|            63 |          106704 | 0.962159 |
-|           318 |          108104 | 0.962158 |
-|           322 |          116301 | 0.962158 |
-|           314 |          104302 | 0.962158 |
-|           321 |          112604 | 0.962146 |
-|           319 |          108302 | 0.962143 |
-|           323 |          117105 | 0.962142 |
-|           136 |          115502 | 0.962142 |
 
 :::
 
-As an example, let's look at the reports made by `114802`:
+Most reporters have reliability in the $[0.4, 0.6]$ interval, but 113302 has a "reliability" of $\approx 0.9$ in the advice layer. Let's check the ties reported by this reporter:
 
 ```python
-edgelist[edgelist["reporter"] == "114802"]
+edgelist[(edgelist["reporter"] == "113302") & (edgelist["layer"] == "advice")]
 ```
 
-::: {style="width: 50%;"}
+::: panel-tabset
 
-|    ego |   alter |   reporter | tie_type    | layer   |   weight |
-|-------:|--------:|-----------:|:------------|:--------|---------:|
-| 114802 |  110202 |     114802 | lendmoney   | money   |        1 |
-| 110502 |  114802 |     114802 | borrowmoney | money   |        1 |
-| 110402 |  114802 |     114802 | borrowmoney | money   |        1 |
-| 110202 |  114802 |     114802 | borrowmoney | money   |        1 |
+## Ties reported by 113302 in the layer advice
+
+::: {style="width:50%"}
+
+|    ego |   alter |   reporter | tie_type     | layer    |   weight |
+|-------:|--------:|-----------:|:-------------|:---------|---------:|
+| 113302 |  **110502** |     113302 | giveadvice   | advice   |        1 |
+| 113302 |  **113102** |     113302 | giveadvice   | advice   |        1 |
+| **105701** |  113302 |     113302 | helpdecision | advice   |        1 |
+| **110501** |  113302 |     113302 | helpdecision | advice   |        1 |
+| **113601** |  113302 |     113302 | helpdecision | advice   |        1 |
+| **113301** |  113302 |     113302 | helpdecision | advice   |        1 |
 
 :::
 
-Amongst the nodes reported, only `110502` is a reporter and it does not report any ties with `114802` (run `edgelist[edgelist["reporter"] == "110502"]` to verify this).
-
-Besides, another node (`113401`) reports ties with `114802`, but `114802` does not acknowledge any of these ties:
-
-```python
-edgelist[(
-    (edgelist["ego"] == "114802") | (edgelist["alter"] == "114802")) & 
-    (edgelist["reporter"] != "114802")].sort_values(["reporter"])
-```
-
-::: {style="width: 50%;"}
-
-|    ego |   alter |   reporter | tie_type    | layer   |   weight |
-|-------:|--------:|-----------:|:------------|:--------|---------:|
-| 113401 |  114802 |     113401 | lendmoney   | money   |        1 |
-| 114802 |  113401 |     113401 | borrowmoney | money   |        1 |
-
 :::
 
-Bear in mind that this other node (`113401`) has $\theta=0.000019$ and has not reported on several other ties. Which reporter is the most reliable? It is hard to say without knowing more about the survey design.
+Node `113302` does not report any reciprocal ties, but it does report ties with six other nodes.
+
+**Are all nodes also reporters?**
+
+Two of these six nodes are not reporters:
+
+```python
+nodes_mentioned = ["110502", "113102", "105701", "110501", "113601", "113301"]
+not_reporters = [x for x in nodes_mentioned if x not in reporters]
+not_reporters
+```
+
+```text
+['113102', '105701']
+```
+
+We will never be able to confirm ties between `113302` and these nodes and this is already one of the reasons why `113302`'s "reliability" is high. (Note that these two non-reporter nodes will have reliability values of $\approx 0$).
+
+On top of that, when we look at the reports made by the remaining four reporters, only node `113301` confirms the helpdecision tie reported by `113302`:
+
+```python
+potential_friends = ["110502", "110501", "113601", "113301"]
+
+edgelist[(edgelist['reporter'].isin(potential_friends)) & 
+         ((edgelist['ego'] == '113302') | (edgelist['alter'] == '113302'))]
+```
+
+|    ego |   alter |   reporter | tie_type   | layer   |   weight |
+|-------:|--------:|-----------:|:-----------|:--------|---------:|
+| 113301 |  113302 |     113301 | giveadvice | advice  |        1 |
+
+That is why `113302`'s $\theta\lambda_{k=1}$ is high: it reports a lot of ties, but only one of them is confirmed by other reporters.
+
+Nodes with values in the average range of the $\theta_{lm}\lambda_{lk}$ distribution is likely to be more "reliable" reporters.
+
 
 ## 3.2: Implicit assumptions
 
@@ -893,7 +768,7 @@ It's worth noting that currently, the last dimension has size $N$ instead of $M$
 
 Future tutorials will cover:
 
-- How to extract point estimates from the posterior distribution and visualise the resulting network
+- How to extract point estimates and visualise the resulting network using $\rho$
 - How to handle different survey designs
 - How to sample from the posterior distribution
 - (Advanced) Tweaking the optimization parameters
