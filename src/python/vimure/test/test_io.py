@@ -404,7 +404,6 @@ class TestReadFromCSV:
         # Save dataframe to a random file in the temp folder
         temp_filename = os.path.join(tempfile.gettempdir(), "test.csv")
         df.to_csv(temp_filename, index=False)
-        print(temp_filename)
 
         with pytest.warns(None) as record:
             net_obj = vm.io.read_from_csv(temp_filename)
@@ -457,7 +456,6 @@ class TestReadFromCSV:
         # Save dataframe to a random file in the temp folder
         temp_filename = os.path.join(tempfile.gettempdir(), "test.csv")
         df.to_csv(temp_filename, index=False)
-        print(temp_filename)
 
         expected_error_msg = (
             "Required columns not found in data frame: ego, alter, reporter. "
@@ -474,7 +472,6 @@ class TestReadFromCSV:
         # Save dataframe to a random file in the temp folder
         temp_filename = os.path.join(tempfile.gettempdir(), "test.csv")
         df.to_csv(temp_filename, index=False)
-        print(temp_filename)
 
         with pytest.warns(None) as record:
             net_obj = vm.io.read_from_csv(temp_filename, 

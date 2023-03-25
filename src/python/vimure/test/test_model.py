@@ -77,8 +77,9 @@ class TestVimureWithRandomNetworks:
 
         logger.debug("Starting VimureModel")
         model = vm.model.VimureModel()
-        with suppress_stdout_stderr():
-            model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
+        with pytest.warns(None) as record:
+            with suppress_stdout_stderr():
+                model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
 
         check_final_parameters(model, gt_network)
 
@@ -128,56 +129,58 @@ class TestVimureWithRandomNetworks:
         seed = 25
         K = 2
 
-        gt_network = vm.synthetic.Multitensor(
-            N=100,
-            M=100,
-            L=1,
-            C=2,
-            K=K,
-            avg_degree=5,
-            sparsify=True,
-            seed=seed,  # seed=25 works well with default values
-            ExpM=None,
-            eta=eta,
-        )
+        with pytest.warns(None) as record:
+            gt_network = vm.synthetic.Multitensor(
+                N=100,
+                M=100,
+                L=1,
+                C=2,
+                K=K,
+                avg_degree=5,
+                sparsify=True,
+                seed=seed,  # seed=25 works well with default values
+                ExpM=None,
+                eta=eta,
+            )
 
-        theta = vm.synthetic.build_custom_theta(
-            gt_network=gt_network,
-            theta_ratio=theta_ratio,
-            exaggeration_type="over",
-            seed=seed,
-        )
+            theta = vm.synthetic.build_custom_theta(
+                gt_network=gt_network,
+                theta_ratio=theta_ratio,
+                exaggeration_type="over",
+                seed=seed,
+            )
 
-        LAMBDA_0 = 0.01
-        LAMBDA_DIFF = 0.99
-        gt_network.build_X(
-            mutuality=eta,  # Same as planted mutuality
-            theta=theta,  # Pre-defined theta
-            cutoff_X=False,
-            lambda_diff=LAMBDA_DIFF,
-            flag_self_reporter=True,
-            seed=seed,
-            verbose=True,
-        )
+            LAMBDA_0 = 0.01
+            LAMBDA_DIFF = 0.99
+            gt_network.build_X(
+                mutuality=eta,  # Same as planted mutuality
+                theta=theta,  # Pre-defined theta
+                cutoff_X=False,
+                lambda_diff=LAMBDA_DIFF,
+                flag_self_reporter=True,
+                seed=seed,
+                verbose=False,
+            )
 
         lambda_k_GT = np.array([[LAMBDA_0, LAMBDA_0 + LAMBDA_DIFF]])
         beta_lambda = 10000 * np.ones((lambda_k_GT.shape))
         alpha_lambda = lambda_k_GT * beta_lambda
 
-        model = vm.model.VimureModel(mutuality=True, verbose=True)
-        with suppress_stdout_stderr():
-            model.fit(
-                gt_network.X,
-                K=K,
-                seed=seed,
-                theta_prior=(0.1, 0.1),
-                eta_prior=(0.5, 1),
-                alpha_lambda=alpha_lambda,
-                beta_lambda=beta_lambda,
-                num_realisations=2,
-                max_iter=21,
-                R=gt_network.R,
-            )
+        model = vm.model.VimureModel(mutuality=True, verbose=False)
+        with pytest.warns(None) as record:
+            with suppress_stdout_stderr():
+                model.fit(
+                    gt_network.X,
+                    K=K,
+                    seed=seed,
+                    theta_prior=(0.1, 0.1),
+                    eta_prior=(0.5, 1),
+                    alpha_lambda=alpha_lambda,
+                    beta_lambda=beta_lambda,
+                    num_realisations=2,
+                    max_iter=21,
+                    R=gt_network.R,
+                )
 
         Y_true = gt_network.Y.toarray()[0].flatten()
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
@@ -199,56 +202,58 @@ class TestVimureWithRandomNetworks:
         seed = 25
         K = 2
 
-        gt_network = vm.synthetic.Multitensor(
-            N=100,
-            M=100,
-            L=1,
-            C=2,
-            K=K,
-            avg_degree=5,
-            sparsify=True,
-            seed=seed,  # seed=25 works well with default values
-            ExpM=None,
-            eta=eta,
-        )
+        with pytest.warns(None) as record:
+            gt_network = vm.synthetic.Multitensor(
+                N=100,
+                M=100,
+                L=1,
+                C=2,
+                K=K,
+                avg_degree=5,
+                sparsify=True,
+                seed=seed,  # seed=25 works well with default values
+                ExpM=None,
+                eta=eta,
+            )
 
-        theta = vm.synthetic.build_custom_theta(
-            gt_network=gt_network,
-            theta_ratio=theta_ratio,
-            exaggeration_type="over",
-            seed=seed,
-        )
+            theta = vm.synthetic.build_custom_theta(
+                gt_network=gt_network,
+                theta_ratio=theta_ratio,
+                exaggeration_type="over",
+                seed=seed,
+            )
 
-        LAMBDA_0 = 0.01
-        LAMBDA_DIFF = 0.99
-        gt_network.build_X(
-            mutuality=eta,  # Same as planted mutuality
-            theta=theta,  # Pre-defined theta
-            cutoff_X=False,
-            lambda_diff=LAMBDA_DIFF,
-            flag_self_reporter=True,
-            seed=seed,
-            verbose=True,
-        )
+            LAMBDA_0 = 0.01
+            LAMBDA_DIFF = 0.99
+            gt_network.build_X(
+                mutuality=eta,  # Same as planted mutuality
+                theta=theta,  # Pre-defined theta
+                cutoff_X=False,
+                lambda_diff=LAMBDA_DIFF,
+                flag_self_reporter=True,
+                seed=seed,
+                verbose=False,
+            )
 
         lambda_k_GT = np.array([[LAMBDA_0, LAMBDA_0 + LAMBDA_DIFF]])
         beta_lambda = 10000 * np.ones((lambda_k_GT.shape))
         alpha_lambda = lambda_k_GT * beta_lambda
 
-        model = vm.model.VimureModel(mutuality=True, verbose=True)
-        with suppress_stdout_stderr():
-            model.fit(
-                gt_network.X.toarray(),
-                K=K,
-                seed=seed,
-                theta_prior=(0.1, 0.1),
-                eta_prior=(0.5, 1),
-                alpha_lambda=alpha_lambda,
-                beta_lambda=beta_lambda,
-                num_realisations=2,
-                max_iter=21,
-                R=gt_network.R.toarray(),
-            )
+        model = vm.model.VimureModel(mutuality=True, verbose=False)
+        with pytest.warns(None) as record:
+            with suppress_stdout_stderr():
+                model.fit(
+                    gt_network.X.toarray(),
+                    K=K,
+                    seed=seed,
+                    theta_prior=(0.1, 0.1),
+                    eta_prior=(0.5, 1),
+                    alpha_lambda=alpha_lambda,
+                    beta_lambda=beta_lambda,
+                    num_realisations=2,
+                    max_iter=21,
+                    R=gt_network.R.toarray(),
+                )
 
         Y_true = gt_network.Y.toarray()[0].flatten()
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
@@ -270,56 +275,58 @@ class TestVimureWithRandomNetworks:
         seed = 25
         K = 2
 
-        gt_network = vm.synthetic.Multitensor(
-            N=100,
-            M=100,
-            L=1,
-            C=2,
-            K=K,
-            avg_degree=5,
-            sparsify=True,
-            seed=seed,  # seed=25 works well with default values
-            ExpM=None,
-            eta=eta,
-        )
+        with pytest.warns(None) as record:
+            gt_network = vm.synthetic.Multitensor(
+                N=100,
+                M=100,
+                L=1,
+                C=2,
+                K=K,
+                avg_degree=5,
+                sparsify=True,
+                seed=seed,  # seed=25 works well with default values
+                ExpM=None,
+                eta=eta,
+            )
 
-        theta = vm.synthetic.build_custom_theta(
-            gt_network=gt_network,
-            theta_ratio=theta_ratio,
-            exaggeration_type="under",
-            seed=seed,
-        )
+            theta = vm.synthetic.build_custom_theta(
+                gt_network=gt_network,
+                theta_ratio=theta_ratio,
+                exaggeration_type="under",
+                seed=seed,
+            )
 
-        LAMBDA_0 = 0.01
-        LAMBDA_DIFF = 0.99
-        gt_network.build_X(
-            mutuality=eta,  # Same as planted mutuality
-            theta=theta,  # Pre-defined theta
-            cutoff_X=False,
-            lambda_diff=LAMBDA_DIFF,
-            flag_self_reporter=True,
-            seed=seed,
-            verbose=True,
-        )
+            LAMBDA_0 = 0.01
+            LAMBDA_DIFF = 0.99
+            gt_network.build_X(
+                mutuality=eta,  # Same as planted mutuality
+                theta=theta,  # Pre-defined theta
+                cutoff_X=False,
+                lambda_diff=LAMBDA_DIFF,
+                flag_self_reporter=True,
+                seed=seed,
+                verbose=False,
+            )
 
         lambda_k_GT = np.array([[LAMBDA_0, LAMBDA_0 + LAMBDA_DIFF]])
         beta_lambda = 10000 * np.ones((lambda_k_GT.shape))
         alpha_lambda = lambda_k_GT * beta_lambda
 
-        model = vm.model.VimureModel(mutuality=True, verbose=True)
-        with suppress_stdout_stderr():
-            model.fit(
-                gt_network.X,
-                K=K,
-                seed=seed,
-                theta_prior=(0.1, 0.1),
-                eta_prior=(0.5, 1),
-                alpha_lambda=alpha_lambda,
-                beta_lambda=beta_lambda,
-                num_realisations=2,
-                max_iter=21,
-                R=gt_network.R,
-            )
+        model = vm.model.VimureModel(mutuality=True, verbose=False)
+        with pytest.warns(None) as record:
+            with suppress_stdout_stderr():
+                model.fit(
+                    gt_network.X,
+                    K=K,
+                    seed=seed,
+                    theta_prior=(0.1, 0.1),
+                    eta_prior=(0.5, 1),
+                    alpha_lambda=alpha_lambda,
+                    beta_lambda=beta_lambda,
+                    num_realisations=2,
+                    max_iter=21,
+                    R=gt_network.R,
+                )
 
         Y_true = gt_network.Y.toarray()[0].flatten()
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
@@ -338,7 +345,7 @@ class TestVimureWithReadData:
         with pytest.warns(None) as record:
             net_obj = vm.io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
 
-        model = vm.model.VimureModel(mutuality=True, verbose=True)
+        model = vm.model.VimureModel(mutuality=True, verbose=False)
         with suppress_stdout_stderr():
             model.fit(
                 net_obj.X,
@@ -462,11 +469,12 @@ class TestVimureRealData:
 
         # Run model directly with a pandas dataframe
         model = vm.model.VimureModel()
-        with suppress_stdout_stderr():
-            model.fit(df, 
-                      seed=1,
-                      num_realisations=1,
-                      max_iter=500)
+        with pytest.warns(None) as record:
+            with suppress_stdout_stderr():
+                model.fit(df, 
+                        seed=1,
+                        num_realisations=1,
+                        max_iter=500)
 
         # Read in data as an edgelist to compare
         with pytest.warns(None) as record:
