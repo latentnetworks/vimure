@@ -563,12 +563,20 @@ id_reporters = df_nodes[df_nodes['name'].isin(reporters)]["id"].values
 # Get the reliability estimates for the reporters
 df_theta_reporters = pd.DataFrame({
     "reporter_id": id_reporters,
-    "reporter_name": df_nodes.iloc[id_reporters]["name"].values,
-    "theta": posterior_estimates['theta'][0, id_reporters]
+    "reporter_name": df_nodes.iloc[id_reporters]["name"].values
 })
 
+# Add the theta values
+theta_layer_cols = [f"theta_{layer}" for layer in model.layerNames]
+
+theta_per_layer = pd.DataFrame(posterior_estimates['theta'].T, 
+                               columns=theta_layer_cols)
+
+df_theta_reporters = pd.concat([df_theta_reporters, theta_per_layer], axis=1)
+df_theta_reporters['reporter_id'] = df_theta_reporters['reporter_id'].astype(pd.Int64Dtype())
+
 # Sort by reliability
-df_theta_reporters.sort_values(by="theta", ascending=False, inplace=True)
+df_theta_reporters.sort_values(by=theta_layer_cols, ascending=False, inplace=True)
 
 df_theta_reporters.head()
 ```
@@ -576,14 +584,13 @@ df_theta_reporters.head()
 
 ::: {style="width: 50%;"}
 
-|   reporter_id |   reporter_name |   theta |
-|--------------:|----------------:|--------:|
-|           120 |          113302 | 1.56319 |
-|           124 |          113901 | 1.53006 |
-|            97 |          109902 | 1.48193 |
-|            92 |          109505 | 1.4819  |
-|            56 |          105902 | 1.48187 |
-
+|   reporter_id |   reporter_name |   theta_advice |   theta_kerorice |   theta_money |   theta_visit |
+|--------------:|----------------:|---------------:|-----------------:|--------------:|--------------:|
+|           120 |          113302 |        1.56308 |      2.06044     |   0.99434     |      0.502956 |
+|           124 |          113901 |        1.52996 |      2.28673     |   1.87973     |      1.6035   |
+|            97 |          109902 |        1.48183 |      2.20819     |   3.36878e-05 |      1.53681  |
+|            92 |          109505 |        1.4818  |      3.61538e-05 |   1.81555     |      2.06534  |
+|            56 |          105902 |        1.48178 |      3.55888e-05 |   0.992002    |      0.895679 |
 :::
 
 **How should we interpret the values?**
