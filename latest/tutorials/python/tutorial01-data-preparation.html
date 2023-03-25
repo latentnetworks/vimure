@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.2.475">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -729,7 +729,7 @@ Note
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Example with the lendmoney data</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>edgelist_lendmoney <span class="op">=</span> pd.melt(lendmoney, id_vars<span class="op">=</span>[<span class="dv">0</span>]).dropna()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This produces a bogus <code>variable</code> column, which we can drop. We should also rename the columns to something more meaningful. It is <strong>important</strong> that we add a <code>respondent</code> column. This will be the <code>pid</code> of the individual who reported the relationship.</p>
+<p>This produces a bogus <code>variable</code> column, which we can drop. We should also rename the columns to something more meaningful. It is <strong>important</strong> that we add a <code>reporter</code> column. This will be the <code>pid</code> of the individual who reported the relationship.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>edgelist_lendmoney <span class="op">=</span> edgelist_lendmoney.drop(columns<span class="op">=</span><span class="st">"variable"</span>)<span class="op">\</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>       .rename(columns<span class="op">=</span>{<span class="dv">0</span>: <span class="st">"ego"</span>, <span class="st">"value"</span>: <span class="st">"alter"</span>})<span class="op">\</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>       .assign(reporter<span class="op">=</span><span class="kw">lambda</span> x: x[<span class="st">"ego"</span>])</span>
@@ -1067,7 +1067,7 @@ Click to see full pre-processing script
 <span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"borrowmoney"</span>: <span class="st">"money"</span>,</span>
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"lendmoney"</span>: <span class="st">"money"</span>,</span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"giveadvice"</span>: <span class="st">"advice"</span>,</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"giveadvice"</span>: <span class="st">"advice"</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"helpdecision"</span>: <span class="st">"advice"</span>,</span>
 <span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"keroricego"</span>: <span class="st">"kerorice"</span>,</span>
 <span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"keroricecome"</span>: <span class="st">"kerorice"</span>,</span>
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"visitgo"</span>: <span class="st">"visit"</span>,</span>

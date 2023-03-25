@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="If you have an edge list, or a set of igraph objects, VIMuRe can help you model the latent network structure.">
+
+<title>VIMuRe - 💻 Tutorial 02: Introduction to VIMuRe in Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<link href="../../../figures/stable_diffusion_stickmen.png" rel="icon" type="image/png">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">💻 <strong>Tutorial 02</strong>: Introduction to VIMuRe in Python</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../../">VIMuRe</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <a href="" title="" id="sidebar-tool-dropdown-0" class="sidebar-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-github"></i></a>
+    <ul class="dropdown-menu" aria-labelledby="sidebar-tool-dropdown-0">
+        <li>
+          <a class="dropdown-item sidebar-tools-main-item" href="https://github.com/latentnetworks/vimure">
+          Source Code
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item sidebar-tools-main-item" href="https://github.com/latentnetworks/vimure/discussions">
+          Ask Questions
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item sidebar-tools-main-item" href="https://github.com/latentnetworks/vimure/issues/new/choose">
+          Report a Bug
+          </a>
+        </li>
+    </ul>
+  <a href="" class="quarto-color-scheme-toggle sidebar-tool" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle sidebar-tool" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../index.html" class="sidebar-item-text sidebar-link">🏠 Home</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../latest/install.html" class="sidebar-item-text sidebar-link">📦 Installation</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../latest/tutorials.html" class="sidebar-item-text sidebar-link">💻 Tutorials</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../latest/people.html" class="sidebar-item-text sidebar-link">📟 Contact</a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">⚙️ Setup</a></li>
+  <li><a href="#step-1-load-the-data" id="toc-step-1-load-the-data" class="nav-link" data-scroll-target="#step-1-load-the-data">📥 Step 1: Load the data</a></li>
+  <li><a href="#step-2-summary-statistics" id="toc-step-2-summary-statistics" class="nav-link" data-scroll-target="#step-2-summary-statistics">📊 Step 2: Summary statistics</a>
+  <ul class="collapse">
+  <li><a href="#number-of-nodes-and-edges" id="toc-number-of-nodes-and-edges" class="nav-link" data-scroll-target="#number-of-nodes-and-edges">2.1: Number of nodes and edges</a></li>
+  <li><a href="#number-of-reporters" id="toc-number-of-reporters" class="nav-link" data-scroll-target="#number-of-reporters">2.2: Number of reporters</a></li>
+  <li><a href="#average-number-of-ties-per-reporter" id="toc-average-number-of-ties-per-reporter" class="nav-link" data-scroll-target="#average-number-of-ties-per-reporter">2.3: Average number of ties per reporter</a></li>
+  <li><a href="#union-vs.-intersection-and-the-concept-of-concordance" id="toc-union-vs.-intersection-and-the-concept-of-concordance" class="nav-link" data-scroll-target="#union-vs.-intersection-and-the-concept-of-concordance">2.4: Union vs.&nbsp;Intersection and the concept of Concordance</a></li>
+  </ul></li>
+  <li><a href="#step-3-use-vimure-package-to-run-the-model" id="toc-step-3-use-vimure-package-to-run-the-model" class="nav-link" data-scroll-target="#step-3-use-vimure-package-to-run-the-model">📦 Step 3: Use <code>vimure</code> package to run the model</a>
+  <ul class="collapse">
+  <li><a href="#posterior-estimates" id="toc-posterior-estimates" class="nav-link" data-scroll-target="#posterior-estimates">3.1: Posterior Estimates</a>
+  <ul class="collapse">
+  <li><a href="#mutuality-nu-or-eta" id="toc-mutuality-nu-or-eta" class="nav-link" data-scroll-target="#mutuality-nu-or-eta">3.1.1: Mutuality (<span class="math inline">\(\nu\)</span> or <span class="math inline">\(\eta\)</span>)</a></li>
+  <li><a href="#under-reporting-vs-over-reporting-a-combination-of-theta_lm-times-lambda_lk" id="toc-under-reporting-vs-over-reporting-a-combination-of-theta_lm-times-lambda_lk" class="nav-link" data-scroll-target="#under-reporting-vs-over-reporting-a-combination-of-theta_lm-times-lambda_lk">3.1.2: Under-reporting vs over-reporting: a combination of (<span class="math inline">\(\theta_{lm} \times \lambda_{lk}\)</span>)</a></li>
+  </ul></li>
+  <li><a href="#implicit-assumptions" id="toc-implicit-assumptions" class="nav-link" data-scroll-target="#implicit-assumptions">3.2: Implicit assumptions</a></li>
+  <li><a href="#a-note-on-the-reporter-mask-r" id="toc-a-note-on-the-reporter-mask-r" class="nav-link" data-scroll-target="#a-note-on-the-reporter-mask-r">3.3: A note on the reporter mask (<code>R</code>)</a></li>
+  </ul></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">4. Next steps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">💻 <strong>Tutorial 02</strong>: Introduction to VIMuRe in Python</h1>
+<p class="subtitle lead">VIMuRe v0.1.0 (latest).</p>
+  <div class="quarto-categories">
+    <div class="quarto-category">basics</div>
+    <div class="quarto-category">python</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    If you have an edge list, or a set of igraph objects, VIMuRe can help you model the latent network structure.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you use <code>VIMuRe</code> in your research, please cite <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span>.</p>
+</div>
+</div>
+<p>TLDR: By the end of this tutorial, you will be able to:</p>
+<ul>
+<li>Load data into <code>VIMuRe</code></li>
+<li>Fit a model to your data</li>
+<li>Obtain estimates of the latent network structure</li>
+</ul>
+<p>Found an interesting use case for <code>VIMuRe</code>? Let us know! Open a <a href="https://github.com/latentnetworks/vimure/discussions">discussion</a> on our GitHub repository.</p>
+<section id="setup" class="level1">
+<h1>⚙️ Setup</h1>
+<p><strong>Import packages</strong></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> vimure <span class="im">as</span> vm</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>⚠️ Ensure you have installed the latest version of <code>VIMuRe</code> before running this tutorial. Follow the 📦 <a href="../../../latest/install.html">Installation instructions</a> if you haven’t already.</p>
+</section>
+<section id="step-1-load-the-data" class="level1">
+<h1>📥 Step 1: Load the data</h1>
+<p>Here, we’ll use the <code>VIMuRe</code> package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance <span class="citation" data-cites="banerjee_diffusion_2013">(<a href="#ref-banerjee_diffusion_2013" role="doc-biblioref">Banerjee et al. 2013b</a>)</span>. The data files we use here are derived from those openly-available on the Harvard Dataverse page <span class="citation" data-cites="banerjee_diffusion_2013-1">(<a href="#ref-banerjee_diffusion_2013-1" role="doc-biblioref">Banerjee et al. 2013a</a>)</span>. See 💻 <a href="../../../latest/tutorials/python/tutorial01-data-preparation.html">Tutorial 1</a> for more details on how to prepare data for <code>VIMuRe</code>.</p>
+<p>We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were “double-sampled” in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both <em>“If you needed to borrow kerosene or rice, to whom would you go?”</em> as well as <em>“Who would come to you if he/she needed to borrow kerosene or rice?”</em> These two different prompts should give us different perspectives on what could be the same relationship. If everyone in the network is being surveyed, then this should mean that we are eliciting information on a relationship twice (hence, “double sampling”): we’re asking <code>ego</code> if they go to <code>alter</code> for help, and also asking <code>ego</code> if <code>alter</code> comes to them for help.</p>
+<p>Four different tie types (or “layers”) were double-sampled in this way (i.e., elicited with two prompts). Here, we will use all four layers to model the latent network structure. The four layers are:</p>
+<ul>
+<li><code>money</code>: money lending and borrowing</li>
+<li><code>advice</code>: advice giving and receiving</li>
+<li><code>visit</code>: visiting and being visited</li>
+<li><code>kerorice</code>: lending and borrowing of household items</li>
+</ul>
+<p>We stored all the data in a single data frame, <code>edgelist</code>.</p>
+<details>
+<summary>
+Click to see the code we used
+</summary>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Here we are using the get_layer() function defined in Tutorial 01</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>edgelist_money, reporters_money <span class="op">=</span> get_layer(<span class="dv">1</span>, <span class="st">"money"</span>, get_indivinfo(METADATA_FILE), raw_csv_folder<span class="op">=</span>RAW_CSV_FOLDER)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>edgelist_visit, reporters_visit <span class="op">=</span> get_layer(<span class="dv">1</span>, <span class="st">"visit"</span>, get_indivinfo(METADATA_FILE), raw_csv_folder<span class="op">=</span>RAW_CSV_FOLDER)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>edgelist_advice, reporters_advice <span class="op">=</span> get_layer(<span class="dv">1</span>, <span class="st">"advice"</span>, get_indivinfo(METADATA_FILE), raw_csv_folder<span class="op">=</span>RAW_CSV_FOLDER)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>edgelist_kerorice, reporters_kerorice <span class="op">=</span> get_layer(<span class="dv">1</span>, <span class="st">"kerorice"</span>, get_indivinfo(METADATA_FILE), raw_csv_folder<span class="op">=</span>RAW_CSV_FOLDER)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>edgelist <span class="op">=</span> pd.concat([edgelist_money, edgelist_visit, edgelist_advice, edgelist_kerorice])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> edgelist_money, edgelist_visit, edgelist_advice, edgelist_kerorice</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>reporters <span class="op">=</span> reporters_money.union(reporters_visit).union(reporters_advice).union(reporters_kerorice)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="kw">del</span> reporters_money, reporters_visit, reporters_advice, reporters_kerorice</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># The code below should help you confirm that all reporters appear in the edgelist:</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>reporters.difference(<span class="bu">set</span>(edgelist.reporter)) <span class="co"># This should return an empty set</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Load Data Frame</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Load <code>igraph</code> object</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>After our preprocessing, the input data takes the form of the dataset given below.</p>
+<ul>
+<li><code>ego</code>: generally the requester, who is also referred to as <span class="math inline">\(i\)</span> in <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span> (required ✔️)</li>
+<li><code>alter</code>: generally the giver, also referred to as <span class="math inline">\(j\)</span> in <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span> (required ✔️)</li>
+<li><code>reporter</code>: the person reporting on the tie, as referred to as <span class="math inline">\(m\)</span> in <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span> (required ✔️)</li>
+<li><code>tie_type</code>: the prompt type that was given, e.g., borrow money or lend money (optional)</li>
+<li><code>layer</code>: the relationship type, e.g., money (optional)</li>
+<li><code>weight</code>: the weight of the edge, e.g., the actual amount of money transferred (optional)</li>
+</ul>
+<p>Suppose we have a data frame <code>edgelist</code> of our village’s data that looks like this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edgelist.sample</span>(<span class="at">n=</span><span class="dv">10</span>, <span class="at">random_state=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<caption>A typical data input for <code>VIMuRe</code></caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">ego</th>
+<th style="text-align: right;">alter</th>
+<th style="text-align: right;">reporter</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">107303</td>
+<td style="text-align: right;">107307</td>
+<td style="text-align: right;">107307</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">116402</td>
+<td style="text-align: right;">115702</td>
+<td style="text-align: right;">116402</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">103202</td>
+<td style="text-align: right;">117301</td>
+<td style="text-align: right;">103202</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">116201</td>
+<td style="text-align: right;">110401</td>
+<td style="text-align: right;">116201</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">114606</td>
+<td style="text-align: right;">109701</td>
+<td style="text-align: right;">109701</td>
+<td style="text-align: left;">keroricego</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">101302</td>
+<td style="text-align: right;">116201</td>
+<td style="text-align: right;">101302</td>
+<td style="text-align: left;">visitcome</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">111204</td>
+<td style="text-align: right;">110701</td>
+<td style="text-align: right;">111204</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">108304</td>
+<td style="text-align: right;">111502</td>
+<td style="text-align: right;">108304</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">117301</td>
+<td style="text-align: right;">113901</td>
+<td style="text-align: right;">113901</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">106201</td>
+<td style="text-align: right;">116105</td>
+<td style="text-align: right;">106201</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Alternatively, you might have your data as a <strong>directed</strong> <code>igraph</code> object. In this case, you must ensure that the <code>igraph</code> object has the following <strong>edge attributes</strong>:</p>
+<ul>
+<li><code>reporter</code>: the person reporting on the tie, as referred to as <span class="math inline">\(m\)</span> in <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span> (required ✔️)</li>
+<li><code>tie_type</code>: the prompt type that was given (optional)</li>
+<li><code>layer</code>: the tie type (optional)</li>
+<li><code>weight</code>: the weight of the edge (optional)</li>
+</ul>
+<p>Note that the <code>igraph</code> function assumes that the first two columns in the data frame comprise the edge list (i.e., the <span class="math inline">\(ego\)</span> and <span class="math inline">\(alter\)</span> columns and treat all subsequent columns as edge attributes).</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> igraph <span class="im">as</span> ig</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> ig.Graph.DataFrame(edgelist, directed<span class="op">=</span><span class="va">True</span>, use_vids<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Suppose our village’s data is in the form of an <code>igraph</code> object <code>G</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(G.summary())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>which gives us the following output:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>IGRAPH DNW<span class="op">-</span> <span class="dv">417</span> <span class="dv">2690</span> <span class="op">--</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">+</span> attr: name (v), layer (e), reporter (e), tie_type (e), weight (e)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="step-2-summary-statistics" class="level1">
+<h1>📊 Step 2: Summary statistics</h1>
+<p>Let’s take a closer look at how many nodes and edges we have in our data. We can also look at how many reporters we have in our data.</p>
+<section id="number-of-nodes-and-edges" class="level2">
+<h2 class="anchored" data-anchor-id="number-of-nodes-and-edges">2.1: Number of nodes and edges</h2>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Data Frame</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false"><code>igraph</code> object</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>unique_nodes <span class="op">=</span> pd.concat([edgelist[<span class="st">'ego'</span>], edgelist[<span class="st">'alter'</span>]]).unique()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of nodes: </span><span class="sc">{</span><span class="bu">len</span>(unique_nodes)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of edges: </span><span class="sc">{</span><span class="bu">len</span>(edgelist)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>which yields:</p>
+<pre class="text"><code>Number of nodes: 417
+Number of edges: 2690</code></pre>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of nodes: </span><span class="sc">{</span>G<span class="sc">.</span>vcount()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Number of edges: </span><span class="sc">{</span>G<span class="sc">.</span>ecount()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>which yields:</p>
+<pre class="text"><code>Number of nodes: 417
+Number of edges: 2690</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="number-of-reporters" class="level2">
+<h2 class="anchored" data-anchor-id="number-of-reporters">2.2: Number of reporters</h2>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Data Frame</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false"><code>igraph</code> object</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>reporters <span class="ot">=</span> edgelist[<span class="st">"reporter"</span>]<span class="fu">.unique</span>()</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(f<span class="st">"Number of reporters: {len(reporters)}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>Number of reporters: 203</code></pre>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>reporters <span class="ot">=</span> <span class="fu">set</span>(G.es[<span class="st">"reporter"</span>])</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(f<span class="st">"Number of reporters: {len(reporters)}"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>Number of reporters:  203 </code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="average-number-of-ties-per-reporter" class="level2">
+<h2 class="anchored" data-anchor-id="average-number-of-ties-per-reporter">2.3: Average number of ties per reporter</h2>
+<p>There are a couple of things to note about this dataset: reporters could name a maximum of four alters for each question, and reporters can only report on ties that they are a part of (e.g., if a reporter is not part of a tie, they cannot report on it). Because we are modelling double-sampled questions, each reporter can report a maximum of 8 ties.</p>
+<p>Let’s create a plot to visualise the distribution of the number of ties per reporter:</p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Data Frame</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false"><code>igraph</code> object</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a plot_df to summarise the number of ties per reporter</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plot_df <span class="op">=</span> (</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    edgelist.groupby([<span class="st">'layer'</span>, <span class="st">'tie_type'</span>, <span class="st">'reporter'</span>])</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    .size()</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    .reset_index(name<span class="op">=</span><span class="st">'n_ties'</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    .groupby([<span class="st">'n_ties'</span>, <span class="st">'tie_type'</span>, <span class="st">'layer'</span>])</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    .size()</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    .reset_index(name<span class="op">=</span><span class="st">'n_reporters'</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    .sort_values([<span class="st">"layer"</span>,  <span class="st">"n_ties"</span>, <span class="st">"tie_type"</span>])</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a plot_df to summarise the number of ties per reporter</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>plot_df <span class="op">=</span> (</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    pd.DataFrame({attr: G.es[attr] <span class="cf">for</span> attr <span class="kw">in</span> [<span class="st">"reporter"</span>, <span class="st">"tie_type"</span>, <span class="st">"layer"</span>]})</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    .groupby([<span class="st">"reporter"</span>, <span class="st">"layer"</span>])</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">apply</span>(<span class="kw">lambda</span> x: x[<span class="st">"tie_type"</span>].value_counts())</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    .reset_index(name<span class="op">=</span><span class="st">"n_ties"</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    .rename(columns<span class="op">=</span>{<span class="st">"level_2"</span>: <span class="st">"tie_type"</span>})</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    .groupby([<span class="st">"n_ties"</span>, <span class="st">"tie_type"</span>, <span class="st">"layer"</span>])</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    .size()</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    .reset_index(name<span class="op">=</span><span class="st">"n_reporters"</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    .sort_values([<span class="st">"layer"</span>,  <span class="st">"n_ties"</span>, <span class="st">"tie_type"</span>])</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>producing the following table:</p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Layer advice</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Layer kerorice</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-3" role="tab" aria-controls="tabset-5-3" aria-selected="false">Layer money</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-4" role="tab" aria-controls="tabset-5-4" aria-selected="false">Layer visit</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div style="width:50%">
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">n_ties</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">n_reporters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">115</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">104</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">45</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">73</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">13</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">2</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div style="width:50%">
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">n_ties</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">n_reporters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">41</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">keroricego</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">42</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">99</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">keroricego</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">100</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">45</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">keroricego</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">40</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">keroricego</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="tabset-5-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-3-tab">
+<div style="width:50%">
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">n_ties</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">n_reporters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">57</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">66</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">92</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">86</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">31</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="tabset-5-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-4-tab">
+<div style="width:50%">
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">n_ties</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">n_reporters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">visitcome</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">45</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: left;">visitgo</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">36</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">visitcome</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">84</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">visitgo</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">67</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">visitcome</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">39</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">visitgo</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">38</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">visitcome</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">4</td>
+<td style="text-align: left;">visitgo</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">31</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>Alternatively as a bar plot:</p>
+<details>
+<summary>
+Click to show plot code
+</summary>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plot_df[<span class="st">"tie_type"</span>] <span class="op">=</span> pd.Categorical(plot_df[<span class="st">"tie_type"</span>], </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                                     categories<span class="op">=</span>[<span class="st">"visitgo"</span>, <span class="st">"visitcome"</span>, </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                                                 <span class="st">"keroricego"</span>, <span class="st">"keroricecome"</span>, </span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                                                 <span class="st">"borrowmoney"</span>, <span class="st">"lendmoney"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                                                 <span class="st">"helpdecision"</span>, <span class="st">"giveadvice"</span>])</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>plot_df[<span class="st">"layer"</span>] <span class="op">=</span> pd.Categorical(plot_df[<span class="st">"layer"</span>], categories<span class="op">=</span>[<span class="st">"advice"</span>, <span class="st">"money"</span>, <span class="st">"kerorice"</span>, <span class="st">"visit"</span>])</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> (</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    ggplot(plot_df, aes(x <span class="op">=</span> <span class="st">"tie_type"</span>, y<span class="op">=</span><span class="st">"n_reporters"</span>, fill<span class="op">=</span><span class="st">"layer"</span>)) <span class="op">+</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    geom_col() <span class="op">+</span></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    coord_flip() <span class="op">+</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    facet_grid(<span class="st">"n_ties ~ ."</span>, labeller<span class="op">=</span><span class="st">"label_both"</span>) <span class="op">+</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    theme_bw() <span class="op">+</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    theme(legend_position <span class="op">=</span> <span class="st">"bottom"</span>,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>        legend_box_spacing <span class="op">=</span> <span class="fl">0.5</span>) <span class="op">+</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    labs(x <span class="op">=</span> <span class="st">"Number of ties reported for this prompt"</span>, </span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>         y <span class="op">=</span> <span class="st">"Number of reporters"</span>,</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>         fill <span class="op">=</span> <span class="st">"Layer"</span>)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>ggsave(g, <span class="st">"tutorial02_fig01.png"</span>, width<span class="op">=</span><span class="dv">6</span>, height<span class="op">=</span><span class="dv">8</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p><img src="../../../latest/tutorials/python/tutorial02_fig01.png" class="img-fluid" style="width:75.0%"></p>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>Note that the plot above only represents the reports made by the 203 nodes that appear in the <code>reporter</code> column. Given that the total number of nodes in the network is 417, either some nodes did not report on any ties, or they were not interviewed at all.</p>
+<p>VIMuRe will consider all nodes in the network, even if they are not present in the <code>reporter</code> column. If you want to restrict your analysis to include only the network of reporters, you must filter the edge list before proceeding.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="union-vs.-intersection-and-the-concept-of-concordance" class="level2">
+<h2 class="anchored" data-anchor-id="union-vs.-intersection-and-the-concept-of-concordance">2.4: Union vs.&nbsp;Intersection and the concept of Concordance</h2>
+<p>Concordance is the proportion of the ties in the network that both reporters report. It measures the extent to which the two reporters agree about the tie (see <span class="citation" data-cites="ready_measuring_2021">(<a href="#ref-ready_measuring_2021" role="doc-biblioref">Ready and Power 2021</a>)</span> for a discussion of concordance in the Karnataka network data). It is calculated as follows:</p>
+<p><span class="math display">\[
+\text{Concordance} = \frac{\text{\# of ties reported by both reporters}}{\text{\# number of unique ties reported}}
+\]</span></p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">Data Frame</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false"><code>igraph</code> object</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Take the intersection: keep only records where </span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># both reporters report on the same tie in both tie_types</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>df_intersection <span class="op">=</span> (</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    edgelist.groupby([<span class="st">'ego'</span>, <span class="st">'alter'</span>], dropna<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">filter</span>(<span class="kw">lambda</span> x: <span class="bu">len</span>(x) <span class="op">==</span> <span class="dv">2</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    .loc[:, [<span class="st">'ego'</span>, <span class="st">'alter'</span>]]</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    .drop_duplicates()</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Take the union: keep all ties reported </span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># irrespective of tie_type and how many times they were reported</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>df_union <span class="op">=</span> edgelist.loc[:, [<span class="st">'ego'</span>, <span class="st">'alter'</span>]].drop_duplicates()</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Concordance</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>concordance <span class="op">=</span> <span class="bu">len</span>(df_intersection) <span class="op">/</span> <span class="bu">len</span>(df_union)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Concordance is: </span><span class="sc">{</span>concordance<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<div class="sourceCode" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Take the intersection: keep only records where </span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># both reporters report on the same tie in both tie_types</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>which_edges_intersection <span class="op">=</span> [e <span class="cf">for</span> e <span class="kw">in</span> G.es <span class="cf">if</span> G.count_multiple(e) <span class="op">==</span> <span class="dv">2</span>]</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>G_intersection <span class="op">=</span> G.subgraph_edges(which_edges_intersection)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>G_intersection <span class="op">=</span> G_intersection.simplify()</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Take the union: keep all ties reported </span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co"># irrespective of tie_type and how many times they were reported</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>G_union <span class="op">=</span> G.simplify()</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Concordance</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Concordance is:"</span>, G_intersection.ecount() <span class="op">/</span> G_union.ecount())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>producing:</p>
+<pre class="text"><code>Concordance is: 0.2002262443438914</code></pre>
+</section>
+</section>
+<section id="step-3-use-vimure-package-to-run-the-model" class="level1">
+<h1>📦 Step 3: Use <code>vimure</code> package to run the model</h1>
+<p>Now that you have prepared your data, you can use <code>vimure</code> to run the model:</p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true">Data Frame</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false"><code>igraph</code> object</a></li></ul>
+<div class="tab-content">
+<div id="tabset-7-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-7-1-tab">
+<div class="sourceCode" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> vimure <span class="im">as</span> vm</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the model</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> vm.model.VimureModel()</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>model.fit(edgelist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="tabset-7-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-7-2-tab">
+<div class="sourceCode" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> vimure <span class="im">as</span> vm</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the model</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> vm.model.VimureModel()</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>model.fit(G)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+<p>(<em>If you rather see what the model is doing, you can set <code>verbose=True</code> in the <code>fit()</code> method</em>)</p>
+<p>After which, you might be interested to look at the posterior estimates of the model parameters:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns a dictionary with the posterior estimates of the model parameters</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>posterior_estimates <span class="op">=</span> model.get_posterior_estimates()</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check which parameters were estimated</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>posterior_estimates.keys()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>dict_keys(['nu', 'theta', 'lambda', 'rho'])</code></pre>
+<p>We will look at what these mean in the next section.</p>
+<section id="posterior-estimates" class="level2">
+<h2 class="anchored" data-anchor-id="posterior-estimates">3.1: Posterior Estimates</h2>
+<p>The four values you get from the <code>get_posterior_estimates()</code> method are the <a href="https://www.lesswrong.com/posts/DMxe4XKXnjyMEAAGw/the-geometric-expectation">geometric expectations</a> of the distributions of the following parameters:</p>
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 80%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parameter</th>
+<th>Symbol</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>nu</code></td>
+<td><span class="math inline">\(\nu\)</span></td>
+<td>The inferred <strong>mutuality</strong> for the network (latent equivalent to <span class="math inline">\(\eta\)</span>)</td>
+</tr>
+<tr class="even">
+<td><code>theta</code></td>
+<td><span class="math inline">\(\theta_{lm}\)</span></td>
+<td>The “reliability” of a reporter <span class="math inline">\(m\)</span> on layer <span class="math inline">\(l\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>lambda</code></td>
+<td><span class="math inline">\(\lambda_{lk}\)</span></td>
+<td>The latent contribution that <span class="math inline">\(Y_l=k\)</span> has on <span class="math inline">\(\theta_{lm}\)</span>, where <span class="math inline">\(k \in \{1, \ldots, K\}\)</span> represents the weight of the tie.</td>
+</tr>
+<tr class="even">
+<td><code>rho</code></td>
+<td><span class="math inline">\(\rho_{lijk}\)</span></td>
+<td>The probability that a directed tie of weight <span class="math inline">\(k-1\)</span> exists between nodes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> on a particular layer <span class="math inline">\(l\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>Remember that the expected value of our model is:</p>
+<p><span class="math display">\[
+\mathbb{E} \left[X_{lijm}^{}|Y_{lij}^{} = k\right] = \theta_{lm}\lambda_{lk}^{}+\eta X_{ljim}^{}
+\]</span></p>
+<p>where <span class="math inline">\(X_{lijm}^{}\)</span> is the observed value of the tie between nodes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> reported by reporter <span class="math inline">\(m\)</span> on layer <span class="math inline">\(l\)</span> and <span class="math inline">\(Y_{lij}^{}\)</span> is the “ground truth” of the strength of the directed tie between nodes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> on layer <span class="math inline">\(l\)</span>.</p>
+<p>In the subsections below, we will provide an explanation of <span class="math inline">\(\nu\)</span> and <span class="math inline">\(\theta_{lm}\)</span> parameters and how to reason about the mutuality and “reliability” of reporters. <span class="math inline">\(\rho\)</span> and <span class="math inline">\(\lambda\)</span> are more technical and we will go into detail about them in a future tutorial.</p>
+<p><strong>A quick note about <span class="math inline">\(\rho\)</span></strong></p>
+<p>If you want to extract a quick point estimate of the inferred network, you can simply take the expected value of <span class="math inline">\(\rho\)</span> for <span class="math inline">\(k=1\)</span>:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected value of rho for k=1</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>rho <span class="op">=</span> posterior_estimates[<span class="st">'rho'</span>][<span class="dv">0</span>,:,:,<span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The code above will return a <span class="math inline">\(N \times N\)</span> weighted adjacency matrix which can be thought of as the probability of a tie between individuals <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> on layer <span class="math inline">\(l = 0\)</span> (Tutorial 03 will go into more detail about how to interpret the <span class="math inline">\(\rho\)</span> parameter.)</p>
+<p>Now let’s look at parameters <span class="math inline">\(\nu\)</span> and <span class="math inline">\(\theta_{lm}\)</span>:</p>
+<section id="mutuality-nu-or-eta" class="level3">
+<h3 class="anchored" data-anchor-id="mutuality-nu-or-eta">3.1.1: Mutuality (<span class="math inline">\(\nu\)</span> or <span class="math inline">\(\eta\)</span>)</h3>
+<p>In our case study:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>posterior_estimates[<span class="st">'nu'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>0.6177802251078235</code></pre>
+<p>This indicates a large mutuality in the network. That is, if <span class="math inline">\(i\)</span> reports that <span class="math inline">\(j\)</span> comes to them for money, then <span class="math inline">\(j\)</span> is likely to report that <span class="math inline">\(i\)</span> comes to them as well.</p>
+<p>This is a network-wide parameter and encompasses all layers. If you have reasons to believe mutuality varies across layers, you have to re-run the model for each layer separately.</p>
+</section>
+<section id="under-reporting-vs-over-reporting-a-combination-of-theta_lm-times-lambda_lk" class="level3">
+<h3 class="anchored" data-anchor-id="under-reporting-vs-over-reporting-a-combination-of-theta_lm-times-lambda_lk">3.1.2: Under-reporting vs over-reporting: a combination of (<span class="math inline">\(\theta_{lm} \times \lambda_{lk}\)</span>)</h3>
+<p>First, let’s look at the shape of the <span class="math inline">\(\theta\)</span> array:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>posterior_estimates[<span class="st">'theta'</span>].shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>(4, 417)</code></pre>
+<p>We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that there are 417 reporters in the network.</p>
+<p>This parameter, combined with <span class="math inline">\(\lambda_{lk}\)</span> represents the “reliability” of a reporter <span class="math inline">\(m\)</span> on layer <span class="math inline">\(l\)</span>:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>posterior_estimates[<span class="st">'lambda'</span>].shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>(4, 2)</code></pre>
+<p>The first dimension is the number of layers <span class="math inline">\(l\)</span>, and the second dimension is the strength of the tie, which in this case can assume the values <span class="math inline">\(k \in \{0, 1\}\)</span>. We only have two possible values for <span class="math inline">\(k\)</span> because that is the default setting for the <code>VimureModel</code> class. If you want to model more than two possible values for <span class="math inline">\(k\)</span>, you can set the <code>K</code> parameter when running the fit function: <code>model.fit(..., K=3)</code>.</p>
+<p>Combined, these two parameters indicate the probability that a reporter will <em>tend</em> to report ties, in general, for a given layer (recall the expected value of the VIMuRe model shown in Section <a href="#posterior-estimates">3.1: Posterior Estimates</a>). Loosely speaking, we can think of this value as the “reliability” of a reporter on a given layer.</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Another note on the number of reporters
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>You might be wondering why there are so many reporters, 417. After all, in Section <a href="#number-of-reporters">2.2: Number of reporters</a>, we calculated this number to be around 200! This is due to a technicality in the way the VIMuRe package handles the data. Our current implementation represents the total number of reporters, <span class="math inline">\(M\)</span> as <span class="math inline">\(M = N\)</span> (i.e.&nbsp;the number of nodes is equal to the number of reporters).</p>
+<p>This is akin to saying each node has <em>the potential</em> to be a reporter. But to control for which nodes are actually reporters, we use a binary mask, <span class="math inline">\(R_{lijm}\)</span>, which is 1 if the node <span class="math inline">\(m\)</span> is a reporter on layer <span class="math inline">\(l\)</span> for the tie between nodes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> and 0 otherwise. You can control how this mask is built by passing the <code>R</code> parameter to the <code>fit()</code> method. Read more about it in section <a href="#a-note-on-the-reporter-mask-r">3.3: A note on the reporter mask (<code>R</code>)</a>.</p>
+<p>Changing this is a priority for the next version of the package. But, as it is not a trivial change, we have decided to leave it as it is for now.</p>
+</div>
+</div>
+</div>
+<p><strong>How are reporters’ “reliability” distributed across layers?</strong></p>
+<p>Let’s check which reporters have the highest “reliability” values, and plot the values for each layer:</p>
+<details>
+<summary>
+Click to see the code
+</summary>
+<div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the node mapping: which node corresponds to which index in the array</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>df_nodes <span class="op">=</span> model.nodeNames</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Which nodes are reporters?</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: this assumes you have a `reporters` list from Tutorial 01</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>id_reporters <span class="op">=</span> df_nodes[df_nodes[<span class="st">'name'</span>].isin(reporters)][<span class="st">"id"</span>].values</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>df_lambda_k1 <span class="op">=</span> pd.DataFrame(<span class="bu">dict</span>(layer<span class="op">=</span>model.layerNames, lambda_k1<span class="op">=</span>posterior_estimates[<span class="st">'lambda'</span>][:,<span class="dv">1</span>]))</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Add the theta values</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>df_theta_reporters <span class="op">=</span> [</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    (layer_name, reporter_id, df_nodes[<span class="st">'name'</span>].iloc[reporter_id], posterior_estimates[<span class="st">'theta'</span>][l, reporter_id] <span class="op">*</span> df_lambda_k1[<span class="st">'lambda_k1'</span>].iloc[l])</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> reporter_id <span class="kw">in</span> id_reporters</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> l, layer_name <span class="kw">in</span> <span class="bu">enumerate</span>(model.layerNames)]</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>df_theta_reporters <span class="op">=</span> <span class="op">\</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a>    pd.DataFrame(df_theta_reporters, </span>
+<span id="cb32-18"><a href="#cb32-18" aria-hidden="true" tabindex="-1"></a>                 columns<span class="op">=</span>[<span class="st">'layer'</span>, <span class="st">'reporter_id'</span>, <span class="st">'reporter_name'</span>, <span class="st">'theta_scaled'</span>])</span>
+<span id="cb32-19"><a href="#cb32-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-20"><a href="#cb32-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort by reliability (scaled by lambda_k=1)</span></span>
+<span id="cb32-21"><a href="#cb32-21" aria-hidden="true" tabindex="-1"></a>df_theta_reporters<span class="op">\</span></span>
+<span id="cb32-22"><a href="#cb32-22" aria-hidden="true" tabindex="-1"></a>    .pivot(index<span class="op">=</span>[<span class="st">'reporter_id'</span>, <span class="st">'reporter_name'</span>], </span>
+<span id="cb32-23"><a href="#cb32-23" aria-hidden="true" tabindex="-1"></a>           columns<span class="op">=</span>[<span class="st">'layer'</span>], </span>
+<span id="cb32-24"><a href="#cb32-24" aria-hidden="true" tabindex="-1"></a>           values<span class="op">=</span>[<span class="st">'theta_scaled'</span>])<span class="op">\</span></span>
+<span id="cb32-25"><a href="#cb32-25" aria-hidden="true" tabindex="-1"></a>    .droplevel(<span class="dv">0</span>, axis<span class="op">=</span><span class="dv">1</span>)<span class="op">\</span></span>
+<span id="cb32-26"><a href="#cb32-26" aria-hidden="true" tabindex="-1"></a>    .reset_index()<span class="op">\</span></span>
+<span id="cb32-27"><a href="#cb32-27" aria-hidden="true" tabindex="-1"></a>    .sort_values(by<span class="op">=</span>model.layerNames, ascending<span class="op">=</span><span class="va">False</span>)<span class="op">\</span></span>
+<span id="cb32-28"><a href="#cb32-28" aria-hidden="true" tabindex="-1"></a>    .head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<details>
+<summary>
+Click to see the code
+</summary>
+<div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co"># plotnine is the python equivalent of ggplot2</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>plot_df <span class="op">=</span> df_theta_reporters.copy()</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>COLORS <span class="op">=</span>  [<span class="st">'#E69F25'</span>, <span class="st">'#5CB4E4'</span>, <span class="st">'#069F72'</span>, <span class="st">'#F1E545'</span>, <span class="st">'#0773B2'</span>, <span class="st">'#CC79A8'</span>]</span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> (ggplot(plot_df,  aes(x<span class="op">=</span><span class="st">"theta_scaled"</span>, fill<span class="op">=</span><span class="st">"layer"</span>)) <span class="op">+</span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>     geom_histogram(binwidth<span class="op">=</span><span class="fl">0.1</span>, color<span class="op">=</span><span class="st">"#212121"</span>) <span class="op">+</span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>     theme_bw() <span class="op">+</span> </span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>     facet_grid(<span class="st">"layer ~ ."</span>, scales<span class="op">=</span><span class="st">"free_y"</span>) <span class="op">+</span></span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>     scale_fill_manual(values<span class="op">=</span>COLORS, guide<span class="op">=</span><span class="va">False</span>) <span class="op">+</span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>     theme(figure_size<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">3</span>),</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>           axis_text_x<span class="op">=</span>element_text(size<span class="op">=</span><span class="dv">10</span>),</span>
+<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>           axis_text_y<span class="op">=</span>element_text(size<span class="op">=</span><span class="dv">10</span>),</span>
+<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>           panel_grid_minor<span class="op">=</span>element_blank(),</span>
+<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>           panel_grid_major<span class="op">=</span>element_blank(),           </span>
+<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>           strip_background <span class="op">=</span> element_blank(),</span>
+<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>           strip_text_x <span class="op">=</span> element_text(size<span class="op">=</span><span class="dv">10</span>),</span>
+<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>           axis_title<span class="op">=</span>element_text(size<span class="op">=</span><span class="dv">16</span>)) <span class="op">+</span></span>
+<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>     scale_x_continuous(name<span class="op">=</span><span class="vs">r"$\theta \times \lambda_{k=1}$"</span>, breaks<span class="op">=</span>np.arange(<span class="dv">0</span>, <span class="fl">1.1</span>, <span class="fl">0.1</span>), limits<span class="op">=</span>(<span class="dv">0</span>, <span class="fl">1.1</span>)) <span class="op">+</span></span>
+<span id="cb33-23"><a href="#cb33-23" aria-hidden="true" tabindex="-1"></a>     scale_y_continuous(name<span class="op">=</span><span class="st">"Count"</span>, breaks<span class="op">=</span>np.arange(<span class="dv">0</span>, <span class="dv">60</span>, <span class="dv">10</span>), limits<span class="op">=</span>(<span class="dv">0</span>, <span class="dv">50</span>)) <span class="op">+</span></span>
+<span id="cb33-24"><a href="#cb33-24" aria-hidden="true" tabindex="-1"></a>     ggtitle(<span class="vs">r"Reliability distribution across layers ($\theta_l \times \lambda_{k=1}$)"</span>))</span>
+<span id="cb33-25"><a href="#cb33-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-26"><a href="#cb33-26" aria-hidden="true" tabindex="-1"></a>ggsave(g, <span class="st">"theta_reporters.png"</span>, width<span class="op">=</span><span class="dv">7</span>, height<span class="op">=</span><span class="dv">9</span>, dpi<span class="op">=</span><span class="dv">300</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<p><img src="figures/theta_reporters.png" class="img-fluid"></p>
+<p><strong>How should we interpret the values?</strong></p>
+<p>The interpretation depends on both the mutuality of the network and the survey design. If the mutuality is high (as indicated by <span class="math inline">\(\nu\)</span> being closer to 1), reporters will naturally tend to reciprocate the ties they report, by default, thus reporters with high <span class="math inline">\(\theta\)</span> values (relative to the <span class="math inline">\(\theta\)</span> distribution) are likely “over-reporting” ties.</p>
+<p>Let’s investigate this a bit further by checking the ties reported by a top reporter (113302) in the advice layer:</p>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-8-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-8-1" role="tab" aria-controls="tabset-8-1" aria-selected="true">Reporters ranked by advice “reliability”</a></li></ul>
+<div class="tab-content">
+<div id="tabset-8-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-8-1-tab">
+<div style="width: 100%;font-size:0.85em">
+<table class="table">
+<colgroup>
+<col style="width: 10%">
+<col style="width: 10%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">reporter_id</th>
+<th style="text-align: right;">reporter_name</th>
+<th style="text-align: right;">advice</th>
+<th style="text-align: right;">kerorice</th>
+<th style="text-align: right;">money</th>
+<th style="text-align: right;">visit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: right;">0.897073</td>
+<td style="text-align: right;">0.73975</td>
+<td style="text-align: right;">0.459182</td>
+<td style="text-align: right;">0.209975</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">124</td>
+<td style="text-align: right;">113901</td>
+<td style="text-align: right;">0.878063</td>
+<td style="text-align: right;">0.820995</td>
+<td style="text-align: right;">0.868054</td>
+<td style="text-align: right;">0.669433</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">97</td>
+<td style="text-align: right;">109902</td>
+<td style="text-align: right;">0.850442</td>
+<td style="text-align: right;">0.792795</td>
+<td style="text-align: right;">1.55569e-05</td>
+<td style="text-align: right;">0.641589</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">92</td>
+<td style="text-align: right;">109505</td>
+<td style="text-align: right;">0.850422</td>
+<td style="text-align: right;">1.29801e-05</td>
+<td style="text-align: right;">0.838414</td>
+<td style="text-align: right;">0.86224</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">105902</td>
+<td style="text-align: right;">0.850409</td>
+<td style="text-align: right;">1.27773e-05</td>
+<td style="text-align: right;">0.458103</td>
+<td style="text-align: right;">0.37393</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>Most reporters have reliability in the <span class="math inline">\([0.4, 0.6]\)</span> interval, but 113302 has a “reliability” of <span class="math inline">\(\approx 0.9\)</span> in the advice layer. Let’s check the ties reported by this reporter:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>edgelist[(edgelist[<span class="st">"reporter"</span>] <span class="op">==</span> <span class="st">"113302"</span>) <span class="op">&amp;</span> (edgelist[<span class="st">"layer"</span>] <span class="op">==</span> <span class="st">"advice"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-9-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-9-1" role="tab" aria-controls="tabset-9-1" aria-selected="true">Ties reported by 113302 in the layer advice</a></li></ul>
+<div class="tab-content">
+<div id="tabset-9-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-9-1-tab">
+<div style="width:50%">
+<table class="table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 19%">
+<col style="width: 22%">
+<col style="width: 15%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">ego</th>
+<th style="text-align: right;">alter</th>
+<th style="text-align: right;">reporter</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">113302</td>
+<td style="text-align: right;"><strong>110502</strong></td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">113302</td>
+<td style="text-align: right;"><strong>113102</strong></td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><strong>105701</strong></td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><strong>110501</strong></td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;"><strong>113601</strong></td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;"><strong>113301</strong></td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<p>Node <code>113302</code> does not report any reciprocal ties, but it does report ties with six other nodes.</p>
+<p><strong>Are all nodes also reporters?</strong></p>
+<p>Two of these six nodes are not reporters:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>nodes_mentioned <span class="op">=</span> [<span class="st">"110502"</span>, <span class="st">"113102"</span>, <span class="st">"105701"</span>, <span class="st">"110501"</span>, <span class="st">"113601"</span>, <span class="st">"113301"</span>]</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>not_reporters <span class="op">=</span> [x <span class="cf">for</span> x <span class="kw">in</span> nodes_mentioned <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> reporters]</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>not_reporters</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>['113102', '105701']</code></pre>
+<p>We will never be able to confirm ties between <code>113302</code> and these nodes and this is already one of the reasons why <code>113302</code>’s “reliability” is high. (Note that these two non-reporter nodes will have reliability values of <span class="math inline">\(\approx 0\)</span>).</p>
+<p>On top of that, when we look at the reports made by the remaining four reporters, only node <code>113301</code> confirms the helpdecision tie reported by <code>113302</code>:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>potential_friends <span class="op">=</span> [<span class="st">"110502"</span>, <span class="st">"110501"</span>, <span class="st">"113601"</span>, <span class="st">"113301"</span>]</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>edgelist[(edgelist[<span class="st">'reporter'</span>].isin(potential_friends)) <span class="op">&amp;</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>         ((edgelist[<span class="st">'ego'</span>] <span class="op">==</span> <span class="st">'113302'</span>) <span class="op">|</span> (edgelist[<span class="st">'alter'</span>] <span class="op">==</span> <span class="st">'113302'</span>))]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">ego</th>
+<th style="text-align: right;">alter</th>
+<th style="text-align: right;">reporter</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">113301</td>
+<td style="text-align: right;">113302</td>
+<td style="text-align: right;">113301</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<p>That is why <code>113302</code>’s <span class="math inline">\(\theta\lambda_{k=1}\)</span> is high: it reports a lot of ties, but only one of them is confirmed by other reporters.</p>
+<p>Nodes with values in the average range of the <span class="math inline">\(\theta_{lm}\lambda_{lk}\)</span> distribution is likely to be more “reliable” reporters.</p>
+</section>
+</section>
+<section id="implicit-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="implicit-assumptions">3.2: Implicit assumptions</h2>
+<p>You might have noticed the following warning messages when you ran <code>model.fit()</code>:</p>
+<blockquote class="blockquote">
+<p><code>UserWarning: The set of nodes was not informed, using ego and alter columns to infer nodes.</code></p>
+<p><code>UserWarning: The set of reporters was not informed, assuming set(reporters) = set(nodes) and N = M.</code></p>
+<p><code>UserWarning: Reporters Mask was not informed (parameter R). Parser will build it from reporter column, assuming a reporter can only report their own ties.</code></p>
+</blockquote>
+<p>The messages are not errors; they are simply indications that the VIMuRe package has made some implicit assumptions when loading the data. If you would like to set the nodes, reporters, and reporter mask <em>explicitly</em>, you can pass these values as arguments to the fit() method. For example:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>model.fit(edgelist, </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>          nodes<span class="op">=</span>all_nodes, </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>          reporters<span class="op">=</span>all_reporters, </span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>          R<span class="op">=</span>reporter_mask)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="a-note-on-the-reporter-mask-r" class="level2">
+<h2 class="anchored" data-anchor-id="a-note-on-the-reporter-mask-r">3.3: A note on the reporter mask (<code>R</code>)</h2>
+<p>While nodes and reporters are simple lists of strings, the reporter mask <code>R</code> is a multidimensional sparse logical array (a tensor) with dimensions <span class="math inline">\(L \times N \times N \times N\)</span>. Here, <code>R[l, i, j, m]</code> indicates that reporter <span class="math inline">\(m\)</span> can report on the tie between <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> if the tie belongs to layer <span class="math inline">\(l\)</span>.</p>
+<p>So, for example, if the survey design was such that reporters could only report on ties involving themselves, this implies:</p>
+<span class="math display">\[\begin{cases}
+
+R_{lijm} = 1 &amp; \text{if } i = m \text{ or } j = m \\
+R_{lijm} = 0 &amp; \text{otherwise}.
+
+\end{cases}\]</span>
+<p>Depending on your survey design, you might want to construct <code>R</code> manually. For example, if all reporters were asked about all ties – regardless of whether they were involved in the ties or not – then <code>R</code> would be a multi-dimensional array of ones. We are planning a future tutorial on how to handle different survey designs.</p>
+<p>It’s worth noting that currently, the last dimension has size <span class="math inline">\(N\)</span> instead of <span class="math inline">\(M\)</span>. This is because the current implementation of the code assumes that all reporters are part of the network. The mathematical model, as described in <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span>, is more flexible and supports an arbitrary set of reporters, whether they are a subset of nodes or not. However, we have not yet implemented this functionality in the code. Our survey designs have so far assumed that all reporters are part of the network, so this has not been a problem. If this is a feature you would like to see sooner, let us know by adding a <a href="https://github.com/latentnetworks/vimure/discussions">discussion</a> on GitHub.</p>
+</section>
+</section>
+<section id="next-steps" class="level1">
+<h1>4. Next steps</h1>
+<p>Future tutorials will cover:</p>
+<ul>
+<li>How to extract point estimates and visualise the resulting network using <span class="math inline">\(\rho\)</span></li>
+<li>How to handle different survey designs</li>
+<li>How to sample from the posterior distribution</li>
+<li>(Advanced) Tweaking the optimization parameters</li>
+<li>(Advanced) Understanding the convergence diagnostics</li>
+</ul>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-banerjee_diffusion_2013-1" class="csl-entry" role="doc-biblioentry">
+Banerjee, Abhijit, Arun G. Chandrasekhar, Esther Duflo, and Matthew O. Jackson. 2013a. <span>“The <span>Diffusion</span> of <span>Microfinance</span> (<span>Dataset</span>).”</span> Harvard Dataverse. <a href="https://doi.org/10.7910/DVN/U3BIHX">https://doi.org/10.7910/DVN/U3BIHX</a>.
+</div>
+<div id="ref-banerjee_diffusion_2013" class="csl-entry" role="doc-biblioentry">
+———. 2013b. <span>“The <span>Diffusion</span> of <span>Microfinance</span>.”</span> <em>Science</em> 341 (6144): 1236498. <a href="https://doi.org/10.1126/science.1236498">https://doi.org/10.1126/science.1236498</a>.
+</div>
+<div id="ref-de_bacco_latent_2023" class="csl-entry" role="doc-biblioentry">
+De Bacco, Caterina, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Gabriela Lima Borges, Diego Baptista, Tracy Sweet, et al. 2023. <span>“Latent Network Models to Account for Noisy, Multiply Reported Social Network Data.”</span> <em>Journal of the Royal Statistical Society Series A: Statistics in Society</em>, February, qnac004. <a href="https://doi.org/10.1093/jrsssa/qnac004">https://doi.org/10.1093/jrsssa/qnac004</a>.
+</div>
+<div id="ref-ready_measuring_2021" class="csl-entry" role="doc-biblioentry">
+Ready, Elspeth, and Eleanor A. Power. 2021. <span>“Measuring Reciprocity: <span>Double</span> Sampling, Concordance, and Network Construction.”</span> <em>Network Science</em> 9 (4): 387–402. <a href="https://doi.org/10.1017/nws.2021.18">https://doi.org/10.1017/nws.2021.18</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp(/^(?:http:|https:)\/\/(?:latentnetworks\.github\.io\/|localhost)/);
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+    var links = window.document.querySelectorAll('a:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

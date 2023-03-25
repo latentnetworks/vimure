@@ -2,13 +2,15 @@
   {
     "listing": "/latest/tutorials/R-tutorials.html",
     "items": [
-      "/latest/tutorials/R/tutorial01-data-preparation.html"
+      "/latest/tutorials/R/tutorial01-data-preparation.html",
+      "/latest/tutorials/R/tutorial02-introduction-to-vimure.html"
     ]
   },
   {
     "listing": "/latest/tutorials/python-tutorials.html",
     "items": [
-      "/latest/tutorials/python/tutorial01-data-preparation.html"
+      "/latest/tutorials/python/tutorial01-data-preparation.html",
+      "/latest/tutorials/python/tutorial02-introduction-to-vimure.html"
     ]
   }
 ]

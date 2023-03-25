@@ -2,34 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://github.com/latentnetworks/vimure/index.html</loc>
-    <lastmod>2023-03-22T11:15:41.726Z</lastmod>
+    <lastmod>2023-03-25T20:03:05.846Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/install.html</loc>
-    <lastmod>2023-03-22T11:15:43.034Z</lastmod>
+    <lastmod>2023-03-25T20:03:07.162Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/people.html</loc>
-    <lastmod>2023-03-22T11:15:43.414Z</lastmod>
+    <lastmod>2023-03-25T20:03:07.570Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials.html</loc>
-    <lastmod>2023-03-22T11:15:43.774Z</lastmod>
+    <lastmod>2023-03-25T20:03:07.950Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/R-tutorials.html</loc>
-    <lastmod>2023-03-22T11:15:44.142Z</lastmod>
+    <lastmod>2023-03-25T20:03:08.366Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/R/tutorial01-data-preparation.html</loc>
-    <lastmod>2023-03-22T11:15:45.090Z</lastmod>
+    <lastmod>2023-03-25T20:03:09.306Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/latentnetworks/vimure/latest/tutorials/R/tutorial02-introduction-to-vimure.html</loc>
+    <lastmod>2023-03-25T20:03:10.494Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/python-tutorials.html</loc>
-    <lastmod>2023-03-22T11:15:45.446Z</lastmod>
+    <lastmod>2023-03-25T20:03:10.886Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/python/tutorial01-data-preparation.html</loc>
-    <lastmod>2023-03-22T11:15:46.338Z</lastmod>
+    <lastmod>2023-03-25T20:03:11.894Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/latentnetworks/vimure/latest/tutorials/python/tutorial02-introduction-to-vimure.html</loc>
+    <lastmod>2023-03-25T20:03:13.078Z</lastmod>
   </url>
 </urlset>
