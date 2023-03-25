@@ -40,10 +40,12 @@ vimure <-
            rho_prior = NULL,
            seed = NULL,
            etol = 0.1,
-           verbose = TRUE,
+           verbose = FALSE,
            ...) {
 
-  if(!any(class(x) %in% c("sktensor.sptensor.sptensor", "array", "igraph"))){
+  valid_classes <- c("sktensor.sptensor.sptensor", "array",
+                     "igraph", "data.frame", "tbl_df")
+  if (!any(class(x) %in% valid_classes)) {
     stop("invalid 'type'", class(x), "of argument")
   }
 
