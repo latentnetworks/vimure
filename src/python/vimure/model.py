@@ -10,8 +10,8 @@ import sktensor as skt
 import scipy.special as sp
 from scipy.stats import poisson
 
-from .io import read_from_edgelist, read_from_igraph
-from .log import setup_logging
+from ._io import read_from_edgelist, read_from_igraph
+from ._log import setup_logging
 from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_threshold
 
 from sklearn.base import TransformerMixin, BaseEstimator
@@ -33,8 +33,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
     reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
     network (rho). The inference is performed with a Variational Inference approach.
     
-    .. note::This closely follows the scikit-learn structure of classes:
-        https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py
+    📝 note: this closely follows the [scikit-learn structure of classes](https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py)
     """
     @_deprecate_positional_args
     def __init__(
@@ -348,23 +347,22 @@ class VimureModel(TransformerMixin, BaseEstimator):
             Shape and scale hyperparameters for variable eta
         rho_prior : None/ndarray
             Array with prior values of the rho parameter - if ndarray.
-
-        Extra parameters (Advanced tuning of inference)
-        ----------------
-        R: ndarray
+        R: ndarray (optional)
             a multidimensional array L x N x N x M indicating which reports to consider
-        K: None/int
+        K: None/int (optional)
             Value of the maximum entry of the network - i
-        EPS : float
+        EPS : float (optional)
             White noise. Default: 1e-12
-        bias0: float
+        bias0: float (optional)
             Bias for rho_prior entry 0. Default: 0.2
-        max_iter: int
+        max_iter: int (optional)
             Maximum number of iteration steps before aborting. Default=500
 
         Returns
         -------
-        self.rho_f, self.G_exp_theta_f, self.G_exp_lambda_f, self.G_exp_nu_f, self.maxL
+        self : object
+            Returns the instance itself.
+        
         """
 
         if self.verbose:
@@ -699,7 +697,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
     def _update_gamma(self, subs_nz):
 
-        self.gamma_shp = self.alpha_theta + self.sp_uttkrp_theta(
+        self.gamma_shp = self.alpha_theta + self._sp_uttkrp_theta(
             self.data_z1_nz, subs_nz
         )
 
@@ -730,7 +728,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
     def _update_phi(self, subs_nz):
 
-        self.phi_shp = self.alpha_lambda + self.sp_uttkrp_lambda(
+        self.phi_shp = self.alpha_lambda + self._sp_uttkrp_lambda(
             self.data_z1_nz, subs_nz
         )
 
@@ -801,7 +799,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         self.logger.verbose("calculating log_rho")
         log_rho = (
             self.logpr_rho
-            + self.sp_uttkrp_rho(self.data_z1_nz, subs_nz)
+            + self._sp_uttkrp_rho(self.data_z1_nz, subs_nz)
             - Exp_theta_lambda
         )
 
@@ -831,7 +829,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         return dist_nu
 
-    def sp_uttkrp_theta(self, vals, subs):
+    def _sp_uttkrp_theta(self, vals, subs):
         """
         Compute the Khatri-Rao product (sparse version).
 
@@ -860,7 +858,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
             out[l, m] += tmp[c]
         return out
 
-    def sp_uttkrp_lambda(self, vals, subs):
+    def _sp_uttkrp_lambda(self, vals, subs):
         """
         Compute the Khatri-Rao product (sparse version).
 
@@ -888,7 +886,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         return out
 
-    def sp_uttkrp_rho(self, vals, subs):
+    def _sp_uttkrp_rho(self, vals, subs):
         """
         Compute the Khatri-Rao product (sparse version).
 
@@ -956,7 +954,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         E_exp_lambda = self.phi_shp / self.phi_rte
         E_exp_rec = self.nu_shp / self.nu_rte
 
-        E_PoissonMean = self.calculate_mean_poisson(
+        E_PoissonMean = self._calculate_mean_poisson(
             G_exp_theta=E_exp_theta,
             G_exp_lambda=E_exp_lambda,
             G_exp_nu=E_exp_rec,
@@ -966,7 +964,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         )
         elbo = -E_PoissonMean.vals.sum()
 
-        G_PoissonMean = self.calculate_mean_poisson(
+        G_PoissonMean = self._calculate_mean_poisson(
             G_exp_theta=self.G_exp_theta,
             G_exp_lambda=self.G_exp_lambda,
             G_exp_nu=self.G_exp_nu,
@@ -996,23 +994,23 @@ class VimureModel(TransformerMixin, BaseEstimator):
         logPoissonMean = np.log(logPoissonMean + self.EPS)
         elbo += (data.vals * logPoissonMean).sum()
 
-        elbo += gamma_elbo_term(
+        elbo += _gamma_elbo_term(
             pa=self.alpha_theta,
             pb=self.beta_theta,
             qa=self.gamma_shp,
             qb=self.gamma_rte,
         ).sum()
-        elbo += gamma_elbo_term(
+        elbo += _gamma_elbo_term(
             pa=self.alpha_lambda, pb=self.beta_lambda, qa=self.phi_shp, qb=self.phi_rte
         ).sum()
-        elbo += gamma_elbo_term(
+        elbo += _gamma_elbo_term(
             pa=self.alpha_mutuality,
             pb=self.beta_mutuality,
             qa=self.nu_shp,
             qb=self.nu_rte,
         )
 
-        elbo += categorical_elbo_term(self.rho, self.pr_rho, self.EPS).sum()
+        elbo += _categorical_elbo_term(self.rho, self.pr_rho, self.EPS).sum()
 
         if np.isnan(elbo):
             raise ValueError("ELBO is NaN!!!!")
@@ -1189,7 +1187,17 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         return methods[method](self, threshold)
 
+    # Let's write a long and comprehensive docstring
     def get_posterior_estimates(self):
+        """Get posterior estimates
+
+        Use this function to get the posterior estimates of the model parameters
+
+        Returns
+        -------
+        posterior_estimates : dict
+            A dictionary with the posterior estimates of the model parameters (nu, theta, lambda, rho). See 💻 [Tutorial 02](/latest/tutorials/python/tutorial02-introduction-to-vimure.html#posterior-estimates).
+        """
 
         if not hasattr(self, "rho_f"):
             NotFittedError(
@@ -1209,7 +1217,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
     UTILS
     """
 
-    def calculate_mean_poisson(
+    def _calculate_mean_poisson(
         self,
         G_exp_theta=None,
         G_exp_lambda=None,
@@ -1289,13 +1297,13 @@ class VimureModel(TransformerMixin, BaseEstimator):
 UTIL FUNCTIONS FOR INFERENCE
 """
 
-def gamma_elbo_term(pa, pb, qa, qb):
+def _gamma_elbo_term(pa, pb, qa, qb):
     return (
         sp.gammaln(qa) - pa * np.log(qb) + (pa - qa) * sp.psi(qa) + qa * (1 - pb / qb)
     )
 
 
-def categorical_elbo_term(rho, prior_rho, EPS):
+def _categorical_elbo_term(rho, prior_rho, EPS):
     K = rho.shape[-1]
     layer = np.zeros((rho.shape[0], rho.shape[1], rho.shape[2]))
     for k in range(K):

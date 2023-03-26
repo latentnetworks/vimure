@@ -14,7 +14,6 @@ from vimure.synthetic import (
     DEFAULT_EXP_IN,
     DEFAULT_EXP_OUT,
     DEFAULT_AVG_DEGREE,
-    DEFAULT_SEED,
     DEFAULT_ETA,
 )
 

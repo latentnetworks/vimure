@@ -1,4 +1,10 @@
-"""Code to generate synthetic networks that emulates directed double-sample questions networks"""
+"""Code to generate synthetic networks that emulates directed double-sample questions networks
+
+You can read more about our synthetic network generation in our paper: [@de_bacco_latent_2023]
+
+"""
+
+# Paper link: https://doi.org/10.1093/jrsssa/qnac004
 
 import math
 
@@ -8,9 +14,9 @@ import networkx as nx
 import sktensor as skt
 
 from abc import ABCMeta, abstractmethod
-from .io import BaseNetwork, DEFAULT_SEED
-from .log import setup_logging
-from .utils import preprocess, sptensor_from_dense_array
+from ._io import BaseNetwork
+from ._log import setup_logging
+from .utils import preprocess, sptensor_from_dense_array, transpose_ij
 
 DEFAULT_N = 100
 DEFAULT_M = 100
@@ -30,23 +36,6 @@ DEFAULT_AVG_DEGREE = 2
 
 module_logger = setup_logging("vm.synthetic", False)
 
-def transpose_ij(M):
-    """
-    Compute the transpose of a matrix.
-
-    Parameters
-    ----------
-    M : numpy.array
-        Numpy matrix.
-
-    Returns
-    -------
-    Transpose of the matrix.
-    """
-
-    return np.einsum("ij->ji", M)
-
-
 class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
     """
     A base abstract class for generation and management of synthetic networks. 
@@ -58,20 +47,20 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         M: int = DEFAULT_M,
         L: int = DEFAULT_L,
         K: int = DEFAULT_K,
-        seed: int = DEFAULT_SEED,
+        seed: int = 0,
         **kwargs,
     ):
         super().__init__(N=N, M=M, L=L, K=K, seed=seed, **kwargs)
 
     @abstractmethod
-    def generate_lv(self):
+    def _generate_lv(self):
         pass
 
     @abstractmethod
-    def build_Y(self):
+    def _build_Y(self):
         pass
 
-    def build_X(
+    def _build_X(
         self,
         mutuality: float = 0.5,
         sh_theta: float = 2.0,
@@ -263,7 +252,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         Note: the output adjacency matrix is binary
 
-        # TODO: Maybe the calculation of baseline adjacency matrices shouldn't be inside the build_X() function, 
+        # TODO: Maybe the calculation of baseline adjacency matrices shouldn't be inside the _build_X() function, 
         #       since it isn't a feature of the package itself?
         """
         lij = (subs_lijm[0], subs_lijm[1], subs_lijm[2])
@@ -291,7 +280,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         Similar to the union baseline, here we disregard the strength of ties. 
 
-        # TODO: Maybe the calculation of baseline adjacency matrices shouldn't be inside the build_X() function, 
+        # TODO: Maybe the calculation of baseline adjacency matrices shouldn't be inside the _build_X() function, 
         #       since it isn't a feature of the package itself?
         """
 
@@ -409,7 +398,7 @@ class StandardSBM(BaseSyntheticNetwork):
         kwargs : 
             Additional arguments of `vimure.synthetic.StandardSBM` 
         """
-        self.init_sbm_params(
+        self._init_sbm_params(
             C=C,
             structure=structure,
             avg_degree=avg_degree,
@@ -417,9 +406,9 @@ class StandardSBM(BaseSyntheticNetwork):
             overlapping=overlapping,
             **kwargs,
         )
-        self.build_Y()
+        self._build_Y()
 
-    def init_sbm_params(self, **kwargs):
+    def _init_sbm_params(self, **kwargs):
         """
         Check SBM-specific parameters
         """
@@ -556,11 +545,11 @@ class StandardSBM(BaseSyntheticNetwork):
         return_str += f"sparsify={self.sparsify}, overlapping={self.overlapping})"
         return return_str
 
-    def build_Y(self):
+    def _build_Y(self):
         """
         Latent variables
         """
-        self.u, self.v, self.w = self.generate_lv()
+        self.u, self.v, self.w = self._generate_lv()
 
         """
         Generate Y
@@ -702,7 +691,7 @@ class StandardSBM(BaseSyntheticNetwork):
 
         return u, v
 
-    def generate_lv(self):
+    def _generate_lv(self):
         """
         Generate latent variables for a Stochastic BlockModel, assuming network layers are independent.
         """
@@ -726,8 +715,7 @@ class DegreeCorrectedSBM(StandardSBM):
     **Degree-corrected stochastic blockmodel.**
 
     A generative model that incorporates heterogeneous vertex degrees into stochastic blockmodels, improving the performance of the models for statistical inference of group structure.
-    For more information about this model, see Karrer, B., & Newman, M. E. (2011). _Stochastic blockmodels and community structure in networks_. Physical review E, 83(1), 016107.
-    [DOI:10.1103/PhysRevE.83.016107](https://arxiv.org/pdf/1008.3926.pdf).
+    For more information about this model, see [@karrer_stochastic_2011].
     """
     def __init__(
             self, exp_in: float = DEFAULT_EXP_IN,
@@ -740,8 +728,8 @@ class DegreeCorrectedSBM(StandardSBM):
             Exponent power law of in-degree distribution.
         exp_out : float
             Exponent power law of out-degree distribution.
-        kwargs : 
-            Additional arguments of `vimure.synthetic.StandardSBM` 
+        kwargs : dict
+            Additional arguments of `vimure.synthetic.StandardSBM`.
         """
 
         self.exp_in = exp_in  # exponent power law distribution in degree
@@ -750,12 +738,12 @@ class DegreeCorrectedSBM(StandardSBM):
         # Initialize all other variables
         super().__init__(**kwargs)
 
-    def generate_lv(self):
+    def _generate_lv(self):
         """
         Overwrite standard SBM model to add degree distribution
         """
 
-        u, v, w = super().generate_lv()
+        u, v, w = super()._generate_lv()
 
         # We add +1 to the degree distributions to avoid creating disconnected nodes
         self.d_in = np.array(
@@ -792,14 +780,15 @@ class Multitensor(StandardSBM):
     **A generative model with reciprocity**
 
     A mathematically principled generative model for capturing both community and reciprocity patterns in directed networks.
-    Adapted from Safdari H., Contisciani M. & De Bacco C. (2021). Generative model for reciprocity and community detection in networks, Phys. Rev. Research 3, 023209.
-    [DOI:10.1103/PhysRevResearch.3.023209](https://journals.aps.org/prresearch/abstract/10.1103/PhysRevResearch.3.023209).
+    Adapted from [@safdari_generative_2021].
     
     Generate a directed, possibly weighted network by using the reciprocity generative model.
     Can be used to generate benchmarks for networks with reciprocity.
-    Steps:
-        1. Generate the latent variables.
-        2. Extract `A_{ij}` entries (network edges) from a Poisson distribution; its mean depends on the latent variables.
+
+    **Steps:**
+    
+    1. Generate the latent variables.
+    2. Extract `A_{ij}` entries (network edges) from a Poisson distribution; its mean depends on the latent variables.
         
     .. note:: Open Source code available at https://github.com/mcontisc/CRep and modified in accordance with its [license](https://github.com/mcontisc/CRep/blob/master/LICENSE).
 
@@ -818,7 +807,7 @@ class Multitensor(StandardSBM):
         kwargs : 
             Additional arguments of `vimure.synthetic.StandardSBM` 
         """
-        super().init_sbm_params(**kwargs)
+        super()._init_sbm_params(**kwargs)
 
         if eta < 0 or eta >= 1:
             msg = "The reciprocity parameter eta has to be in [0, 1)!"
@@ -830,9 +819,9 @@ class Multitensor(StandardSBM):
             self.ExpM = int(ExpM)
             self.avg_degree = 2 * self.ExpM / float(self.N)
 
-        self.build_Y()
+        self._build_Y()
 
-    def Exp_ija_matrix(self, u, v, w):
+    def _Exp_ija_matrix(self, u, v, w):
         """
         Compute the mean lambda0_ij for all entries.
 
@@ -856,7 +845,7 @@ class Multitensor(StandardSBM):
 
         return M
 
-    def build_Y(self):
+    def _build_Y(self):
         """
         Generate network layers G and adjacency matrix A using the latent variables,
         with the generative model `(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A_{ij},u,v,w,eta)`
@@ -864,7 +853,7 @@ class Multitensor(StandardSBM):
 
         self.Y = np.zeros((self.L, self.N, self.N))
 
-        self.u, self.v, self.w = self.generate_lv()
+        self.u, self.v, self.w = self._generate_lv()
 
         for l in range(self.L):
 
@@ -872,7 +861,7 @@ class Multitensor(StandardSBM):
             # TODO:Document this section
             """
 
-            M0 = self.Exp_ija_matrix(self.u, self.v, self.w[l])  # whose elements are lambda0_{ij}
+            M0 = self._Exp_ija_matrix(self.u, self.v, self.w[l])  # whose elements are lambda0_{ij}
             np.fill_diagonal(M0, 0)
 
             if self.sparsify:
@@ -1013,7 +1002,7 @@ def build_custom_theta(
     Parameters
     ----------
     gt_network : vimure.synthetic.BaseSyntheticNetwork
-        Generative ground truth model.
+        A network generated from a generative model.
     theta_ratio : float
         Percentage of reporters who exaggerate.
     exaggeration_type : str

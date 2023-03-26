@@ -1,0 +1,767 @@
+---
+title: "📚 Python package documentation"
+subtitle: "VIMuRe 0.1.0-dev [abc8820] (latest)"
+---
+<details><summary>Module `vimure.model`</summary>
+
+# Module `vimure.model`
+
+Inference model
+
+## Classes
+
+### VimureModel
+
+
+```python
+class VimureModel(
+    undirected: bool = False,
+    mutuality: bool = True,
+    convergence_tol: float = 0.1,
+    decision: int = 1,
+    verbose: bool = False
+):
+```
+
+**ViMuRe**
+
+
+Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
+reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
+network (rho). The inference is performed with a Variational Inference approach.
+
+
+📝 note: this closely follows the [scikit-learn structure of classes](https://github.com/scikit-learn-contrib/project-template/blob/master/skltemplate/_template.py)
+
+
+**Parameters**
+
+- **``undirected``** : `boolean`
+
+    Whether the network is undirected.
+
+- **``mutuality``** : `boolean`
+
+    Whether to use the mutuality parameter.
+
+- **``convergence_tol``** : `float`
+
+    Controls when to stop the optimisation algorithm (CAVI)
+
+
+#### Ancestors
+
+
+* sklearn.base.TransformerMixin
+* sklearn.utils._set_output._SetOutputMixin
+* sklearn.base.BaseEstimator
+
+
+#### Methods
+
+#### `fit`
+
+
+```python
+def fit(
+    self,
+    X,
+    theta_prior=(0.1, 0.1),
+    lambda_prior=(10.0, 10.0),
+    eta_prior=(0.5, 1.0),
+    rho_prior=None,
+    seed: int = None,
+    **extra_params
+):
+```
+
+**Parameters**
+
+- **``X``** : `ndarray`
+
+    Network adjacency tensor.
+
+- **``theta_prior``** : `2D tuple`
+
+    Shape and scale hyperparameters for variable theta
+
+- **``lambda_prior``** : `2D tuple`
+
+    Shape and scale hyperparameters for variable lambda
+
+- **``eta_prior``** : `2D tuple`
+
+    Shape and scale hyperparameters for variable eta
+
+- **``rho_prior``** : `None/ndarray`
+
+    Array with prior values of the rho parameter - if ndarray.
+
+- **``R``** : `ndarray (optional)`
+
+    a multidimensional array L x N x N x M indicating which reports to consider
+
+- **``K``** : `None/int (optional)`
+
+    Value of the maximum entry of the network - i
+
+- **``EPS``** : `float (optional)`
+
+    White noise. Default: 1e-12
+
+- **``bias0``** : `float (optional)`
+
+    Bias for rho_prior entry 0. Default: 0.2
+
+- **``max_iter``** : `int (optional)`
+
+    Maximum number of iteration steps before aborting. Default=500
+
+
+**Returns**
+
+- **``self``** : `object`
+
+    Returns the instance itself.
+
+
+#### `get_inferred_model`
+
+
+```python
+def get_inferred_model(self, method='rho_max', threshold=None):
+```
+
+Estimate Y
+
+
+Use this function to reconstruct the Y matrix with a fitted vimure model.
+It will use `model.rho_f` values to extract an estimated Y matrix.
+
+
+* *rho_max*: Assign the value of the highest probability
+* *rho_mean*: Expected value of the discrete distribution
+* *fixed_threshold*: Check if the probability is higher than a threshold (Only for K=2)
+* *heuristic_threshold*: Calculate and use the best threshold (Only for K=2)
+
+
+**Parameters**
+
+- **``model``** : `vm.model.VimureModel`
+
+    A `vm.model.VimureModel` object
+
+- **``method``** : `str`
+
+    A character string indicating which method is to be computed.
+
+One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".
+- **``threshold``** : `float`
+
+    A threshold to be used when method = "fixed_threshold".
+
+
+**Returns**
+
+- **``Y``** : `ndarray`
+
+     
+
+
+#### `get_posterior_estimates`
+
+
+```python
+def get_posterior_estimates(self):
+```
+
+Get posterior estimates
+
+
+Use this function to get the posterior estimates of the model parameters
+
+
+**Returns**
+
+- **``posterior_estimates``** : `dict`
+
+    A dictionary with the posterior estimates of the model parameters (nu, theta, lambda, rho). See 💻 [Tutorial 02](/latest/tutorials/python/tutorial02-introduction-to-vimure.html#posterior-estimates).
+
+
+#### `sample_inferred_model`
+
+
+```python
+def sample_inferred_model(self, N=1, seed=None):
+```
+
+Sample Y trials from rho distribution
+
+
+Use this function to sample Y trials with a fitted vimure model.
+It will use `model.rho_f` as the probabilities of a discrete distribution.
+
+
+**Parameters**
+
+- **``model``** : `vm.model.VimureModel`
+
+    A `vm.model.VimureModel` object
+
+- **``N``** : `int`
+
+    Number of trials
+
+- **``seed``** : `int`
+
+    A pseudo generator seed
+
+
+**Returns**
+
+- **``Y``** : `List[ndarray]`
+
+    A list of trials
+
+
+
+
+</details>
+
+<details><summary>Module `vimure.synthetic`</summary>
+
+# Module `vimure.synthetic`
+
+Code to generate synthetic networks that emulates directed double-sample questions networks
+
+
+You can read more about our synthetic network generation in our paper: [@de_bacco_latent_2023]
+
+## Functions
+
+#### `build_custom_theta`
+
+
+```python
+def build_custom_theta(
+    gt_network: BaseSyntheticNetwork,
+    theta_ratio: float = 0.5,
+    exaggeration_type: str = 'over',
+    seed: int = None
+):
+```
+
+Instead of the regular generative model for `theta ~ Gamma(sh,sc)`,
+create a more extreme scenario where some percentage of reporters are exaggerating.
+
+
+**Parameters**
+
+**`gt_network`** : [`BaseSyntheticNetwork`](vimure.#vimure.synthetic.BaseSyntheticNetwork)
+A network generated from a generative model.
+- **``theta_ratio``** : `float`
+
+    Percentage of reporters who exaggerate.
+
+- **``exaggeration_type``** : `str`
+
+    ("over", "under")
+
+- **``seed``** : `int`
+
+    If not set, use gt_network.prng instead.
+
+
+**Returns**
+
+- **``theta``** : `numpy.array`
+
+    A L x M matrix for theta.
+
+
+#### `build_self_reporter_mask`
+
+
+```python
+def build_self_reporter_mask(gt_network):
+```
+
+Build the reporters' mask in a way such that:
+
+
+* A reporter `m` can report ties in which she is ego:
+`m --> i`
+* A reporter `m` can report ties in which she is alter: `i --> m`
+* A reporter `m` **cannot** report ties she is not involved, that is `i --> j` where `i != m` and `j != m`
+
+
+**Parameters**
+
+**`gt_network`** : [`BaseSyntheticNetwork`](vimure.#vimure.synthetic.BaseSyntheticNetwork)
+Generative ground truth model.
+
+## Classes
+
+### BaseSyntheticNetwork
+
+
+```python
+class BaseSyntheticNetwork(
+    N: int = 100,
+    M: int = 100,
+    L: int = 1,
+    K: int = 2,
+    seed: int = 0,
+    **kwargs
+):
+```
+
+A base abstract class for generation and management of synthetic networks.
+Suitable for representing any type of synthetic network (whether SBM or not).
+
+
+**Parameters**
+
+- **``N``** : `int`
+
+    Number of nodes.
+
+- **``M``** : `int`
+
+    Number of reporters.
+
+- **``L``** : `int`
+
+    Number of layers.
+
+- **``K``** : `int`
+
+    Maximum edge weight in the adjacency matrix. When `K=2`, the adjacency matrix will contain some `Y_{ij}=0` and `Y_{ij}=1`.
+
+- **``seed``** : `int`
+
+    Pseudo random generator seed to use.
+
+
+#### Ancestors
+
+
+* vimure._io.BaseNetwork
+
+
+#### Subclasses
+
+
+* [HollandLaskeyLeinhardtModel](#vimure.synthetic.HollandLaskeyLeinhardtModel "vimure.synthetic.HollandLaskeyLeinhardtModel")
+* [StandardSBM](#vimure.synthetic.StandardSBM "vimure.synthetic.StandardSBM")
+
+### DegreeCorrectedSBM
+
+
+```python
+class DegreeCorrectedSBM(
+    exp_in: float = 2,
+    exp_out: float = 2.5,
+    **kwargs
+):
+```
+
+**Degree-corrected stochastic blockmodel.**
+
+
+A generative model that incorporates heterogeneous vertex degrees into stochastic blockmodels, improving the performance of the models for statistical inference of group structure.
+For more information about this model, see [@karrer_stochastic_2011].
+
+
+**Parameters**
+
+- **``exp_in``** : `float`
+
+    Exponent power law of in-degree distribution.
+
+- **``exp_out``** : `float`
+
+    Exponent power law of out-degree distribution.
+
+- **``kwargs``** : `dict`
+
+    Additional arguments of [`StandardSBM`](vimure.#vimure.synthetic.StandardSBM).
+
+
+#### Ancestors
+
+
+* [StandardSBM](#vimure.synthetic.StandardSBM "vimure.synthetic.StandardSBM")
+* [BaseSyntheticNetwork](#vimure.synthetic.BaseSyntheticNetwork "vimure.synthetic.BaseSyntheticNetwork")
+* vimure._io.BaseNetwork
+
+### HollandLaskeyLeinhardtModel
+
+
+```python
+class HollandLaskeyLeinhardtModel(**kwargs):
+```
+
+A base abstract class for generation and management of synthetic networks.
+Suitable for representing any type of synthetic network (whether SBM or not).
+
+
+**Parameters**
+
+- **``N``** : `int`
+
+    Number of nodes.
+
+- **``M``** : `int`
+
+    Number of reporters.
+
+- **``L``** : `int`
+
+    Number of layers.
+
+- **``K``** : `int`
+
+    Maximum edge weight in the adjacency matrix. When `K=2`, the adjacency matrix will contain some `Y_{ij}=0` and `Y_{ij}=1`.
+
+- **``seed``** : `int`
+
+    Pseudo random generator seed to use.
+
+
+#### Ancestors
+
+
+* [BaseSyntheticNetwork](#vimure.synthetic.BaseSyntheticNetwork "vimure.synthetic.BaseSyntheticNetwork")
+* vimure._io.BaseNetwork
+
+### Multitensor
+
+
+```python
+class Multitensor(eta=0.5, ExpM=None, **kwargs):
+```
+
+**A generative model with reciprocity**
+
+
+A mathematically principled generative model for capturing both community and reciprocity patterns in directed networks.
+Adapted from [@safdari_generative_2021].
+
+
+Generate a directed, possibly weighted network by using the reciprocity generative model.
+Can be used to generate benchmarks for networks with reciprocity.
+
+
+**Steps:**
+
+
+1. Generate the latent variables.
+2. Extract `A_{ij}` entries (network edges) from a Poisson distribution; its mean depends on the latent variables.
+
+Note: Open Source code available at <https://github.com/mcontisc/CRep> and modified in accordance with its [license](https://github.com/mcontisc/CRep/blob/master/LICENSE).
+
+---
+
+
+Copyright (c) 2020 Hadiseh Safdari, Martina Contisciani and Caterina De Bacco.
+
+
+**Parameters**
+
+- **``eta``** : `float`
+
+    Initial value for the reciprocity coefficient. Eta has to be in [0, 1).
+
+- **``ExpM``** : `int`
+
+    Expected number of edges
+
+**`kwargs`**
+Additional arguments of [`StandardSBM`](vimure.#vimure.synthetic.StandardSBM)
+
+#### Ancestors
+
+
+* [StandardSBM](#vimure.synthetic.StandardSBM "vimure.synthetic.StandardSBM")
+* [BaseSyntheticNetwork](#vimure.synthetic.BaseSyntheticNetwork "vimure.synthetic.BaseSyntheticNetwork")
+* vimure._io.BaseNetwork
+
+### StandardSBM
+
+
+```python
+class StandardSBM(
+    C: int = 2,
+    structure: str = None,
+    avg_degree: float = 2,
+    sparsify: bool = True,
+    overlapping: float = 0.0,
+    **kwargs
+):
+```
+
+**Creates a standard stochastic block-model synthetic network.**
+
+
+A generative graph model which assumes the probability of connecting two nodes in a graph is determined entirely by their block assignments.
+For more information about this model, see Holland, P. W., Laskey, K. B., & Leinhardt, S. (1983). *Stochastic blockmodels: First steps. Social networks*, 5(2), 109-137.
+[DOI:10.1016/0378-8733(83)90021-7](https://www.sciencedirect.com/science/article/abs/pii/0378873383900217)
+
+
+**Parameters**
+
+- **``C``** : `int`
+
+    Number of communities
+
+- **``structure``** : `str`
+
+    Structures for the affinity tensor `w`. It can be 'assortative' or 'disassortative'.
+
+It can be a list to map structure for each layer in a multilayer graph.
+- **``avg_degree``** : `float`
+
+    Desired average degree for the network. It is not guaranteed that the
+
+ultimate network will have that exact average degree value.
+Try tweaking this parameter if you want to increase or decrease the
+density of the network.
+- **``sparsify``** : `bool`
+
+    If True (default), enforce sparsity.
+
+- **``overlapping``** : `float`
+
+    Fraction of nodes with mixed membership. It has to be in [`0, 1)`.
+
+**`kwargs`**
+Additional arguments of `[StandardSBM`](vimure.#vimure.synthetic.StandardSBM)
+
+#### Ancestors
+
+
+* [BaseSyntheticNetwork](#vimure.synthetic.BaseSyntheticNetwork "vimure.synthetic.BaseSyntheticNetwork")
+* vimure._io.BaseNetwork
+
+
+#### Subclasses
+
+
+* [DegreeCorrectedSBM](#vimure.synthetic.DegreeCorrectedSBM "vimure.synthetic.DegreeCorrectedSBM")
+* [Multitensor](#vimure.synthetic.Multitensor "vimure.synthetic.Multitensor")
+
+
+
+</details>
+
+<details><summary>Module `vimure.utils`</summary>
+
+# Module `vimure.utils`
+
+## Functions
+
+#### `apply_rho_threshold`
+
+
+```python
+def apply_rho_threshold(model, threshold=None):
+```
+
+Apply a threshold to binarise the rho matrix and return the recovered Y
+
+#### `calculate_AUC`
+
+
+```python
+def calculate_AUC(pred, data0, mask=None):
+```
+
+Return the AUC of the link prediction. It represents the probability that a randomly chosen missing connection
+(true positive) is given a higher score by our method than a randomly chosen pair of unconnected vertices
+(true negative).
+
+
+**Parameters**
+
+- **``pred``** : `ndarray`
+
+    Inferred values.
+
+- **``data0``** : `ndarray`
+
+    Given values.
+
+- **``mask``** : `ndarray`
+
+    Mask for selecting a subset of the adjacency tensor.
+
+
+**Returns**
+
+
+AUC value.
+
+#### `calculate_average_over_reporter_mask`
+
+
+```python
+def calculate_average_over_reporter_mask(X, R):
+```
+
+#### `calculate_overall_reciprocity`
+
+
+```python
+def calculate_overall_reciprocity(Y):
+```
+
+#### `get_item_array_from_subs`
+
+
+```python
+def get_item_array_from_subs(A, ref_subs):
+```
+
+Get values of ref_subs entries of a dense tensor.
+Output is a 1-d array with dimension = number of non zero entries.
+
+#### `get_optimal_threshold`
+
+
+```python
+def get_optimal_threshold(model):
+```
+
+<https://arxiv.org/pdf/2112.11396.pdf> pg 8
+
+#### `is_sparse`
+
+
+```python
+def is_sparse(X):
+```
+
+Check whether the input tensor is sparse.
+It implements a heuristic definition of sparsity. A tensor is considered sparse if:
+given
+M = number of modes
+S = number of entries
+I = number of non-zero entries
+then
+N > M(I + 1)
+
+
+**Parameters**
+
+- **``X``** : `ndarray`
+
+    Input data.
+
+
+**Returns**
+
+
+Boolean flag: true if the input tensor is sparse, false otherwise.
+
+#### `match_arg`
+
+
+```python
+def match_arg(x, lst):
+```
+
+#### `preprocess`
+
+
+```python
+def preprocess(X):
+```
+
+Pre-process input data tensor.
+If the input is sparse, returns an int sptensor. Otherwise, returns an int dtensor.
+
+
+**Parameters**
+
+- **``X``** : `ndarray/list`
+
+    Input data.
+
+
+**Returns**
+
+- **``X``** : `sptensor/dtensor`
+
+    Pre-processed data. If the input is sparse, returns an int sptensor. Otherwise, returns an int dtensor.
+
+
+#### `sparse_max`
+
+
+```python
+def sparse_max(A, B):
+```
+
+Return the element-wise maximum of sparse matrices `A` and `B`.
+
+#### `sptensor_from_dense_array`
+
+
+```python
+def sptensor_from_dense_array(X):
+```
+
+Create an sptensor from a ndarray or dtensor.
+
+
+**Parameters**
+
+- **``X``** : `ndarray`
+
+    Input data.
+
+
+**Returns**
+
+
+sptensor from a ndarray or dtensor.
+
+#### `sptensor_from_list`
+
+
+```python
+def sptensor_from_list(X):
+```
+
+Create an sptensor a sptensor from a list.
+
+
+Assuming it is a list of dimensions L x M with sparse matrices as elements
+
+#### `transpose_ij`
+
+
+```python
+def transpose_ij(M):
+```
+
+Compute the transpose of a matrix.
+
+
+**Parameters**
+
+- **``M``** : `numpy.array`
+
+    Numpy matrix.
+
+
+**Returns**
+
+
+Transpose of the matrix.
+
+
+
+</details>
+

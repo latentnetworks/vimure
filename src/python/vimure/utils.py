@@ -5,6 +5,23 @@ import sktensor as skt
 
 from sktensor.sptensor import fromarray
 
+def transpose_ij(M):
+    """
+    Compute the transpose of a matrix.
+
+    Parameters
+    ----------
+    M : numpy.array
+        Numpy matrix.
+
+    Returns
+    -------
+    Transpose of the matrix.
+    """
+
+    return np.einsum("ij->ji", M)
+
+
 def match_arg(x, lst):
     return [el for el in lst if x == el]
 

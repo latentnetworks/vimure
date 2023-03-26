@@ -5,6 +5,7 @@ project:
     - "*.qmd"
     - "latest/**.qmd"
     - "latest/tutorials/**.qmd"
+    - "latest/pkg-docs/**.qmd"
 
 website:
   title: "VIMuRe"
@@ -16,7 +17,6 @@ website:
     location: navbar
     type: overlay
   sidebar:
-    
     style: "docked"
     contents:
       - href: index.qmd
@@ -25,6 +25,11 @@ website:
         text: "📦 Installation"
       - href: latest/tutorials.qmd
         text: "💻 Tutorials"
+      - href: latest/pkg-docs.qmd
+        text: "📚 Documentation"
+        contents: 
+          - href: latest/pkg-docs/python.qmd
+            text: "🐍 Python"
       - href: latest/people.qmd
         text: "📟 Contact"
     tools:
