@@ -1,0 +1,155 @@
+---
+title: "📚 Python package documentation"
+subtitle: "VIMuRe v0.1 (latest)"
+---
+Module `vimure.test.test_io`
+
+## Functions
+
+`def synth_dataset_custom_names()`
+
+Produces a data frame with the unexpected column names
+
+`def synth_dataset_externals()`
+
+Produces a data frame with the expected column names
+
+`def synth_dataset_standard_names()`
+
+Produces a data frame with the expected column names
+
+## Classes
+
+`class TestReadFromCSV`
+
+### Methods
+
+`def test_non_standard_names_correct_mapping(self)`
+
+`def test_read_from_csv(self)`
+
+Tests that the function works as expected
+
+`def test_read_from_csv_incorrect_name_mapping(self)`
+
+Tests that read_from_csv throws an error if the user
+does not provide the correct column names mapping.
+
+`class TestReadFromEdgelist`
+
+Tests that vm.io functions works with the expected input types
+and raises errors when the input is not of the expected type.
+
+### Methods
+
+`def test_external_reporters_are_not_supported(self)`
+
+We do not support reporters that are not nodes.
+Test that it raises an error when this happens.
+
+`def test_external_reporters_are_not_supported_even_if_informed(self)`
+
+We do not support reporters that are not nodes.
+Test that it raises an error when this happens.
+
+`def test_no_required_columns(self)`
+
+Tests that an error is raised when the dataframe does not contain the expected columns
+and that the error message contains a hint on how to fix the problem.
+
+`def test_nodes_parameter(self)`
+
+Tests that an error is raised when the nodes parameter is passed and
+is not a valid list.
+
+`def test_non_dataframe_input(self)`
+
+Tests that the function raises an error when the input is not a dataframe
+
+`def test_non_standard_names(self)`
+
+Tests that the function works with non standard column names
+if parameters are set up correctly.
+
+`def test_only_alter_column(self)`
+
+Tests that an error is raised when the dataframe does not contain the expected columns
+and that the error message contains a hint on how to fix the problem.
+
+`def test_only_ego_column(self)`
+
+Tests that an error is raised when the dataframe does not contain the expected columns
+and that the error message contains a hint on how to fix the problem.
+
+`def test_only_reporter_column(self)`
+
+Tests that an error is raised when the dataframe does not contain the expected columns
+and that the error message contains a hint on how to fix the problem.
+
+`def test_reporters_parameter(self)`
+
+Tests that an error is raised when the reporters parameter is passed and
+is not a valid list.
+
+`def test_standard_names(self)`
+
+Tests that the function works with the expected column names
+
+`def test_standard_names_with_nodes_param(self)`
+
+Tests that the function works as expected when you pass the nodes parameter
+
+`class TestRealData`
+
+Using Karnataka data to test read_from_edgelist
+
+### Methods
+
+`def test_inform_nodes_reporters(self, karnataka_edgelist_vil1_money)`
+
+`def test_not_inform_nodes_reporters(self, karnataka_edgelist_vil1_money)`
+
+# Index
+
+* ### Super-module
+
+
+	+ [`vimure.test`](vimure.index.html)
+* ### [Functions](#header-functions)
+
+
+	+ [`synth_dataset_custom_names`](vimure.#vimure.test.test_io.synth_dataset_custom_names)
+	+ [`synth_dataset_externals`](vimure.#vimure.test.test_io.synth_dataset_externals)
+	+ [`synth_dataset_standard_names`](vimure.#vimure.test.test_io.synth_dataset_standard_names)
+* ### [Classes](#header-classes)
+
+
+	+ #### [`TestReadFromCSV`](vimure.#vimure.test.test_io.TestReadFromCSV)
+	
+	
+		- [`test_non_standard_names_correct_mapping`](vimure.#vimure.test.test_io.TestReadFromCSV.test_non_standard_names_correct_mapping)
+		- [`test_read_from_csv`](vimure.#vimure.test.test_io.TestReadFromCSV.test_read_from_csv)
+		- [`test_read_from_csv_incorrect_name_mapping`](vimure.#vimure.test.test_io.TestReadFromCSV.test_read_from_csv_incorrect_name_mapping)
+	+ #### [`TestReadFromEdgelist`](vimure.#vimure.test.test_io.TestReadFromEdgelist)
+	
+	
+		- [`test_external_reporters_are_not_supported`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_external_reporters_are_not_supported)
+		- [`test_external_reporters_are_not_supported_even_if_informed`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_external_reporters_are_not_supported_even_if_informed)
+		- [`test_no_required_columns`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_no_required_columns)
+		- [`test_nodes_parameter`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_nodes_parameter)
+		- [`test_non_dataframe_input`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_non_dataframe_input)
+		- [`test_non_standard_names`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_non_standard_names)
+		- [`test_only_alter_column`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_only_alter_column)
+		- [`test_only_ego_column`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_only_ego_column)
+		- [`test_only_reporter_column`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_only_reporter_column)
+		- [`test_reporters_parameter`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_reporters_parameter)
+		- [`test_standard_names`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_standard_names)
+		- [`test_standard_names_with_nodes_param`](vimure.#vimure.test.test_io.TestReadFromEdgelist.test_standard_names_with_nodes_param)
+	+ #### [`TestRealData`](vimure.#vimure.test.test_io.TestRealData)
+	
+	
+		- [`test_inform_nodes_reporters`](vimure.#vimure.test.test_io.TestRealData.test_inform_nodes_reporters)
+		- [`test_not_inform_nodes_reporters`](vimure.#vimure.test.test_io.TestRealData.test_not_inform_nodes_reporters)
+
+Generated by [pdoc 0.10.0](https://pdoc3.github.io/pdoc "pdoc: Python API documentation generator").
+
