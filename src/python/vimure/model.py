@@ -59,7 +59,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         self.undirected = undirected
 
         if undirected:
-            msg = "Overriding mutuality to False since the network is undirected"
+            msg = "Overriding mutuality to False because the network is undirected"
             warnings.warn(msg)
             self.mutuality = False
         else:
@@ -70,9 +70,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         self.verbose = verbose
         self.logger = setup_logging("vm.model.VimureModel", verbose)
-
-    # TODO Minor refactoring: make this function easier to read (High cyclomatic complexity)
-    #      https://betterembsw.blogspot.com/2014/06/avoid-high-cyclomatic-complexity.html
 
     def __str__(self) -> str:
         return super().__str__()
@@ -1183,7 +1180,10 @@ class VimureModel(TransformerMixin, BaseEstimator):
         if (not self.mutuality and method != "rho_max") or (
             self.rho_f.shape[-1] > 2 and "threshold" in method
         ):
-            msg = 'threshold methods is incompatible with VIMuRe\'s mutuality=False or for data with more than 2 categories. Using "rho_max" method.'
+            msg = (
+                'threshold methods is incompatible with VIMuRe\'s mutuality=False '
+                'or for data with more than 2 categories. Using "rho_max" method.'
+            )
             warnings.warn(msg, UserWarning)
             method = "rho_max"
 
