@@ -10,8 +10,8 @@ import sktensor as skt
 import scipy.special as sp
 from scipy.stats import poisson
 
-from .io import read_from_edgelist, read_from_igraph
-from .log import setup_logging
+from ._io import read_from_edgelist, read_from_igraph
+from ._log import setup_logging
 from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_threshold
 
 from sklearn.base import TransformerMixin, BaseEstimator
@@ -348,18 +348,15 @@ class VimureModel(TransformerMixin, BaseEstimator):
             Shape and scale hyperparameters for variable eta
         rho_prior : None/ndarray
             Array with prior values of the rho parameter - if ndarray.
-
-        Extra parameters (Advanced tuning of inference)
-        ----------------
-        R: ndarray
+        R: ndarray (optional)
             a multidimensional array L x N x N x M indicating which reports to consider
-        K: None/int
+        K: None/int (optional)
             Value of the maximum entry of the network - i
-        EPS : float
+        EPS : float (optional)
             White noise. Default: 1e-12
-        bias0: float
+        bias0: float (optional)
             Bias for rho_prior entry 0. Default: 0.2
-        max_iter: int
+        max_iter: int (optional)
             Maximum number of iteration steps before aborting. Default=500
 
         Returns

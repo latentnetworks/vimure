@@ -1,6 +1,6 @@
 """Logging setup
 
-# Refactor this to use the logging module
+Refactor this to use the logging module
 
 """
 import sys

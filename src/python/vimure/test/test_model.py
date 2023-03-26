@@ -343,7 +343,7 @@ class TestVimureWithReadData:
         df, nodes, reporters = karnataka_edgelist_vil1_money
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
+            net_obj = vm._io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
 
         model = vm.model.VimureModel(mutuality=True, verbose=False)
         with suppress_stdout_stderr():
@@ -454,7 +454,7 @@ class TestVimureRealData:
         df, _, _ = karnataka_edgelist_vil1_money
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_edgelist(df, K=2)
+            net_obj = vm._io.read_from_edgelist(df, K=2)
 
         model = vm.model.VimureModel()
 
@@ -478,5 +478,5 @@ class TestVimureRealData:
 
         # Read in data as an edgelist to compare
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_edgelist(df, K=2)
+            net_obj = vm._io.read_from_edgelist(df, K=2)
         check_final_parameters(model, net_obj)

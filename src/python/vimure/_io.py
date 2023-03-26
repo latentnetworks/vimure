@@ -11,14 +11,13 @@ import warnings
 from abc import ABCMeta
 from scipy import sparse
 
-from .log import setup_logging
+from ._log import setup_logging
 from .utils import sparse_max, sptensor_from_list
 
 """
 CONSTANTS
 """
 
-DEFAULT_SEED = 10
 
 """
 SETUP
@@ -34,7 +33,7 @@ class BaseNetwork(metaclass=ABCMeta):
     """
 
     def __init__(
-        self, N: int, M: int, L: int, K: int, seed: int = DEFAULT_SEED, **kwargs,
+        self, N: int, M: int, L: int, K: int, seed: int = 10, **kwargs,
     ):
         """
         Parameters
@@ -145,7 +144,7 @@ def read_from_edgelist(
     K=None,
     R=None,
     **kwargs,
-) -> RealNetwork:
+):
     """
     Parameters
     -----------

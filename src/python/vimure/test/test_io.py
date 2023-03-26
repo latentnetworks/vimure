@@ -67,7 +67,7 @@ def synth_dataset_externals():
 
 class TestReadFromEdgelist:
     """
-    Tests that vm.io functions works with the expected input types
+    Tests that vm._io functions works with the expected input types
     and raises errors when the input is not of the expected type.
     """
 
@@ -80,7 +80,7 @@ class TestReadFromEdgelist:
         error_msg = "'df' should be a DataFrame, instead it is of type: <class 'str'>."
 
         with pytest.raises(ValueError, match=error_msg):
-            vm.io.read_from_edgelist("string") # type: ignore
+            vm._io.read_from_edgelist("string") # type: ignore
             
     def test_no_required_columns(self):
         """
@@ -95,7 +95,7 @@ class TestReadFromEdgelist:
         )
 
         with pytest.raises(ValueError, match=expected_error_msg):
-            vm.io.read_from_edgelist(synth_dataset_custom_names())
+            vm._io.read_from_edgelist(synth_dataset_custom_names())
 
     def test_only_ego_column(self):
         """
@@ -110,7 +110,7 @@ class TestReadFromEdgelist:
         )
 
         with pytest.raises(ValueError, match=expected_error_msg):
-            vm.io.read_from_edgelist(synth_dataset_custom_names(), ego="i")
+            vm._io.read_from_edgelist(synth_dataset_custom_names(), ego="i")
 
     def test_only_alter_column(self):
         """
@@ -125,7 +125,7 @@ class TestReadFromEdgelist:
         )
 
         with pytest.raises(ValueError, match=expected_error_msg):
-            vm.io.read_from_edgelist(synth_dataset_custom_names(), alter="j")
+            vm._io.read_from_edgelist(synth_dataset_custom_names(), alter="j")
  
     def test_only_reporter_column(self):
         """
@@ -140,7 +140,7 @@ class TestReadFromEdgelist:
         )
 
         with pytest.raises(ValueError, match=expected_error_msg):
-            vm.io.read_from_edgelist(synth_dataset_custom_names(), reporter="r")
+            vm._io.read_from_edgelist(synth_dataset_custom_names(), reporter="r")
 
     def test_nodes_parameter(self):
         """
@@ -150,7 +150,7 @@ class TestReadFromEdgelist:
         error_msg = "'nodes' should be a list, instead it is of type: <class 'str'>."
 
         with pytest.raises(ValueError, match=error_msg):
-            vm.io.read_from_edgelist(synth_dataset_standard_names(), nodes="test") # type: ignore
+            vm._io.read_from_edgelist(synth_dataset_standard_names(), nodes="test") # type: ignore
 
         nodes_missing_jack = ['Tom', 'nick', 'krish']
         error_msg = (
@@ -158,7 +158,7 @@ class TestReadFromEdgelist:
             "but it does not contain all nodes in the data frame."
         )
         with pytest.raises(ValueError, match=error_msg):
-            vm.io.read_from_edgelist(synth_dataset_standard_names(),
+            vm._io.read_from_edgelist(synth_dataset_standard_names(),
                                      nodes=nodes_missing_jack)
 
     def test_reporters_parameter(self):
@@ -169,7 +169,7 @@ class TestReadFromEdgelist:
         error_msg = "'reporters' should be a list, instead it is of type: <class 'str'>."
 
         with pytest.raises(ValueError, match=error_msg):
-            vm.io.read_from_edgelist(synth_dataset_standard_names(), 
+            vm._io.read_from_edgelist(synth_dataset_standard_names(), 
                                      reporters="test") # type: ignore
 
         reporters_missing_jack = ['Tom', 'nick', 'krish']
@@ -181,7 +181,7 @@ class TestReadFromEdgelist:
         )
         with pytest.warns(None) as record:
             with pytest.raises(ValueError, match=error_msg):
-                vm.io.read_from_edgelist(synth_dataset_standard_names(),
+                vm._io.read_from_edgelist(synth_dataset_standard_names(),
                                          reporters=reporters_missing_jack)
                     
                 # Check that it registered the warning about nodes
@@ -203,7 +203,7 @@ class TestReadFromEdgelist:
         df = synth_dataset_standard_names()
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_edgelist(df)
+            net_obj = vm._io.read_from_edgelist(df)
 
             assert net_obj.L == 1
             assert net_obj.K == 2
@@ -251,7 +251,7 @@ class TestReadFromEdgelist:
         df = synth_dataset_custom_names()
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_edgelist(df, ego="i", alter="j", reporter="r")
+            net_obj = vm._io.read_from_edgelist(df, ego="i", alter="j", reporter="r")
 
             assert net_obj.L == 1
             assert net_obj.K == 2
@@ -299,7 +299,7 @@ class TestReadFromEdgelist:
         nodes = ['Tom', 'nick', 'krish', 'jack']
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_edgelist(df, nodes=nodes, K=2)
+            net_obj = vm._io.read_from_edgelist(df, nodes=nodes, K=2)
 
             assert net_obj.L == 1
             assert net_obj.K == 2
@@ -346,7 +346,7 @@ class TestReadFromEdgelist:
 
         with pytest.warns(None) as record:
             with pytest.raises(ValueError, match=error_msg):
-                vm.io.read_from_edgelist(df)
+                vm._io.read_from_edgelist(df)
 
         # Check that it registered several warnings
         assert len(record) == 2
@@ -381,7 +381,7 @@ class TestReadFromEdgelist:
 
         with pytest.warns(None) as record:
             with pytest.raises(ValueError, match=error_msg):
-                vm.io.read_from_edgelist(df, reporters=reporters)
+                vm._io.read_from_edgelist(df, reporters=reporters)
 
         # Check that it registered several warnings
         assert len(record) == 1
@@ -406,7 +406,7 @@ class TestReadFromCSV:
         df.to_csv(temp_filename, index=False)
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_csv(temp_filename)
+            net_obj = vm._io.read_from_csv(temp_filename)
 
             assert net_obj.L == 1
             assert net_obj.K == 2
@@ -464,7 +464,7 @@ class TestReadFromCSV:
         )
 
         with pytest.raises(ValueError, match=expected_error_msg):
-            vm.io.read_from_csv(temp_filename)
+            vm._io.read_from_csv(temp_filename)
 
     def test_non_standard_names_correct_mapping(self):
         df = synth_dataset_custom_names()
@@ -474,7 +474,7 @@ class TestReadFromCSV:
         df.to_csv(temp_filename, index=False)
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_csv(temp_filename, 
+            net_obj = vm._io.read_from_csv(temp_filename, 
                                                    ego="i",
                                           alter="j",
                                           reporter="r")
@@ -526,7 +526,7 @@ class TestRealData:
         df, _, _ = karnataka_edgelist_vil1_money
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_edgelist(df, K=2)
+            net_obj = vm._io.read_from_edgelist(df, K=2)
 
         # Check that it registered several warnings
         assert len(record) == 3
@@ -587,7 +587,7 @@ class TestRealData:
         df, nodes, reporters = karnataka_edgelist_vil1_money
 
         with pytest.warns(None) as record:
-            net_obj = vm.io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
+            net_obj = vm._io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
 
         # Check that it registered several warnings
         assert len(record) == 2

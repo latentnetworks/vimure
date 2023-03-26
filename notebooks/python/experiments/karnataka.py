@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import vimure as vm
 
-from vimure.log import setup_logging
+from vimure._log import setup_logging
 
 logger = setup_logging("karnataka-script")
 

@@ -5,7 +5,7 @@ import scipy as sp
 import pandas as pd
 import networkx as nx
 
-from .log import setup_logging
+from ._log import setup_logging
 from .model import VimureModel
 from .synthetic import BaseSyntheticNetwork
 from .utils import apply_rho_threshold

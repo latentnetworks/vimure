@@ -8,8 +8,8 @@ import networkx as nx
 import sktensor as skt
 
 from abc import ABCMeta, abstractmethod
-from .io import BaseNetwork, DEFAULT_SEED
-from .log import setup_logging
+from ._io import BaseNetwork
+from ._log import setup_logging
 from .utils import preprocess, sptensor_from_dense_array
 
 DEFAULT_N = 100
@@ -58,7 +58,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         M: int = DEFAULT_M,
         L: int = DEFAULT_L,
         K: int = DEFAULT_K,
-        seed: int = DEFAULT_SEED,
+        seed: int = 0,
         **kwargs,
     ):
         super().__init__(N=N, M=M, L=L, K=K, seed=seed, **kwargs)
