@@ -2,42 +2,50 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://github.com/latentnetworks/vimure/index.html</loc>
-    <lastmod>2023-03-26T10:26:52.231Z</lastmod>
+    <lastmod>2023-03-26T17:06:35.743Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/install.html</loc>
-    <lastmod>2023-03-26T10:26:54.895Z</lastmod>
+    <lastmod>2023-03-26T17:06:37.531Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/people.html</loc>
-    <lastmod>2023-03-26T10:26:55.379Z</lastmod>
+    <lastmod>2023-03-26T17:06:38.063Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/latentnetworks/vimure/latest/pkg-docs.html</loc>
+    <lastmod>2023-03-26T17:06:38.503Z</lastmod>
+  </url>
+  <url>
+    <loc>https://github.com/latentnetworks/vimure/latest/pkg-docs/python.html</loc>
+    <lastmod>2023-03-26T17:06:39.391Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials.html</loc>
-    <lastmod>2023-03-26T10:26:55.795Z</lastmod>
+    <lastmod>2023-03-26T17:06:39.807Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/R-tutorials.html</loc>
-    <lastmod>2023-03-26T10:26:56.275Z</lastmod>
+    <lastmod>2023-03-26T17:06:40.335Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/R/tutorial01-data-preparation.html</loc>
-    <lastmod>2023-03-26T10:26:57.411Z</lastmod>
+    <lastmod>2023-03-26T17:06:41.547Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/R/tutorial02-introduction-to-vimure.html</loc>
-    <lastmod>2023-03-26T10:26:58.911Z</lastmod>
+    <lastmod>2023-03-26T17:06:43.123Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/python-tutorials.html</loc>
-    <lastmod>2023-03-26T10:26:59.463Z</lastmod>
+    <lastmod>2023-03-26T17:06:43.647Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/python/tutorial01-data-preparation.html</loc>
-    <lastmod>2023-03-26T10:27:00.704Z</lastmod>
+    <lastmod>2023-03-26T17:06:44.859Z</lastmod>
   </url>
   <url>
     <loc>https://github.com/latentnetworks/vimure/latest/tutorials/python/tutorial02-introduction-to-vimure.html</loc>
-    <lastmod>2023-03-26T10:27:02.132Z</lastmod>
+    <lastmod>2023-03-26T17:06:46.271Z</lastmod>
   </url>
 </urlset>
