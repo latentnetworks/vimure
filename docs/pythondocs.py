@@ -32,7 +32,11 @@ if __name__ == '__main__':
     # Convert HTML to Markdown
     output_md = [{'module_name': output['module_name'],
                   'module_md': markdownify.markdownify(output['module_html'], heading_style='ATX')}
-                 for output in output_html]
+                 for output in output_html 
+                 if ('test' not in output['module_name'] and 
+                     'extras' not in output['module_name'] and
+                     'diagnostics' not in output['module_name'] and
+                     output['module_name'] != 'vimure')]
 
     def remove_initial_css(module_md):
         # Regular expression pattern
@@ -41,11 +45,21 @@ if __name__ == '__main__':
         # Extract the desired string
         result = re.search(pattern, module_md, re.DOTALL)
 
-        return module_md[result.start():]
+        return "# " + module_md[result.start():]
 
     # Remove the initial CSS from all output_md['module_md']
     for output in tqdm(output_md, desc="Removing initial CSS"):
         output['module_md'] = remove_initial_css(output['module_md'])
+
+    def remove_index_section(module_md):
+        # Find the index line using the re.search() function
+        match = re.search(r".*# Index.*\n", module_md)
+
+        return module_md[:match.start()]
+    
+    # Remove the index section from all output_md['module_md']
+    for output in tqdm(output_md, desc="Removing index section"):
+        output['module_md'] = remove_index_section(output['module_md'])
 
     def wrap_code_blocks(module_md):
         # Regular expression pattern
@@ -82,10 +96,6 @@ if __name__ == '__main__':
     for output in tqdm(output_md, desc="Fixing links"):
         output['module_md'] = fix_links(output['module_md'])
 
-    # Add QMD_HEADER to the top of all output_md['module_md']
-    for output in tqdm(output_md, desc="Adding QMD header"):
-        output['module_md'] = QMD_HEADER + output['module_md']
-
     def remove_extra_newlines(markdown_string):
         pattern = re.compile(r'\n{4,}')
         return re.sub(pattern, '\n\n', markdown_string)
@@ -101,7 +111,84 @@ if __name__ == '__main__':
     for output in tqdm(output_md, desc="Replacing escaped characters"):
         output['module_md'] = replace_escaped_characters(output['module_md'])
 
+    def format_functions_section(module_md):
+        # Replace backticks surrounding function names with markdown headers
+        module_md = re.sub(r'`def\s+(.*?)\((.*?)\)`', r'### `\1`\n\n```python\ndef \1(\2):\n```', module_md)
+
+        # Replace bolded "Parameters" and "Returns" with actual list items
+        pattern = r"\*\*(.*?)\*\* : `(.*?)`\n(.*?)\n"
+        replacement = r"- **`\g<1>`** : `\g<2>`\n\n    \g<3>\n"
+
+        module_md = re.sub(pattern, replacement, module_md)
+        module_md = re.sub(r'(\*\*Parameters\*\*|## Parameters)\n\n', r'**Parameters**\n\n', module_md)
+        module_md = re.sub(r'(\*\*Returns\*\*|## Returns)\n\n', r'**Returns**\n\n', module_md)
+
+
+        return module_md
+
+    # Format functions section in all output_md['module_md']
+    for output in tqdm(output_md, desc="Formatting functions section"):
+        output['module_md'] = format_functions_section(output['module_md'])
+
+    def format_classes(module_md):
+        class_pattern = re.compile(r'`class\s+([\w\s]+)\n\((.*?)\)`')
+        module_md = class_pattern.sub(r'### \g<1>\n\n```python\nclass \g<1>(\g<2>)\n```', module_md)
+
+        return module_md
+    
+    # Format classes in all output_md['module_md']
+    for output in tqdm(output_md, desc="Formatting classes"):
+        output['module_md'] = format_classes(output['module_md'])
+
+    def wrap_long_function_signatures(module_md):
+        pattern = r'```python\s*\n(?:def)\s+(\w+)\((.*?)\):\s*'
+
+        def format_params(match):
+            func_name = match.group(1)
+            params = match.group(2)
+            if (match.end() - match.start()) > 75:
+                pattern = r',\s*(?![^()]*\))'
+                params_str = re.sub(pattern, ',\n    ', params)
+                return f'\n```python\ndef {func_name}(\n    {params_str}\n):\n'
+            else:
+                return f'\n```python\ndef {func_name}({params}):\n'
+            
+        return re.sub(pattern, format_params, module_md)
+
+    # Wrap long signatures in all output_md['module_md']
+    for output in tqdm(output_md, desc="Wrapping long signatures"):
+        output['module_md'] = wrap_long_function_signatures(output['module_md'])
+
+
+    def wrap_long_class_signatures(module_md):
+        pattern = r'```python\s*\nclass\s+(\w+)\((.*?)\)\s*'
+
+        def format_params(match):
+            class_name = match.group(1)
+            params = match.group(2)
+            if (match.end() - match.start()) > 75:
+                pattern = r',\s*(?![^()]*\))'
+                params_str = re.sub(pattern, ',\n    ', params)
+                return f'\n```python\nclass {class_name}(\n    {params_str}\n):\n'
+            else:
+                return f'\n```python\nclass {class_name}({params}):\n'
+
+        return re.sub(pattern, format_params, module_md)
+
+    # Wrap long class signatures in all output_md['module_md']
+    for output in tqdm(output_md, desc="Wrapping long class signatures"):
+        output['module_md'] = wrap_long_class_signatures(output['module_md'])
+
+    # Wrap each one of output_md['module_md'] in a <details> tag
+    for output in tqdm(output_md, desc="Wrapping in <details> tags"):
+        output['module_md'] = f"<details><summary>Module `{output['module_name']}`</summary>\n\n{output['module_md']}\n\n</details>\n\n"
+    
+    # Concatenate all output_md['module_md'] into a single string
+    output_md = ''.join([output['module_md'] for output in output_md])
+
+    # Add QMD_HEADER to the top of all output_md['module_md']
+    output_md = QMD_HEADER + output_md
+
     # Write each module to a separate file
-    for output in tqdm(output_md, desc="Writing to file"):
-        with open(f"docs/latest/pdocs/{output['module_name']}.qmd", 'w') as f:
-            f.write(output['module_md'])
+    with open(f"docs/latest/py-docs/py-vimure.qmd", 'w') as f:
+        f.write(output_md)

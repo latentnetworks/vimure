@@ -5,7 +5,7 @@ project:
     - "*.qmd"
     - "latest/**.qmd"
     - "latest/tutorials/**.qmd"
-    - "latest/pdocs/**.qmd"
+    - "latest/py-docs/**.qmd"
 
 website:
   title: "VIMuRe"
@@ -25,7 +25,7 @@ website:
         text: "📦 Installation"
       - href: latest/tutorials.qmd
         text: "💻 Tutorials"
-      - href: latest/pdocs.qmd
+      - href: latest/py-docs.qmd
         text: "📚 Documentation"
       - href: latest/people.qmd
         text: "📟 Contact"
