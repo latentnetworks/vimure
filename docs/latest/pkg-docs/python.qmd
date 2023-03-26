@@ -1,6 +1,6 @@
 ---
 title: "📚 Python package documentation"
-subtitle: "VIMuRe 0.1.0-dev [abc8820] (latest)"
+subtitle: "VIMuRe 0.1.0-dev-abc8820 (latest)"
 ---
 <details><summary>Module `vimure.model`</summary>
 
