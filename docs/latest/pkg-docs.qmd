@@ -17,7 +17,7 @@ Choose your favourite language:
 </figure>
 
 <figure style="display:inline-block;padding:3em;align:middle;text-align:center;border-radius:2em;border:1px solid var(--bs-gray-200);background-color:var(--bs-gray-100);">
-    <a href="/latest/py-docs/py-vimure.html">
+    <a href="/latest/pkg-docs/python.html">
         <img src="/figures/logos/python-logo-notext.svg" alt="Logo of the programming language python" role="presentation" style="object-fit: cover;width:5em;height:5em;object-position: 95% 0;">
     </a>
     <figcaption><strong>Python</strong></figcaption>

@@ -65,7 +65,7 @@ class TestGenerateXForStandardSBM:
             seed=10,
         )
 
-        gt_network.build_X(
+        gt_network._build_X(
             flag_self_reporter=False,
             cutoff_X=False,
             mutuality=0.5,
@@ -89,7 +89,7 @@ class TestGenerateXForStandardSBM:
         gt_network = vm.synthetic.StandardSBM(
             N=20, M=20, L=1, K=4, C=2, avg_degree=4, sparsify=False, seed=10
         )
-        gt_network.build_X(flag_self_reporter=False, cutoff_X=True, mutuality=0.5, seed=20)
+        gt_network._build_X(flag_self_reporter=False, cutoff_X=True, mutuality=0.5, seed=20)
 
         check_objects(gt_network)
         assert np.max(gt_network.X.vals) <= (gt_network.K - 1)
@@ -117,8 +117,8 @@ class TestGenerateXForStandardSBM:
         network1 = deepcopy(gt_network)
         network2 = deepcopy(gt_network)
 
-        network1.build_X(flag_self_reporter=False, cutoff_X=False, mutuality=0.5, seed=18)
-        network2.build_X(flag_self_reporter=False, cutoff_X=False, mutuality=0.5, seed=30)
+        network1._build_X(flag_self_reporter=False, cutoff_X=False, mutuality=0.5, seed=18)
+        network2._build_X(flag_self_reporter=False, cutoff_X=False, mutuality=0.5, seed=30)
 
         msg = "If assert fails, X1 matrix matches X2 perfectly -- which is supposed to be very unlikely."
         np.testing.assert_raises(
@@ -144,7 +144,7 @@ class TestGenerateXForStandardSBM:
             seed=10,
         )
 
-        gt_network.build_X(
+        gt_network._build_X(
             flag_self_reporter=True,
             cutoff_X=True,
             mutuality=0.5,
@@ -219,7 +219,7 @@ class TestGenerateXForStandardSBM:
             seed=10,
         )
 
-        gt_network.build_X(
+        gt_network._build_X(
             flag_self_reporter=True,
             cutoff_X=True,
             mutuality=0.5,

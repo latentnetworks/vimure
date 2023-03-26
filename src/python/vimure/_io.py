@@ -45,8 +45,7 @@ class BaseNetwork(metaclass=ABCMeta):
         L: int
             Number of layers.
         K: int
-            Maximum edge weight in the adjacency matrix. 
-            When `K=2`, the adjacency matrix will contain some `Y_{ij}=0` and `Y_{ij}=1`.
+            Maximum edge weight in the adjacency matrix. When `K=2`, the adjacency matrix will contain some `Y_{ij}=0` and `Y_{ij}=1`.
         seed: int
             Pseudo random generator seed to use.
 

@@ -2,12 +2,14 @@ import re
 import pdoc
 import markdownify
 
+import vimure as vm
+
 from tqdm import tqdm
 
 QMD_HEADER = (
     "---\n"
     "title: \"📚 Python package documentation\"\n"
-    "subtitle: \"VIMuRe v0.1 (latest)\"\n"
+    f"subtitle: \"VIMuRe {vm.VERSION} (latest)\"\n"
     "---\n"
 )
 
@@ -113,12 +115,11 @@ if __name__ == '__main__':
 
     def format_functions_section(module_md):
         # Replace backticks surrounding function names with markdown headers
-        module_md = re.sub(r'`def\s+(.*?)\((.*?)\)`', r'### `\1`\n\n```python\ndef \1(\2):\n```', module_md)
+        module_md = re.sub(r'`def\s+(.*?)\((.*?)\)`', r'#### `\1`\n\n```python\ndef \1(\2):\n```', module_md)
 
         # Replace bolded "Parameters" and "Returns" with actual list items
         pattern = r"\*\*(.*?)\*\* : `(.*?)`\n(.*?)\n"
-        replacement = r"- **`\g<1>`** : `\g<2>`\n\n    \g<3>\n"
-
+        replacement = r"- **`\g<1>`** : `\g<2>`\n\n    \g<3>\n\n"
         module_md = re.sub(pattern, replacement, module_md)
         module_md = re.sub(r'(\*\*Parameters\*\*|## Parameters)\n\n', r'**Parameters**\n\n', module_md)
         module_md = re.sub(r'(\*\*Returns\*\*|## Returns)\n\n', r'**Returns**\n\n', module_md)
@@ -134,6 +135,11 @@ if __name__ == '__main__':
         class_pattern = re.compile(r'`class\s+([\w\s]+)\n\((.*?)\)`')
         module_md = class_pattern.sub(r'### \g<1>\n\n```python\nclass \g<1>(\g<2>)\n```', module_md)
 
+        module_md = re.sub(r'(\*\*Methods\*\*|### Methods)\n\n', r'#### Methods\n\n', module_md)
+        module_md = re.sub(r'(\*\*Ancestors\*\*|### Ancestors)\n\n', r'#### Ancestors\n\n', module_md)
+        module_md = re.sub(r'(\*\*Subclasses\*\*|### Subclasses)\n\n', r'#### Subclasses\n\n', module_md)
+        module_md = re.sub(r'(\*\*Inherited members\*\*|### Inherited members)\n\n', r'#### Inherited members\n\n', module_md)
+
         return module_md
     
     # Format classes in all output_md['module_md']
@@ -146,6 +152,12 @@ if __name__ == '__main__':
         def format_params(match):
             func_name = match.group(1)
             params = match.group(2)
+
+            embedded_links = re.findall(r'(\[(.*?)\]\(.*\))', params)
+            if embedded_links is not None:
+                for link in embedded_links:
+                    params = params.replace(link[0], link[1])
+
             if (match.end() - match.start()) > 75:
                 pattern = r',\s*(?![^()]*\))'
                 params_str = re.sub(pattern, ',\n    ', params)
@@ -190,5 +202,5 @@ if __name__ == '__main__':
     output_md = QMD_HEADER + output_md
 
     # Write each module to a separate file
-    with open(f"docs/latest/py-docs/py-vimure.qmd", 'w') as f:
+    with open(f"docs/latest/pkg-docs/python.qmd", 'w') as f:
         f.write(output_md)

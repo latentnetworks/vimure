@@ -73,7 +73,7 @@ class TestVimureWithRandomNetworks:
         )
 
         logger.debug("Generating observed X from given Y")
-        gt_network.build_X(flag_self_reporter=True)
+        gt_network._build_X(flag_self_reporter=True)
 
         logger.debug("Starting VimureModel")
         model = vm.model.VimureModel()
@@ -100,7 +100,7 @@ class TestVimureWithRandomNetworks:
         )
 
         logger.debug("Generating observed X from given Y")
-        gt_network.build_X(flag_self_reporter=True)
+        gt_network._build_X(flag_self_reporter=True)
 
         logger.debug("Starting VimureModel without providing R")
         model = vm.model.VimureModel()
@@ -152,7 +152,7 @@ class TestVimureWithRandomNetworks:
 
             LAMBDA_0 = 0.01
             LAMBDA_DIFF = 0.99
-            gt_network.build_X(
+            gt_network._build_X(
                 mutuality=eta,  # Same as planted mutuality
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
@@ -225,7 +225,7 @@ class TestVimureWithRandomNetworks:
 
             LAMBDA_0 = 0.01
             LAMBDA_DIFF = 0.99
-            gt_network.build_X(
+            gt_network._build_X(
                 mutuality=eta,  # Same as planted mutuality
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
@@ -298,7 +298,7 @@ class TestVimureWithRandomNetworks:
 
             LAMBDA_0 = 0.01
             LAMBDA_DIFF = 0.99
-            gt_network.build_X(
+            gt_network._build_X(
                 mutuality=eta,  # Same as planted mutuality
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
@@ -363,7 +363,7 @@ class TestInferredModel:
     @classmethod
     def setup_class(cls):
         cls.synth_net = vm.synthetic.StandardSBM(K=2)
-        cls.synth_net.build_X(flag_self_reporter=True)
+        cls.synth_net._build_X(flag_self_reporter=True)
 
         cls.model = vm.model.VimureModel()
         with suppress_stdout_stderr():
