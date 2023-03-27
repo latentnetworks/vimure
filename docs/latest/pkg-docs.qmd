@@ -1,6 +1,6 @@
 ---
 title: "📚 Package Documentation"
-subtitle: "VIMuRe v0.1.0-dev-92c8d6b (latest)"
+subtitle: "VIMuRe v0.1.1 (latest)"
 ---
 
 Check the functions, parameters and examples of the package.
