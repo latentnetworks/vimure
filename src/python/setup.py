@@ -6,7 +6,7 @@ setup(
     long_description=(
         "VIMuRe - A Single-Layered Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data"
     ),
-    version="0.1.0-dev-abc8820",
+    version="0.1.1",
     py_modules=["vimure"],
     author="Caterina de Baco",
     keywords=[""],
