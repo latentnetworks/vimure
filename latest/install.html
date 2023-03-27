@@ -83,6 +83,25 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 
@@ -156,7 +175,7 @@ cookieconsent.run({
 
 
 <meta name="twitter:title" content="VIMuRe - 📦 Installation">
-<meta name="twitter:description" content="VIMuRe v0.1 (latest)">
+<meta name="twitter:description" content="VIMuRe v0.1.0-dev-92c8d6b (latest)">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -258,7 +277,7 @@ cookieconsent.run({
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title d-none d-lg-block">📦 Installation</h1>
-<p class="subtitle lead">VIMuRe v0.1 (latest)</p>
+<p class="subtitle lead">VIMuRe v0.1.0-dev-92c8d6b (latest)</p>
 </div>
 
 
@@ -273,6 +292,19 @@ cookieconsent.run({
 
 </header>
 
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you use <code>VIMuRe</code> in your research, please cite <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span>.</p>
+</div>
+</div>
 <p>VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.</p>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -301,7 +333,7 @@ Step 01: Install <code>reticulate</code>
 <p>Open your R console and type the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"reticulate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="callout-note callout callout-style-default callout-captioned">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
@@ -310,7 +342,7 @@ Why do I need this package?
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <ul>
 <li><p>Our core code is written in python, so we use <code>reticulate</code> to integrate our model in R. This package allows you to use Python within your R session in a seamless, high-performance interoperable way.</p></li>
@@ -384,7 +416,12 @@ Step 04: Check the installation
 
 
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-de_bacco_latent_2023" class="csl-entry" role="doc-biblioentry">
+De Bacco, Caterina, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Gabriela Lima Borges, Diego Baptista, Tracy Sweet, et al. 2023. <span>“Latent Network Models to Account for Noisy, Multiply Reported Social Network Data.”</span> <em>Journal of the Royal Statistical Society Series A: Statistics in Society</em>, February, qnac004. <a href="https://doi.org/10.1093/jrsssa/qnac004">https://doi.org/10.1093/jrsssa/qnac004</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
