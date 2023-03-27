@@ -1,7 +1,13 @@
 ---
 title: "📦 Installation"
-subtitle: "VIMuRe v0.1 (latest)"
+subtitle: "VIMuRe v0.1.0-dev-92c8d6b (latest)"
 ---
+
+::: callout-note
+
+ If you use `VIMuRe` in your research, please cite [@de_bacco_latent_2023].
+
+:::
 
 VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.
 

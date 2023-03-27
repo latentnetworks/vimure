@@ -1,7 +1,13 @@
 ---
-title: "VIMuRe v0.1 (latest)"
+title: "VIMuRe"
 subtitle: "Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data"
 ---
+
+::: callout-note
+
+ If you use `VIMuRe` in your research, please cite [@de_bacco_latent_2023].
+
+:::
 
 # 📑 Is this package for me?
 

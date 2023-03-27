@@ -1,6 +1,6 @@
 ---
 title: "💻 **Tutorial 02**: Introduction to VIMuRe in Python"
-subtitle: "VIMuRe v0.1.0 (latest)."
+subtitle: "VIMuRe v0.1.0-dev-92c8d6b (latest)"
 categories: [basics, python]
 description: "If you have an edge list, or a set of igraph objects, VIMuRe can help you model the latent network structure."
 ---
