@@ -1,1 +1,1 @@
-Sitemap: https://github.com/latentnetworks/vimure/sitemap.xml
+Sitemap: https://latentnetworks.github.io/vimure/sitemap.xml
