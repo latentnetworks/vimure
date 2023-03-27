@@ -10,8 +10,12 @@ project:
 website:
   title: "VIMuRe"
   repo-url: latentnetworks.github.io/vimure/
+  site-url: https://latentnetworks.github.io/vimure
   page-navigation: true
   reader-mode: true
+  twitter-card: true
+  google-analytics: "G-N0GX9ECYYQ"
+  cookie-consent: true
   favicon: "figures/stable_diffusion_stickmen.png"
   search:
     location: navbar
