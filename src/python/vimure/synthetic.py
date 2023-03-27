@@ -7,6 +7,7 @@ You can read more about our synthetic network generation in our paper: [@de_bacc
 # Paper link: https://doi.org/10.1093/jrsssa/qnac004
 
 import math
+import torch
 
 import numpy as np
 import pandas as pd
@@ -550,12 +551,12 @@ class StandardSBM(BaseSyntheticNetwork):
         Latent variables
         """
         self.u, self.v, self.w = self._generate_lv()
-
         """
         Generate Y
         """
-        M_Y = np.einsum("ik,jq->ijkq", self.u, self.v)
-        M_Y = np.einsum("ijkq,akq->aij", M_Y, self.w)
+        M_Y = torch.einsum("ik,jq->ijkq", self.u, self.v)
+        M_Y = torch.einsum("ijkq,akq->aij", M_Y, self.w)
+
         # sparsity parameter for Y
         if self.sparsify:
             # TODO: Explain rationale behind this particular formula
@@ -563,12 +564,14 @@ class StandardSBM(BaseSyntheticNetwork):
             M_Y *= c
             self.w *= c
 
-        Y = self.prng.poisson(M_Y)
+        Y = torch.poisson(M_Y, self.prng)
+
+        # https://stackoverflow.com/a/49512781/843365
         for l in range(self.L):
-            np.fill_diagonal(Y[l], 0)
+            Y[l][torch.eye(self.N).byte()] = 0
         Y[Y > self.K - 1] = self.K - 1  # cut-off, max entry has to be equal to K - 1
 
-        self.Y = preprocess(Y)
+        self.Y = Y.to_sparse_coo()
 
     def __sample_membership_vectors(self):
         """
@@ -602,17 +605,18 @@ class StandardSBM(BaseSyntheticNetwork):
 
         # Generate equal-size unmixed group membership
         size = int(self.N / self.C)
-        u = np.zeros((self.N, self.C))
-        v = np.zeros((self.N, self.C))
+        u = torch.zeros((self.N, self.C), dtype=torch.float32)
+        v = torch.zeros((self.N, self.C), dtype=torch.float32)
+
         for i in range(self.N):
             q = int(math.floor(float(i) / float(size)))
             if q == self.C:
-                u[i:, self.C - 1] = 1.0
-                v[i:, self.C - 1] = 1.0
+                u[i:, self.C - 1] = 1
+                v[i:, self.C - 1] = 1
             else:
                 for j in range(q * size, q * size + size):
-                    u[j, q] = 1.0
-                    v[j, q] = 1.0
+                    u[j, q] = 1
+                    v[j, q] = 1
 
         return u, v
 
@@ -668,14 +672,13 @@ class StandardSBM(BaseSyntheticNetwork):
 
     def __apply_overlapping(self, u, v):
         overlapping = int(self.N * self.overlapping)  # number of nodes belonging to more communities
-        ind_over = np.random.randint(len(u), size=overlapping)
+        ind_over = torch.randint(len(u), size=(overlapping,), dtype=torch.long)
 
         if not self.normalization:
             # u and v from a Dirichlet distribution
-            u[ind_over] = self.prng.dirichlet(self.alpha * np.ones(self.C), overlapping)
-            v[ind_over] = self.corr * u[ind_over] + (1.0 - self.corr) * self.prng.dirichlet(
-                self.alpha * np.ones(self.C), overlapping
-            )
+            dirichlet_dist = torch.distributions.dirichlet.Dirichlet(self.alpha * torch.ones(self.C))
+            u[ind_over] = dirichlet_dist.sample((overlapping,))
+            v[ind_over] = self.corr * u[ind_over] + (1.0 - self.corr) * dirichlet_dist.sample((overlapping,))
             if self.corr == 1.0:
                 assert np.allclose(u, v)
             if self.corr > 0:
@@ -706,6 +709,8 @@ class StandardSBM(BaseSyntheticNetwork):
         w = np.zeros((self.L, self.C, self.C))
         for l in range(self.L):
             w[l, :, :] = self.__compute_affinity_matrix(self.structure[l])
+
+        w = torch.from_numpy(w).to(torch.float32)
 
         return u, v, w
 
@@ -851,7 +856,9 @@ class Multitensor(StandardSBM):
         with the generative model `(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A_{ij},u,v,w,eta)`
         """
 
-        self.Y = np.zeros((self.L, self.N, self.N))
+        self.Y = torch.sparse_coo_tensor(indices=torch.zeros((3, 0), dtype=torch.float), # 3-D sparse tensor 
+                                         values=torch.zeros(0),
+                                         size=(self.L, self.N, self.N))
 
         self.u, self.v, self.w = self._generate_lv()
 

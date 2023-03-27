@@ -2,6 +2,8 @@
 from asyncio.log import logger
 from typing import Optional
 
+import torch
+
 import numpy as np
 import pandas as pd
 import sktensor as skt
@@ -57,7 +59,8 @@ class BaseNetwork(metaclass=ABCMeta):
         self.K = K
 
         self.seed = seed
-        self.prng = np.random.RandomState(self.seed)
+        self.prng = torch.Generator()
+        self.prng.manual_seed(self.seed)
 
     def get_layer(self, layer: int, return_matrix: bool = True):
         """

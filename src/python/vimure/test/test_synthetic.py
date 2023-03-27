@@ -1,9 +1,7 @@
-import pytest
+import torch
 
 import numpy as np
 import vimure as vm
-import networkx as nx
-import sktensor as skt
 
 from vimure.synthetic import (
     DEFAULT_N,
@@ -27,9 +25,11 @@ class TestBaseSyntheticNetwork:
         assert synth_net.avg_degree == DEFAULT_AVG_DEGREE
         assert synth_net.Y.shape == (DEFAULT_L, DEFAULT_N, DEFAULT_N)
 
-        assert isinstance(synth_net.Y, skt.sptensor) or isinstance(synth_net.Y, skt.dtensor)
-        assert synth_net.Y.vals.sum() != 0.0, "Adjacency matrices are empty!"
-        assert synth_net.Y.vals.max() < synth_net.K
+        assert isinstance(synth_net.Y, torch.Tensor)
+        assert synth_net.Y.is_sparse
+
+        assert synth_net.Y.sum() != 0.0, "Adjacency matrices are empty!"
+        assert synth_net.Y.values().max() < synth_net.K
 
 
 class TestStandardSBM(TestBaseSyntheticNetwork):
