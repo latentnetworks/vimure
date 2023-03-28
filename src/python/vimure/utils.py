@@ -5,6 +5,25 @@ import sktensor as skt
 
 from sktensor.sptensor import fromarray
 
+def find_indices_of_value(sparse_tensor, value):
+    """Find the indices of a given value in a sparse tensor.
+
+    Parameters
+    ----------
+    sparse_tensor : PyTorch sparse tensor
+                    Input sparse tensor.
+    value : int
+            Value to be searched.
+    
+    Returns
+    -------
+    Indices of the given value.
+    """
+
+    indices = sparse_tensor._indices()
+    values = sparse_tensor._values()
+    indices_of_value = indices[:, values == value]
+    return indices_of_value
 
 def match_arg(x, lst):
     return [el for el in lst if x == el]

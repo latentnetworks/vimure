@@ -17,7 +17,7 @@ import sktensor as skt
 from abc import ABCMeta, abstractmethod
 from ._io import BaseNetwork
 from ._log import setup_logging
-from .utils import preprocess, sptensor_from_dense_array
+from .utils import preprocess, sptensor_from_dense_array, find_indices_of_value
 
 DEFAULT_N = 100
 DEFAULT_M = 100
@@ -118,10 +118,11 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         # We can generate the same theta, while varying mutuality (to check how X change);
         if seed is None:
             seed = self.seed
-        prng = np.random.RandomState(seed)
+        
+        prng = torch.Generator()
+        prng.manual_seed(seed)
 
         Y = self.Y
-        Y_subs = Y.subs
         N = self.N
         M = self.M
         L = self.L
@@ -136,36 +137,39 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
                 raise ValueError(msg % (L, M))
         else:
             # Generate theta (reliability)
-            theta = prng.gamma(shape=sh_theta, scale=sc_theta, size=(L, M))
+            gamma = torch.distributions.gamma.Gamma(concentration=torch.tensor([sh_theta]), 
+                                                    rate=torch.tensor([1/sc_theta]))
+            theta = gamma.rsample((L, M))[:,:,0]
 
         LAMBDA_0 = 0.01
         # Generate theta (ties average interactions)
-        lambda_k = np.ones(shape=Y.shape).astype("float") * LAMBDA_0
+        lambda_k = torch.ones(Y.shape).float() * LAMBDA_0
 
         if lambda_diff is not None:
             if lambda_diff <= 0:
                 msg = "lambda_diff is optional but when set should be higher than 0!"
                 raise ValueError(msg)
 
-            for k in range(1, K):
-                vals_k = np.argwhere(Y.vals == k).flatten()
-                lij = (Y_subs[0][vals_k], Y_subs[1][vals_k], Y_subs[2][vals_k])
+        for k in range(1, K):
+            indices_val_equals_k = find_indices_of_value(Y, k)
+            lij = (indices_val_equals_k[0], 
+                    indices_val_equals_k[1], 
+                    indices_val_equals_k[2])
+            if lambda_diff is not None:
                 lambda_k[lij] = LAMBDA_0 + lambda_diff
-        else:
-            for k in range(1, K):
-                vals_k = np.argwhere(Y.vals == k).flatten()
-                lij = (Y_subs[0][vals_k], Y_subs[1][vals_k], Y_subs[2][vals_k])
-                lambda_k[lij] = k
+            else:
+                lambda_k[lij] = K
 
-        M_X = np.einsum("lm,lij->lijm", theta, lambda_k)
-        MM = (M_X + mutuality * np.transpose(M_X, axes=(0, 2, 1, 3))) / (1.0 - mutuality * mutuality)
+        M_X = torch.einsum("lm,lij->lijm", theta, lambda_k)
+        MM = (M_X + mutuality * M_X.transpose(1, 2)) / (1.0 - mutuality * mutuality)
 
-        X = np.zeros_like(MM).astype("int")
+        X = torch.zeros(MM.shape).to(torch.int16)
 
         if cutoff_X and Q is None:
             Q = self.K
 
         if flag_self_reporter:
+            #TODO: convert to torch
             R = build_self_reporter_mask(self)
 
             for l in range(L):
