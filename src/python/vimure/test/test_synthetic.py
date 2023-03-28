@@ -1,4 +1,5 @@
 import torch
+import pytest
 
 import numpy as np
 import vimure as vm
@@ -176,52 +177,72 @@ class TestDegreeCorrectedSBM(TestStandardSBM):
             sparsify=True,
         )
 
-        np.testing.assert_raises(
-            AssertionError,
-            np.testing.assert_array_equal,
-            self.synth_net.Y.toarray(),
-            another_synth_net.Y.toarray(),
-        )
-        np.testing.assert_raises(
-            AssertionError,
-            np.testing.assert_array_equal,
-            self.sparse_synth_net.Y.toarray(),
-            another_sparse_synth_net.Y.toarray(),
-        )
+        # pytest test it raises an AssertionError
+        with pytest.raises(AssertionError):
+            torch.testing.assert_close(self.synth_net.Y, another_synth_net.Y)
 
-        assert np.sum(self.synth_net.Y.vals) > np.sum(
-            self.sparse_synth_net.Y.vals
-        ), "self.synth_net.Y should be denser than self.sparser_synth_net.Y"
-        assert np.sum(self.synth_net.Y.vals) > np.sum(
-            another_synth_net.Y.vals
-        ), "another_synth_net should be denser than self.synth_net.Y"
-        assert np.sum(another_synth_net.Y.vals) > np.sum(
-            another_sparse_synth_net.Y.vals
-        ), "another_sparser_synth_net.Y should be denser than self.sparser_synth_net.Y"
+        with pytest.raises(AssertionError):
+            torch.testing.assert_close(self.sparse_synth_net.Y, 
+                                       another_sparse_synth_net.Y)
+
+        assert self.synth_net.Y.sum() > self.sparse_synth_net.Y.sum(), "self.synth_net.Y should be denser than self.sparser_synth_net.Y"
+        assert self.synth_net.Y.sum() > another_synth_net.Y.sum(), "another_synth_net should be denser than self.synth_net.Y"
+        assert another_synth_net.Y.sum() > another_sparse_synth_net.Y.sum(), "another_sparser_synth_net.Y should be denser than self.sparser_synth_net.Y"
 
 
 class TestMultitensor(TestBaseSyntheticNetwork):
-    @classmethod
-    def setup_class(cls):
-        """
-        Creates a single Multitensor instance object to be shared by tests in this class
-        """
-        cls.synth_net = vm.synthetic.Multitensor(
-            N=DEFAULT_N,
-            M=DEFAULT_M,
-            K=DEFAULT_K,
-            L=DEFAULT_L,
-            C=DEFAULT_C,
-            eta=DEFAULT_ETA,
-            avg_degree=DEFAULT_AVG_DEGREE,
-        )
+
 
     def test_yields_appropriate_objects(self):
         """
         CHECK matrices and objects have the right types and shapes and values
         """
 
-        self.check_objects(self.synth_net)
+        synth_net = vm.synthetic.Multitensor(
+                    N=DEFAULT_N,
+                    M=DEFAULT_M,
+                    K=DEFAULT_K,
+                    L=DEFAULT_L,
+                    C=DEFAULT_C,
+                    eta=DEFAULT_ETA,
+                    avg_degree=DEFAULT_AVG_DEGREE,
+                    sparsify=False
+                )
 
-        assert self.synth_net.eta == DEFAULT_ETA
-        assert self.synth_net.ExpM is not None
+        self.check_objects(synth_net)
+
+        assert synth_net.eta == DEFAULT_ETA
+        assert synth_net.ExpM is not None
+
+    def test_sparsify_True(self):
+        """
+        CHECK matrices and objects have the right types and shapes and values
+        """
+
+        synth_net = vm.synthetic.Multitensor(
+                    N=DEFAULT_N,
+                    M=DEFAULT_M,
+                    K=DEFAULT_K,
+                    L=DEFAULT_L,
+                    C=DEFAULT_C,
+                    eta=DEFAULT_ETA,
+                    avg_degree=DEFAULT_AVG_DEGREE,
+                    sparsify=True,
+                    ExpM=DEFAULT_N * DEFAULT_N
+                )
+
+        assert synth_net.C == DEFAULT_C
+        assert synth_net.N == DEFAULT_N
+        assert synth_net.M == DEFAULT_M
+        assert synth_net.L == DEFAULT_L
+        assert synth_net.avg_degree > DEFAULT_AVG_DEGREE*10
+        assert synth_net.Y.shape == (DEFAULT_L, DEFAULT_N, DEFAULT_N)
+
+        assert isinstance(synth_net.Y, torch.Tensor)
+        assert synth_net.Y.is_sparse
+
+        assert synth_net.Y.sum() != 0.0, "Adjacency matrices are empty!"
+        assert synth_net.Y.values().max() < synth_net.K
+
+        assert synth_net.eta == DEFAULT_ETA
+        assert synth_net.ExpM == DEFAULT_N * DEFAULT_N

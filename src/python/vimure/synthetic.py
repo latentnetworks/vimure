@@ -17,7 +17,7 @@ import sktensor as skt
 from abc import ABCMeta, abstractmethod
 from ._io import BaseNetwork
 from ._log import setup_logging
-from .utils import preprocess, sptensor_from_dense_array, transpose_ij
+from .utils import preprocess, sptensor_from_dense_array
 
 DEFAULT_N = 100
 DEFAULT_M = 100
@@ -566,10 +566,13 @@ class StandardSBM(BaseSyntheticNetwork):
 
         Y = torch.poisson(M_Y, self.prng)
 
-        # https://stackoverflow.com/a/49512781/843365
+        # Instead of np.fill_diagonal(Y, 0), 
+        # we use the following https://stackoverflow.com/a/49512781/843365
         for l in range(self.L):
-            Y[l][torch.eye(self.N).byte()] = 0
-        Y[Y > self.K - 1] = self.K - 1  # cut-off, max entry has to be equal to K - 1
+            Y[l][torch.eye(self.N).bool()] = 0
+
+        # cut-off, max entry has to be equal to K - 1
+        Y[Y > self.K - 1] = self.K - 1  
 
         self.Y = Y.to_sparse_coo()
 
@@ -754,12 +757,13 @@ class DegreeCorrectedSBM(StandardSBM):
         self.d_in = np.array(
             [int(x) + 2 for x in nx.utils.powerlaw_sequence(self.N, exponent=self.exp_in, seed=self.seed)]
         )
+
         self.d_out = np.array(
             [int(x) + 1 for x in nx.utils.powerlaw_sequence(self.N, exponent=self.exp_out, seed=self.seed)]
         )
 
-        u_hat = u * self.d_out[:, np.newaxis]
-        v_hat = v * self.d_in[:, np.newaxis]
+        u_hat = u * torch.from_numpy(self.d_out[:, np.newaxis]).to(torch.int8)
+        v_hat = v * torch.from_numpy(self.d_in[:, np.newaxis]).to(torch.int8)
 
         return u_hat, v_hat, w
 
@@ -832,21 +836,21 @@ class Multitensor(StandardSBM):
 
         Parameters
         ----------
-        u : numpy.array
+        u : torch.Tensor
             Out-going membership matrix.
-        v : numpy.array
+        v : torch.Tensor
             In-coming membership matrix.
-        w : numpy.array
+        w : torch.Tensor
             Affinity matrix.
             
         Returns
         -------
-        M : numpy.array
+        M : torch.Tensor
             Mean `\lambda^{0}_{ij}` for all entries.
         """
 
-        M = np.einsum("ik,jq->ijkq", u, v)
-        M = np.einsum("ijkq,kq->ij", M, w)
+        M = torch.einsum("ik,jq->ijkq", u, v)
+        M = torch.einsum("ijkq,kq->ij", M, w)
 
         return M
 
@@ -856,40 +860,44 @@ class Multitensor(StandardSBM):
         with the generative model `(A_{ij},A_{ji}) ~ P(A_{ij}|u,v,w,eta) P(A_{ji}|A_{ij},u,v,w,eta)`
         """
 
-        self.Y = torch.sparse_coo_tensor(indices=torch.zeros((3, 0), dtype=torch.float), # 3-D sparse tensor 
-                                         values=torch.zeros(0),
-                                         size=(self.L, self.N, self.N))
+        Y = torch.zeros(size=(self.L, self.N, self.N), dtype=torch.float32)
 
         self.u, self.v, self.w = self._generate_lv()
 
         for l in range(self.L):
 
-            """
-            # TODO:Document this section
-            """
+            # whose elements are lambda0_{ij}
+            M0 = self._Exp_ija_matrix(self.u, self.v, self.w[l])  
 
-            M0 = self._Exp_ija_matrix(self.u, self.v, self.w[l])  # whose elements are lambda0_{ij}
-            np.fill_diagonal(M0, 0)
+            # Instead of np.fill_diagonal(Y, 0),
+            # we use the following https://stackoverflow.com/a/49512781/843365
+            M0[torch.eye(self.N).bool()] = 0
 
             if self.sparsify:
                 # constant to enforce sparsity
                 c = (self.ExpM * (1.0 - self.eta)) / M0.sum()
 
             # whose elements are m_{ij}
-            MM = (M0 + self.eta * transpose_ij(M0)) / (1.0 - self.eta * self.eta)
-            Mt = transpose_ij(MM)
-            MM0 = M0.copy()  # to be not influenced by c_lambda
+            MM = (M0 + self.eta * M0.transpose(0,1)) / (1.0 - self.eta * self.eta)
+            Mt = MM.transpose(0,1)
+
+            # equivalent of M0.copy()
+            # as per https://stackoverflow.com/a/62496418/843365
+            MM0 = M0.detach().clone()  # to be not influenced by c_lambda
 
             if self.sparsify:
                 M0 *= c
-                self.w *= c  # To allow reconstruction of the network from u, v, w
+                # To allow reconstruction of the network from u, v, w
+                self.w *= c  
 
             # whose elements are lambda0_{ji}
-            M0t = transpose_ij(M0)
+            M0t = M0.transpose(0,1)
 
             # whose elements are m_{ij}
             M = (M0 + self.eta * M0t) / (1.0 - self.eta * self.eta)
-            np.fill_diagonal(M, 0)
+            # Instead of np.fill_diagonal(Y, 0),
+            # we use the following https://stackoverflow.com/a/49512781/843365
+            M[torch.eye(self.N).bool()] = 0
 
             # expected reciprocity
             rw = self.eta + ((MM0 * Mt + self.eta * Mt ** 2).sum() / MM.sum())
@@ -907,26 +915,27 @@ class Multitensor(StandardSBM):
 
             for i in range(self.N):
                 for j in range(i + 1, self.N):
-                    r = self.prng.rand(1)[0]
+                    r = torch.rand(1, generator=self.prng).item()
                     if r < 0.5:
-                        A_ij = self.prng.poisson(M[i, j], 1)[0]  # draw A_ij from P(A_ij) = Poisson(m_ij)
+                        # draw A_ij from P(A_ij) = Poisson(m_ij)
+                        A_ij = torch.poisson(M[i, j], generator=self.prng).item()
                         if A_ij > 0:
                             G.add_edge(i, j, weight=A_ij)
                         lambda_ji = M0[j, i] + self.eta * A_ij
 
                         # draw A_ji from P(A_ji|A_ij) = Poisson(lambda0_ji + eta*A_ij)
-                        A_ji = self.prng.poisson(lambda_ji, 1)[0]
+                        A_ji = torch.poisson(lambda_ji, generator=self.prng).item()
                         if A_ji > 0:
                             G.add_edge(j, i, weight=A_ji)
                     else:
                         # draw A_ij from P(A_ij) = Poisson(m_ij)
-                        A_ji = self.prng.poisson(M[j, i], 1)[0]
+                        A_ji = torch.poisson(M[j, i], generator=self.prng).item()
                         if A_ji > 0:
                             G.add_edge(j, i, weight=A_ji)
                         lambda_ij = M0[i, j] + self.eta * A_ji
 
                         # draw A_ji from P(A_ji|A_ij) = Poisson(lambda0_ji + eta*A_ij)
-                        A_ij = self.prng.poisson(lambda_ij, 1)[0]
+                        A_ij = torch.poisson(lambda_ij, generator=self.prng).item()
                         if A_ij > 0:
                             G.add_edge(i, j, weight=A_ij)
                     counter += 1
@@ -940,11 +949,14 @@ class Multitensor(StandardSBM):
                 msg += "until you get a network with just a single giant component."
                 module_logger.warning(msg)
 
-            self.Y[l] = nx.to_numpy_array(G)
-            # cut-off, max entry has to be equal to K - 1
-            self.Y[self.Y > self.K - 1] = self.K - 1
+            # Adjacency matrix
+            Y_l = torch.from_numpy(nx.to_numpy_array(G)).int()
 
-        self.Y = preprocess(self.Y)
+            # cut-off, max entry has to be equal to K - 1
+            Y_l[Y_l > self.K - 1] = self.K - 1 
+            Y[l] = Y_l
+
+        self.Y = Y.to_sparse_coo()
 
     def __repr__(self):
         return_str = f"{self.__class__.__name__} (N={self.N}, M={self.M}, L={self.L}, "
