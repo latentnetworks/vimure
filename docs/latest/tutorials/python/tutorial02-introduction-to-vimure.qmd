@@ -38,8 +38,8 @@ We have selected a particular village to focus on. The dataset contains informat
 
 Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will use all four layers to model the latent network structure. The four layers are:
 
-- `money`: money lending and borrowing
-- `advice`: advice giving and receiving
+- `money`: lending and borrowing money
+- `advice`: giving and receiving advice
 - `visit`: visiting and being visited
 - `kerorice`: lending and borrowing of household items
 
@@ -453,7 +453,7 @@ model.fit(G)
 
 :::
 
-(_If you rather see what the model is doing, you can set `verbose=True` in the `fit()` method_)
+(_If you would like to see what the model is doing, you can set `verbose=True` in the `fit()` method_)
 
 After which, you might be interested to look at the posterior estimates of the model parameters:
 
@@ -519,7 +519,7 @@ posterior_estimates['nu']
 0.6177802251078235
 ```
 
-This indicates a large mutuality in the network. That is, if $i$ reports that $j$ comes to them for money, then $j$ is likely to report that $i$ comes to them as well.
+This indicates a large mutuality in the network. That is, if $i$ reports that $j$ *lends* money to them, then $i$ is likely to report that $j$ also *borrows* money from them.
 
 This is a network-wide parameter and encompasses all layers. If you have reasons to believe mutuality varies across layers, you have to re-run the model for each layer separately.
 
@@ -535,7 +535,7 @@ posterior_estimates['theta'].shape
 (4, 417)
 ```
 
-We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that there are 417 reporters in the network. 
+We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that VIMuRe infers that there are 417 reporters in the network.
 
 This parameter, combined with $\lambda_{lk}$ represents the "reliability" of a reporter $m$ on layer $l$: 
 
@@ -691,7 +691,7 @@ edgelist[(edgelist["reporter"] == "113302") & (edgelist["layer"] == "advice")]
 
 :::
 
-Node `113302` does not report any reciprocal ties, but it does report ties with six other nodes.
+Node `113302` does not report any reciprocal ties, but they do report ties with six other nodes.
 
 **Are all nodes also reporters?**
 
@@ -722,7 +722,7 @@ edgelist[(edgelist['reporter'].isin(potential_friends)) &
 |-------:|--------:|-----------:|:-----------|:--------|---------:|
 | 113301 |  113302 |     113301 | giveadvice | advice  |        1 |
 
-That is why `113302`'s $\theta\lambda_{k=1}$ is high: it reports a lot of ties, but only one of them is confirmed by other reporters.
+That is why `113302`'s $\theta\lambda_{k=1}$ is high: they report a lot of ties, but only one of them is confirmed by other reporters.
 
 Nodes with values in the average range of the $\theta_{lm}\lambda_{lk}$ distribution is likely to be more "reliable" reporters.
 
