@@ -363,8 +363,8 @@ Note
 <p>We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were “double-sampled” in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both <em>“If you needed to borrow kerosene or rice, to whom would you go?”</em> as well as <em>“Who would come to you if he/she needed to borrow kerosene or rice?”</em> These two different prompts should give us different perspectives on what could be the same relationship. If everyone in the network is being surveyed, then this should mean that we are eliciting information on a relationship twice (hence, “double sampling”): we’re asking <code>ego</code> if they go to <code>alter</code> for help, and also asking <code>ego</code> if <code>alter</code> comes to them for help.</p>
 <p>Four different tie types (or “layers”) were double-sampled in this way (i.e., elicited with two prompts). Here, we will use all four layers to model the latent network structure. The four layers are:</p>
 <ul>
-<li><code>money</code>: money lending and borrowing</li>
-<li><code>advice</code>: advice giving and receiving</li>
+<li><code>money</code>: lending and borrowing money</li>
+<li><code>advice</code>: giving and receiving advice</li>
 <li><code>visit</code>: visiting and being visited</li>
 <li><code>kerorice</code>: lending and borrowing of household items</li>
 </ul>
@@ -1003,7 +1003,7 @@ Important
 </div>
 </div>
 </div>
-<p>(<em>If you rather see what the model is doing, you can set <code>verbose=True</code> in the <code>fit()</code> method</em>)</p>
+<p>(<em>If you would like to see what the model is doing, you can set <code>verbose=True</code> in the <code>fit()</code> method</em>)</p>
 <p>After which, you might be interested to look at the posterior estimates of the model parameters:</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns a list with the posterior estimates of the model parameters</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>posterior_estimates <span class="ot">&lt;-</span> model<span class="sc">$</span><span class="fu">get_posterior_estimates</span>()</span>
@@ -1068,7 +1068,7 @@ Important
 <p>In our case study:</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>posterior_estimates[[<span class="st">'nu'</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre class="text"><code>0.6289576</code></pre>
-<p>This indicates a large mutuality in the network. That is, if <span class="math inline">\(i\)</span> reports that <span class="math inline">\(j\)</span> comes to them for money, then <span class="math inline">\(j\)</span> is likely to report that <span class="math inline">\(i\)</span> comes to them as well.</p>
+<p>This indicates a large mutuality in the network. That is, if <span class="math inline">\(i\)</span> reports that <span class="math inline">\(j\)</span> <em>lends</em> money to them, then <span class="math inline">\(i\)</span> is likely to report that <span class="math inline">\(j\)</span> also <em>borrows</em> money from them.</p>
 <p>This is a network-wide parameter and encompasses all layers. If you have reasons to believe mutuality varies across layers, you have to re-run the model for each layer separately.</p>
 </section>
 <section id="under-reporting-vs-over-reporting-a-combination-of-theta_lm-times-lambda_lk" class="level3">
@@ -1076,7 +1076,7 @@ Important
 <p>First, let’s look at the shape of the <span class="math inline">\(\theta\)</span> array:</p>
 <div class="sourceCode" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>dim(posterior_estimates[[<span class="st">'theta'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre class="text"><code>   4 417</code></pre>
-<p>We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that there are 417 reporters in the network.</p>
+<p>We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that VIMuRe infers that there are 417 reporters in the network.</p>
 <p>This parameter, combined with <span class="math inline">\(\lambda_{lk}\)</span> represents the “reliability” of a reporter <span class="math inline">\(m\)</span> on layer <span class="math inline">\(l\)</span>:</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>dim(posterior_estimates[[<span class="st">'lambda'</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <pre class="text"><code> 4 2</code></pre>
@@ -1327,7 +1327,7 @@ Click to see the code
 </div>
 </div>
 </div>
-<p>Node <code>113302</code> does not report any reciprocal ties, but it does report ties with six other nodes.</p>
+<p>Node <code>113302</code> does not report any reciprocal ties, but they do report ties with six other nodes.</p>
 <p><strong>Are all nodes also reporters?</strong></p>
 <p>Two of these six nodes are not reporters:</p>
 <div class="sourceCode" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>nodes_mentioned <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"110502"</span>, <span class="st">"113102"</span>, <span class="st">"105701"</span>, <span class="st">"110501"</span>, <span class="st">"113601"</span>, <span class="st">"113301"</span>)</span>
@@ -1362,7 +1362,7 @@ Click to see the code
 </tr>
 </tbody>
 </table>
-<p>That is why <code>113302</code>’s <span class="math inline">\(\theta\lambda_{k=1}\)</span> is high: it reports a lot of ties, but only one of them is confirmed by other reporters.</p>
+<p>That is why <code>113302</code>’s <span class="math inline">\(\theta\lambda_{k=1}\)</span> is high: they report a lot of ties, but only one of them is confirmed by other reporters.</p>
 <p>Nodes with values in the average range of the <span class="math inline">\(\theta_{lm}\lambda_{lk}\)</span> distribution is likely to be more “reliable” reporters.</p>
 </section>
 </section>
