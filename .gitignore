@@ -179,3 +179,5 @@ vignettes/*.pdf
 /.quarto/
 _site/
 *unnamed-chunk*.png
+
+.vscode
