@@ -29,11 +29,11 @@
 #'
 #' @param version Vimure version to install. Valid values include:
 #'
-#'   +  `"default"` installs  `develop branch`
+#'   +  `"default"` installs the version from the `main` branch
 #'
-#'   + A version specification like `"2.4"` or `"2.4.0"`. Note that if the patch
+#'   + A version specification like `"0.1"` or `"0.1.0"`. Note that if the patch
 #'   version is not supplied, the latest patch release is installed (e.g.,
-#'   `"2.4"` today installs version "2.4.2")
+#'   `"0.1"` today installs version "0.1.0")
 #'
 #'   + The full URL or path to a installer binary or python *.whl file.
 #'
@@ -59,7 +59,7 @@
 #' @export
 install_vimure <- function(method = c("auto", "virtualenv", "conda"),
            conda = "auto",
-           version = "develop",
+           version = "main",
            envname = NULL,
            restart_session = TRUE,
            conda_python_version = NULL,
