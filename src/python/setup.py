@@ -16,7 +16,8 @@ setup(
         "pandas < 2.0.0",
         "scikit-learn <= 1.2.1",
         "scikit-tensor-py3 @ https://github.com/jonjoncardoso/scikit-tensor-py3/archive/master.zip",
-        "networkx < 3.0.0"
+        "networkx < 3.0.0",
+        "igraph >= 0.10.4"
     ],
     packages=find_packages(),
     python_requires=">=3",
