@@ -74,6 +74,9 @@ jobs:
       - name: Install devtools
         run: install.packages("devtools")
 
+      - name: Install docs dependencies
+        run: install.packages(c("reshape2", "ggcorrplot"))
+
       - name: Install system dependencies
         if: runner.os == 'Linux'
         shell: bash
