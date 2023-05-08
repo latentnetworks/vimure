@@ -737,12 +737,11 @@ You might have noticed the following warning messages when you ran `model.fit()`
 >
 > ```UserWarning: Reporters Mask was not informed (parameter R). Parser will build it from reporter column, assuming a reporter can only report their own ties.```
 
-The messages are not errors; they are simply indications that the VIMuRe package has made some implicit assumptions when loading the data.  If you would like to set the nodes, reporters, and reporter mask _explicitly_, you can pass these values as arguments to the fit() method. For example:
+The messages are not errors; they are simply indications that the VIMuRe package has made some implicit assumptions when loading the data.  If you would like to set the nodes, and the reporter mask _explicitly_, you can pass these values as arguments to the fit() method. For example:
 
 ```python
 model.fit(edgelist, 
-          nodes=all_nodes, 
-          reporters=all_reporters, 
+          nodes=all_nodes,
           R=reporter_mask)
 ```
 
