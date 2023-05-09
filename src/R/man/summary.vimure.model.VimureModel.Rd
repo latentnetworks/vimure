@@ -18,6 +18,7 @@ Diagnostics metrics
 }
 \seealso{
 Other vimure: 
+\code{\link{check_reporters_mask}()},
 \code{\link{get_inferred_model}()},
 \code{\link{vimure}()}
 }

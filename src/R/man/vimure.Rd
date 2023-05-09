@@ -7,8 +7,8 @@
 vimure(
   x,
   R = NULL,
-  mutuality = T,
-  undirected = F,
+  mutuality = TRUE,
+  undirected = FALSE,
   theta_prior = c(0.1, 0.1),
   K = NULL,
   lambda_prior = c(10, 10),
@@ -16,15 +16,18 @@ vimure(
   rho_prior = NULL,
   seed = NULL,
   etol = 0.1,
-  verbose = T,
+  verbose = FALSE,
   ...
 )
 }
 \arguments{
-\item{x}{An adjancency matrix with dimensions L x N x N x N or a igraph object.}
+\item{x}{An adjancency matrix with dimensions L x N x N x N
+or a igraph object.}
 
-\item{R}{Reporters mask (TRUE/FALSE) indicating whether a node \emph{CAN} report on a particular tie, with dimensions L x N x N x N.
-If reporters mask was not informed, the model will assume that every reporter can report on any tie.}
+\item{R}{Reporters mask (TRUE/FALSE) indicating whether a node
+\emph{CAN} report on a particular tie, with dimensions L x N x N x N.
+If reporters mask was not informed, the model will assume that
+every reporter can report on any tie.}
 
 \item{mutuality}{Whether to use the mutuality parameter.}
 
@@ -52,12 +55,15 @@ If reporters mask was not informed, the model will assume that every reporter ca
 vimure model
 }
 \description{
-Fit a probabilistic generative model to double sampled networks. It returns reliability parameters for the
-reporters (theta), average interactions for the links (lambda) and the estimate of the true and unknown
-network (rho). The inference is performed with a Variational Inference approach.
+Fit a probabilistic generative model to double sampled networks.
+It returns reliability parameters for the reporters (theta),
+average interactions for the links (lambda) and the estimate of
+the true and unknown network (rho).
+The inference is performed with a Variational Inference approach.
 }
 \seealso{
 Other vimure: 
+\code{\link{check_reporters_mask}()},
 \code{\link{get_inferred_model}()},
 \code{\link{summary.vimure.model.VimureModel}()}
 }

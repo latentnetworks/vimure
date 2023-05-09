@@ -1,12 +1,15 @@
+require(testthat)
+
 skip_if_no_vimure <- function() {
   have_vimure <- reticulate::py_module_available("vimure")
   if (!have_vimure)
     skip("Vimure not available for testing")
 }
 
-check_parameters <- function(model, synth_net){
+check_parameters <- function(model, synth_net) {
   expect_false(is.null(model$rho))
-  expect_equal(dim(model$rho), c(synth_net$L, synth_net$N, synth_net$N, synth_net$K))
+  expect_equal(dim(model$rho),
+               c(synth_net$L, synth_net$N, synth_net$N, synth_net$K))
   expect_gt(sum(model$rho), 0)
 
   expect_false(is.null(model$gamma_shp))
@@ -76,6 +79,30 @@ check_output <- function(Y, model){
   expect_equal(dim(Y), c(model$L, model$N, model$N))
 }
 
+test_that("Check reporters' mask", {
+  skip_if_no_vimure()
+
+  N <- 20
+  nodes <- 1:N
+  synth_net <- gm_StandardSBM(N = N, M = 20, L = 1, K = 3, C = 2,
+                              avg_degree = 2, sparsify = FALSE)
+
+  # specify some sort of mask
+  # for example, only egos of synth_net are reporters
+  adj_matrix <- synth_net$Y$toarray()[1, , ]
+  reporters <- which(rowSums(adj_matrix) > 0)
+
+  reporter_mask <- array(0,
+                        dim = c(1, N, N, N),
+                        dimnames = list("layer", nodes, nodes, nodes))
+
+  reporter_mask[, , , reporters] <- "clearly_wrong"
+
+  expect_error(vimure(edgelist, R = reporter_mask), 
+               "R must be either entirely made of TRUE/FALSE or of 0s/1s.")
+
+})
+
 test_that("Check vimure model with standard_sbm", {
   skip_if_no_vimure()
 
@@ -94,9 +121,11 @@ test_that("Check vimure model in extreme scenarios of over reporting", {
 })
 
 test_that("Check vimure model for invalid inputs", {
-  INPUTS <- list("a", list(a="a"), mtcars, 1:10)
-  for(x in INPUTS)
-  expect_error(vimure(x), "invalid 'type'")
+  expect_error(vimure("a"), "invalid 'type'")
+  expect_error(vimure(list(a = "a")), "invalid 'type'")
+  expect_error(vimure(mtcars),
+               "ValueError: Required columns not found in data frame")
+  expect_error(vimure(1:10), "invalid 'type'")
 })
 
 
