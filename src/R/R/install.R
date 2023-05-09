@@ -33,7 +33,7 @@
 #'
 #'   + A version specification like `"0.1"` or `"0.1.0"`. Note that if the patch
 #'   version is not supplied, the latest patch release is installed (e.g.,
-#'   `"0.1"` today installs version "0.1.0")
+#'   `"0.1"` today installs version "0.1.1")
 #'
 #'   + The full URL or path to a installer binary or python *.whl file.
 #'
