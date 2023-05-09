@@ -23,19 +23,19 @@ jobs:
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
 
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         config:
-          - {os: macOS-latest,   r: '4.2.3'}
-          - {os: windows-latest, r: '4.2.3'}
-          - {os: ubuntu-latest,  r: 'devel', http-user-agent: '4.2.3'}
-          - {os: ubuntu-latest,  r: '4.2.3'}
+          - {os: macOS-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,  r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,  r: 'release'}
           - {os: ubuntu-latest,  r: 'oldrel-1'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      RSPM: ${{ matrix.config.rspm }}
+      RSPM: false
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
 
     steps:
