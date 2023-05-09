@@ -46,7 +46,7 @@ jobs:
         with:
           r-version: ${{ matrix.r }}
           Ncpus: '2L'
-          use-public-rspm: true
+          use-public-rspm: false
       
       - uses: r-lib/actions/setup-pandoc@v2
       
