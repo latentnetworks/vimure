@@ -38,8 +38,8 @@ vm_config <- function(){
   # found it!
   if (have_vimure) {
     # get version
-    if (reticulate::py_has_attr(vimureP, "version"))
-      version_raw <- vimureP$version$VERSION
+    if (reticulate::py_has_attr(vimureP, "VERSION"))
+      version_raw <- vimureP$VERSION
     else
       version_raw <- ""
 
@@ -75,8 +75,8 @@ vm_version <- function() {
 print.vimure_config <- function(x, ...) {
   if (x$available) {
     aliased <- function(path) sub(Sys.getenv("HOME"), "~", path)
-    cat("Vimure v", x$version_str, " (", aliased(x$location), ")\n", sep = "")
-    cat("Python v", x$python_version, " (", aliased(x$python), ")\n", sep = "")
+    cat("Python version: v", x$python_version, " (", aliased(x$python), ")\n", sep = "")
+    cat("Python version of vimure: ", x$version_str, "\n", sep = "")
   } else {
     cat(x$error_message, "\n")
   }
