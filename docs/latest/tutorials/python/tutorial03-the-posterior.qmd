@@ -1,0 +1,121 @@
+---
+title: "💻 **Tutorial 03**: Extracting point estimates and sampling from the posterior distribution"
+subtitle: "VIMuRe v0.1.1 (latest)"
+categories: [basics, python]
+description: "how to extract point estimates and sample from the posterior distribution of the latent network model fitted by VIMuRe"
+---
+
+::: callout-note
+
+If you use `VIMuRe` in your research, please cite [@de_bacco_latent_2023].
+
+:::
+
+TLDR: By the end of this tutorial, you will be able to:
+
+- Extract point estimates of the latent network structure using the mean of the posterior distribution
+- Visualize the resulting network using $\rho$, a measure of edge strength
+- Sample from the posterior distribution and obtain uncertainty estimates
+- Compare different models using information criteria
+
+Found an interesting use case for `VIMuRe`? Let us know! Open a [discussion](https://github.com/latentnetworks/vimure/discussions) on our GitHub repository.
+
+## ⚙️ Setup
+
+Import packages
+
+```python
+import pandas as pd
+import vimure as vm
+import matplotlib.pyplot as plt
+```
+
+⚠️ Ensure you have installed the latest version of `VIMuRe` before running this tutorial. Follow the 📦 [Installation instructions](/latest/install.qmd) if you haven't already.
+
+## 📥 Step 1: Ensure you have loaded the data and a fitted model
+
+This tutorial assumes that you have completed 💻  [Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) and 💻 [Tutorial 02: Introduction to VIMuRe in Python](/latest/tutorials/python/tutorial02-introduction-to-vimure.qmd) and that, therefore, you have an `edgelist` data frame and a fitted model object called `model` loaded in your Python environment.
+
+We have selected a particular village to focus on. The dataset contains information on four different types of relationships: money, advice, visit and kerorice. We stored all the data in a single data frame, edgelist, which looks like this:
+
+```r
+edgelist.sample(n=10, random_state=1)
+```
+
+|    ego |   alter |   reporter | tie_type     | layer    |   weight |
+|-------:|--------:|-----------:|:-------------|:---------|---------:|
+| 107303 |  107307 |     107307 | helpdecision | advice   |        1 |
+| 116402 |  115702 |     116402 | keroricecome | kerorice |        1 |
+| 103202 |  117301 |     103202 | giveadvice   | advice   |        1 |
+| 116201 |  110401 |     116201 | keroricecome | kerorice |        1 |
+| 114606 |  109701 |     109701 | keroricego   | kerorice |        1 |
+| 101302 |  116201 |     101302 | visitcome    | visit    |        1 |
+| 111204 |  110701 |     111204 | lendmoney    | money    |        1 |
+| 108304 |  111502 |     108304 | keroricecome | kerorice |        1 |
+| 117301 |  113901 |     113901 | borrowmoney  | money    |        1 |
+| 106201 |  116105 |     106201 | keroricecome | kerorice |        1 |
+
+We then ran VIMuRe on this data frame to fit a latent network model:
+
+```python
+import vimure as vm
+
+# Run the model
+model = vm.model.VimureModel()
+model.fit(G)
+```
+
+Importantly, we will be looking at the $\rho$ posterior distribution, a L x N x N x K tensor that can be understood as the probability of a directed edge between a pair of nodes N of a particular layer L of strength K.
+
+```python
+rho = model.get_posterior_estimates()['rho']
+
+rho.shape
+```
+
+```text
+(4, 417, 417, 2)
+```
+
+## 📊 Step 2: Simple point estimates using $\rho$
+
+### Using the mean of the posterior distribution
+
+### Using the maximum of the posterior distribution
+
+
+## 🎲 Step 3: Sample from the posterior distribution and obtain uncertainty estimates
+
+
+## 📋 Step 4: Compare different models using information criteria
+
+We can compare different models using information criteria such as AIC or BIC. These criteria balance model fit and model complexity. Lower values indicate better models. We can compute AIC or BIC using the `vm.aic()` or `vm.bic()` functions, which take a fitted model object as input and return a numeric value.
+
+```python
+aic = vm.aic(model)
+bic = vm.bic(model)
+
+print(f"AIC: {aic}")
+print(f"BIC: {bic}")
+```
+
+We can also compare models with different settings or priors using these criteria. For example, we can fit another model with a different prior mean for θ.
+
+```python
+model2 = vm.fit(g, prior_theta_mean=0.5) # use prior_theta_mean=0.5 instead of default 0
+aic2 = vm.aic(model2)
+bic2 = vm.bic(model2)
+
+print(f"AIC2: {aic2}")
+print(f"BIC2: {bic2}")
+```
+
+We can then compare the two models using AIC or BIC differences.
+
+```python
+aic_diff = aic - aic2 # positive value means model is better than model2
+bic_diff = bic - bic2 # positive value means model is better than model2
+
+print(f"AIC difference: {aic_diff}")
+print(f"BIC difference: {bic_diff}")
+```
