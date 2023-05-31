@@ -32,9 +32,9 @@ import matplotlib.pyplot as plt
 
 ⚠️ Ensure you have installed the latest version of `VIMuRe` before running this tutorial. Follow the 📦 [Installation instructions](/latest/install.qmd) if you haven't already.
 
-## 📥 Step 1: Ensure you have loaded the data and a fitted model
+## 📥 Step 1: Ensure you have suitable data and a fitted `VIMuRe` model
 
-This tutorial assumes that you have completed 💻  [Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) and 💻 [Tutorial 02: Introduction to VIMuRe in Python](/latest/tutorials/python/tutorial02-introduction-to-vimure.qmd) and that, therefore, you have an `edgelist` data frame and a fitted model object called `model` loaded in your Python environment.
+This tutorial assumes that you have completed 💻  [Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) and 💻 [Tutorial 02](/latest/tutorials/python/tutorial02-introduction-to-vimure.qmd) and that, therefore, you have an `edgelist` data frame and a fitted model object called `model` loaded in your Python environment.
 
 We have selected a particular village to focus on. The dataset contains information on four different types of relationships: money, advice, visit and kerorice. We stored all the data in a single data frame, edgelist, which looks like this:
 
@@ -62,10 +62,14 @@ import vimure as vm
 
 # Run the model
 model = vm.model.VimureModel()
-model.fit(G)
+model.fit(edgelist)
 ```
 
-Importantly, we will be looking at the $\rho$ posterior distribution, a L x N x N x K tensor that can be understood as the probability of a directed edge between a pair of nodes N of a particular layer L of strength K.
+If you have both objects in your environment, you are ready to go!
+
+## 📊 Step 2: Interpreting the variable $\rho$
+
+In this step, our main focus is to analyze the posterior distribution of the latent variable known as `rho`, which is included in the list of posterior estimates of the model.
 
 ```python
 rho = model.get_posterior_estimates()['rho']
@@ -76,8 +80,35 @@ rho.shape
 ```text
 (4, 417, 417, 2)
 ```
+The variable `rho` is represented as a tensor with dimensions L x N x N x K. Each entry in the tensor can be denoted as $\rho_{lijk}$, which corresponds to the probability of a directed tie with weight $k-1$ existing between nodes $i$ and $j$ on a specific layer $l$.
 
-## 📊 Step 2: Simple point estimates using $\rho$
+### A note about the parameter $K$
+
+The final dimension of the tensor, denoted by $K$, represents the strength of a tie. By default, the model assumes that the interest is in the presence or absence of ties rather than their weight, resulting in a default value of $K=2$. Consequently, for each potential edge, there are two values of $\rho$: $\rho_{lijk=1}$ and $\rho_{lijk=2}$, corresponding to edges with weights 0 and 1 ($k-1$) respectively.
+
+To make this clearer, let's consider a specific example. Suppose we want to determine the probability of a directed tie with weight 1 existing between nodes 10 and 15 on layer 1 ('advice') of our network. We can examine the following entry in the tensor:
+
+```python
+# rho for layer 1, ego 10, alter 15
+rho[0, 10, 15, :] 
+```
+
+The result would be:
+
+```text
+array([1.00000000e+00, 4.21007361e-13])
+```
+
+This suggests that the model assigns a high probability (approximately 100%) to the absence of a directed tie between nodes 10 and 15 on layer 1 ($\rho_{lijk=1} \approx 1$). Conversely, it assigns a low probability (approximately 0%) to the presence of a directed tie between nodes 10 and 15 on layer 1 ($\rho_{lijk=2} \approx 0$). Based on this, we can conclude that node 10 does not provide advice to node 15.
+
+If you are modelling weighted networks, you can specify a different value for $K$, as shown below. Just note that K must be an integer.
+
+```python
+# Fit the model with a different value for K
+
+model = vm.model.VimureModel()
+model.fit(edgelist, K=10)
+```
 
 ### Using the mean of the posterior distribution
 
