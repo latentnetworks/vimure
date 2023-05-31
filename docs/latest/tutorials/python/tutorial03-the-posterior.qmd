@@ -25,6 +25,7 @@ Found an interesting use case for `VIMuRe`? Let us know! Open a [discussion](htt
 Import packages
 
 ```python
+import numpy as np
 import pandas as pd
 import vimure as vm
 import matplotlib.pyplot as plt
@@ -110,12 +111,69 @@ model = vm.model.VimureModel()
 model.fit(edgelist, K=10)
 ```
 
-### Using the mean of the posterior distribution
+### Visualising `rho` 
 
-### Using the maximum of the posterior distribution
+Since the probability of $K=1$ and $K=2$ are complementary, we can plot the probability of a directed tie existing between nodes $i$ and $j$ on layer $l$ as a function of $\rho_{lijk=2}$. But before we proceed to the plot, let's take a look at the summary statistics of the values of $\rho$ per layer:
 
+<details><summary>Show code</summary>
 
-## 🎲 Step 3: Sample from the posterior distribution and obtain uncertainty estimates
+```python
+#The code below converts from adjacency matrix to edge list 
+# then summarises the values of rho per layer
+pd.concat(
+    [pd.DataFrame(rho[l,:,:,1])
+      .reset_index()\
+      .melt(id_vars=['index'])\
+      .assign(l=l)\
+      .rename(columns={'index':'i', 'variable': 'j'}) 
+      for l in range(rho.shape[0])]
+).groupby(['l'])['value'].describe()
+```
+
+</details>
+
+|   l |   count |       mean |       std |         min |         25% |         50% |         75% |      max |
+|----:|--------:|-----------:|----------:|------------:|------------:|------------:|------------:|---------:|
+|   0 |  173889 | 0.00211962 | 0.0427501 | 1.42201e-13 | 3.61097e-13 | 4.64657e-13 | 6.28092e-13 | 1        |
+|   1 |  173889 | 0.00232455 | 0.039379  | 1.5432e-13  | 5.06778e-13 | 7.39753e-13 | 8.88974e-13 | 0.999831 |
+|   2 |  173889 | 0.00218808 | 0.0409045 | 1.45914e-13 | 4.10353e-13 | 6.37707e-13 | 8.39875e-13 | 0.999873 |
+|   3 |  173889 | 0.00253843 | 0.0433122 | 1.43865e-13 | 4.45755e-13 | 6.87587e-13 | 8.60819e-13 | 1        |
+
+The expected values of $\rho$ are very small, with a mean of approximately 0.002. The inferred network is sparse, as can be expected from a social network of this type. Observe how the minimum value is close but never truly zero, which is a consequence of the Bayesian approach. The standard deviation is also very small, with a mean of approximately 0.04. This suggests that the posterior distribution of $\rho$ is very concentrated around its mean.
+
+Let's look at how the values of $\rho$ are distributed across layers. We can do this by plotting the distribution of $\rho_{lijk=2}$ for each layer:
+
+<details><summary>Show code</summary>
+
+```python
+import igraph as ig
+import matplotlib.pyplot as plt
+
+# Create a figure with 2 x 2 subplots
+fig, axes = plt.subplots(2,2, figsize=(10,10))
+
+# Loop over the layers
+for k in range(4):
+    # Get the subplot index
+    i = k // 2
+    j = k % 2
+    # Get the rho matrix for the layer
+    rho_k = rho[k,:,:,1]
+    axes[i,j].imshow(rho_k, vmin=0, vmax=1, cmap='Blues', aspect='equal')
+    axes[i,j].set_xlabel('Alter')
+    axes[i,j].set_ylabel('Ego')
+    # Add a title with the layer name
+    axes[i,j].set_title(f'Layer: {model.layerNames[k]}')
+plt.show()
+```
+</details>
+
+![](figures/tutorial03_fig01.png)
+
+The plots above give us an idea of how sparse the network is, but without any meaningful node ordering, it's hard to see its structure. In the next section, we'll use $\rho_{lijk=2}$ as a measure of edge strength and treat it as a point estimate. This will help us get a clearer picture of this multi-layered network.
+
+## 🎲 Step 3: Obtaining a simple point estimate
+
 
 
 ## 📋 Step 4: Compare different models using information criteria
