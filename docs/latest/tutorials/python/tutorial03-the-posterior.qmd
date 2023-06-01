@@ -28,6 +28,8 @@ Import packages
 import numpy as np
 import pandas as pd
 import vimure as vm
+import igraph as ig
+
 import matplotlib.pyplot as plt
 ```
 
@@ -170,41 +172,46 @@ plt.show()
 
 ![](figures/tutorial03_fig01.png)
 
-The plots above give us an idea of how sparse the network is, but without any meaningful node ordering, it's hard to see its structure. In the next section, we'll use $\rho_{lijk=2}$ as a measure of edge strength and treat it as a point estimate. This will help us get a clearer picture of this multi-layered network.
+The plots above give us an idea of how sparse the network is, but without any meaningful node ordering, it's hard to see its structure. In the next section, we'll use $\rho_{lijk=2}$ as a measure of edge strength and treat it as a point estimate for our model. This will help us get a clearer picture of this multi-layered network.
 
 ## 🎲 Step 3: Obtaining a simple point estimate
 
+We can treat the probability values represented by $\rho_{lijk=2}$ directly as a point estimate, but since most of the entries are very small and none of them is zero, this would lead to a dense network. Instead, it could be more appropriate to apply a thresholding approach and set the lower values to zero.
 
+However, determining the appropriate threshold value $t_{\rho}$ is not as straightforward as it initially seems. While a suggestion of setting $t_{\rho}=0.5$ may arise based on the assumption of complementarity between $\rho_{lijk=2}$ and $\rho_{lijk=1}$, our research paper [@de_bacco_latent_2023, pages 10-11] reveals the need for adjusting the threshold based on the inferred mutuality, $\eta_{est}$ (represented by the latent variable $\nu$), to achieve a similar level of reciprocity — a network property of interest — as observed in the ground truth network. In other words, tailoring the threshold becomes necessary to ensure that the inferred network accurately captures the desired network property.
 
-## 📋 Step 4: Compare different models using information criteria
-
-We can compare different models using information criteria such as AIC or BIC. These criteria balance model fit and model complexity. Lower values indicate better models. We can compute AIC or BIC using the `vm.aic()` or `vm.bic()` functions, which take a fitted model object as input and return a numeric value.
-
-```python
-aic = vm.aic(model)
-bic = vm.bic(model)
-
-print(f"AIC: {aic}")
-print(f"BIC: {bic}")
-```
-
-We can also compare models with different settings or priors using these criteria. For example, we can fit another model with a different prior mean for θ.
+In the paper, after simulating with synthetic networks with embedded reciprocity, we found that the threshold $t_{\rho}$ should be set to $t_{\rho} = 0.33 \times \eta_{est} + 0.10$. Let's use this same value here to obtain a point estimate of the network:
 
 ```python
-model2 = vm.fit(g, prior_theta_mean=0.5) # use prior_theta_mean=0.5 instead of default 0
-aic2 = vm.aic(model2)
-bic2 = vm.bic(model2)
-
-print(f"AIC2: {aic2}")
-print(f"BIC2: {bic2}")
+threshold = 0.33 * model.get_posterior_estimates()['nu'] + 0.10
+threshold
 ```
 
-We can then compare the two models using AIC or BIC differences.
+```text
+0.3075564363103252
+```
+
+We can then apply the threshold to the values of $\rho_{lijk=2}$ to obtain a point estimate of the network:
 
 ```python
-aic_diff = aic - aic2 # positive value means model is better than model2
-bic_diff = bic - bic2 # positive value means model is better than model2
-
-print(f"AIC difference: {aic_diff}")
-print(f"BIC difference: {bic_diff}")
+# Apply the threshold
+rho_point_estimate = rho[:,:,:,1] > threshold
 ```
+
+To get the network to look consistent across layers, let's create a layout from the union of all nodes and edges across layers:
+
+```python
+layout = (
+    ig.Graph.Adjacency(rho_point_estimate.sum(axis=0).tolist(), mode='directed')
+    .layout_fruchterman_reingold()
+)
+```
+
+```text
+<Layout with 417 vertices and 2 dimensions>
+```
+
+
+
+## 📋 Step 4: Sampling from the posterior
+
