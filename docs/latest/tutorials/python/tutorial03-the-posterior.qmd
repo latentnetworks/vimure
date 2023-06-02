@@ -1,8 +1,8 @@
 ---
-title: "💻 **Tutorial 03**: Extracting point estimates and sampling from the posterior distribution"
+title: "💻 **Tutorial 03**: Extracting point estimates from the posterior distribution"
 subtitle: "VIMuRe v0.1.1 (latest)"
 categories: [basics, python]
-description: "how to extract point estimates and sample from the posterior distribution of the latent network model fitted by VIMuRe"
+description: "How to extract point estimates from the posterior distribution of the latent network model fitted by VIMuRe"
 ---
 
 ::: callout-note
@@ -83,7 +83,7 @@ rho.shape
 ```text
 (4, 417, 417, 2)
 ```
-The variable `rho` is represented as a tensor with dimensions L x N x N x K. Each entry in the tensor can be denoted as $\rho_{lijk}$, which corresponds to the probability of a directed tie with weight $k-1$ existing between nodes $i$ and $j$ on a specific layer $l$.
+The variable `rho` is represented as a tensor with dimensions L x N x N x K. Each entry in the tensor can be denoted as $\rho_{lijk}$, which corresponds to the geometric expectation of the probability of a directed tie with weight $k-1$ existing between nodes $i$ and $j$ on a specific layer $l$.
 
 ### A note about the parameter $K$
 
@@ -170,7 +170,7 @@ plt.show()
 ```
 </details>
 
-![](figures/tutorial03_fig01.png)
+![Figure 1. Distribution of $\rho_{lijk=2}$](figures/tutorial03_fig01.png)
 
 The plots above give us an idea of how sparse the network is, but without any meaningful node ordering, it's hard to see its structure. In the next section, we'll use $\rho_{lijk=2}$ as a measure of edge strength and treat it as a point estimate for our model. This will help us get a clearer picture of this multi-layered network.
 
@@ -180,7 +180,7 @@ We can treat the probability values represented by $\rho_{lijk=2}$ directly as a
 
 However, determining the appropriate threshold value $t_{\rho}$ is not as straightforward as it initially seems. While a suggestion of setting $t_{\rho}=0.5$ may arise based on the assumption of complementarity between $\rho_{lijk=2}$ and $\rho_{lijk=1}$, our research paper [@de_bacco_latent_2023, pages 10-11] reveals the need for adjusting the threshold based on the inferred mutuality, $\eta_{est}$ (represented by the latent variable $\nu$), to achieve a similar level of reciprocity — a network property of interest — as observed in the ground truth network. In other words, tailoring the threshold becomes necessary to ensure that the inferred network accurately captures the desired network property.
 
-In the paper, after simulating with synthetic networks with embedded reciprocity, we found that the threshold $t_{\rho}$ should be set to $t_{\rho} = 0.33 \times \eta_{est} + 0.10$. Let's use this same value here to obtain a point estimate of the network:
+In the paper, we found that the threshold $t_{\rho}$ should be set to $t_{\rho} = 0.33 \times \eta_{est} + 0.10$ was a good heuristic to capture reciprocity in simulated synthetic networks with reciprocity. Let's use this same value here to obtain a point estimate of our network:
 
 ```python
 threshold = 0.33 * model.get_posterior_estimates()['nu'] + 0.10
@@ -211,7 +211,52 @@ layout = (
 <Layout with 417 vertices and 2 dimensions>
 ```
 
+Finally, we can plot the network using the layout and the thresholded values of $\rho_{lijk=2}$:
+
+<details><summary>Show code</summary>
+
+```python
+# Create a figure with 2 x 2 subplots
+fig, axes = plt.subplots(2,2, figsize=(10, 7))
+axes = axes.ravel()
+
+# Loop over the layers
+num_layers = rho_point_estimate.shape[0]
+gs = [ig.Graph.Adjacency(rho_point_estimate[l,:,:].tolist(), mode='directed')
+      for l in range(num_layers)]
+
+visual_style = {
+    "edge_width": 0.6,
+    #"vertex_size": 0.8,
+    "opacity": 0.7,
+    "palette": "heat",
+    "layout": layout
+}
 
 
-## 📋 Step 4: Sampling from the posterior
+max_degree = max([max(g.degree()) for g in gs])
 
+for g, ax in zip(gs, axes):
+    degree = np.array(g.degree())
+    # Scale degree to the interval [0.4 - 1.2]
+    degree = degree / max(degree) * 0.8 + 0.4
+    ig.plot(g, target=ax, vertex_size=degree, **visual_style)
+
+for l in range(4):
+    # Add a title with the layer name
+    axes[l].set_title(f'Layer: {model.layerNames[l]}')
+
+plt.show()
+```
+
+
+</details>
+
+![Figure 2. A point estimate of the four layers of the network, obtained by thresholding $\rho_{lijk=2}$. Node sizes are scaled according to their degree in the network layer.](figures/tutorial03_fig02.png)
+
+
+## Next steps
+
+🚧 **TODO**: Which network properties can we infer from the networks obtained above?
+
+🚧 **TODO**: How does that compare to $t_{\rho}=0.5$?
