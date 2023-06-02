@@ -2,50 +2,58 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://latentnetworks.github.io/vimure/index.html</loc>
-    <lastmod>2023-05-09T18:56:52.438Z</lastmod>
+    <lastmod>2023-06-02T17:03:11.889Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/install.html</loc>
-    <lastmod>2023-05-09T18:56:55.134Z</lastmod>
+    <lastmod>2023-06-02T17:03:14.237Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/people.html</loc>
-    <lastmod>2023-05-09T18:56:55.758Z</lastmod>
+    <lastmod>2023-06-02T17:03:14.737Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/pkg-docs.html</loc>
-    <lastmod>2023-05-09T18:56:56.190Z</lastmod>
+    <lastmod>2023-06-02T17:03:15.069Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/pkg-docs/python.html</loc>
-    <lastmod>2023-05-09T18:56:57.242Z</lastmod>
+    <lastmod>2023-06-02T17:03:15.901Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/tutorials.html</loc>
-    <lastmod>2023-05-09T18:56:57.739Z</lastmod>
+    <lastmod>2023-06-02T17:03:16.257Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/tutorials/R-tutorials.html</loc>
-    <lastmod>2023-05-09T18:56:58.467Z</lastmod>
+    <lastmod>2023-06-02T17:03:16.877Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/tutorials/R/tutorial01-data-preparation.html</loc>
-    <lastmod>2023-05-09T18:57:00.247Z</lastmod>
+    <lastmod>2023-06-02T17:03:18.277Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/tutorials/R/tutorial02-introduction-to-vimure.html</loc>
-    <lastmod>2023-05-09T18:57:02.727Z</lastmod>
+    <lastmod>2023-06-02T17:03:20.245Z</lastmod>
+  </url>
+  <url>
+    <loc>https://latentnetworks.github.io/vimure/latest/tutorials/R/tutorial03-the-posterior.html</loc>
+    <lastmod>2023-06-02T17:03:21.137Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/tutorials/python-tutorials.html</loc>
-    <lastmod>2023-05-09T18:57:03.367Z</lastmod>
+    <lastmod>2023-06-02T17:03:21.741Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/tutorials/python/tutorial01-data-preparation.html</loc>
-    <lastmod>2023-05-09T18:57:05.227Z</lastmod>
+    <lastmod>2023-06-02T17:03:23.153Z</lastmod>
   </url>
   <url>
     <loc>https://latentnetworks.github.io/vimure/latest/tutorials/python/tutorial02-introduction-to-vimure.html</loc>
-    <lastmod>2023-05-09T18:57:07.791Z</lastmod>
+    <lastmod>2023-06-02T17:03:25.077Z</lastmod>
+  </url>
+  <url>
+    <loc>https://latentnetworks.github.io/vimure/latest/tutorials/python/tutorial03-the-posterior.html</loc>
+    <lastmod>2023-06-02T17:03:26.045Z</lastmod>
   </url>
 </urlset>

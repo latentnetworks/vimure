@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="How to extract point estimates from the posterior distribution of the latent network model fitted by VIMuRe">
+
+<title>VIMuRe - 💻 Tutorial 03: Extracting point estimates from the posterior distribution</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../">
+<link href="../../../figures/stable_diffusion_stickmen.png" rel="icon" type="image/png">
+<script src="../../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script async="" src="https://www.googletagmanager.com/gtag/js?id=G-N0GX9ECYYQ"></script>
+
+<script type="text/plain" cookie-consent="tracking">
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-N0GX9ECYYQ', { 'anonymize_ip': true});
+</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"simple",
+  "consent_type":"implied",
+  "palette":"light",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary","functionality","tracking","targeting"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  });
+});
+</script> 
+  
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<meta name="twitter:title" content="VIMuRe - 💻 Tutorial 03: Extracting point estimates from the posterior distribution">
+<meta name="twitter:description" content="How to extract point estimates from the posterior distribution of the latent network model fitted by VIMuRe">
+<meta name="twitter:image" content="https://latentnetworks.github.io/vimure/latest/tutorials/python/figures/tutorial03_fig01.png">
+<meta name="twitter:image-height" content="2562">
+<meta name="twitter:image-width" content="2545">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-sidebar docked">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      VIMuRe
+      </li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../../../">VIMuRe</a> 
+        <div class="sidebar-tools-main tools-wide">
+    <div class="dropdown">
+      <a href="" title="" id="quarto-navigation-tool-dropdown-0" class="quarto-navigation-tool dropdown-toggle px-1" data-bs-toggle="dropdown" aria-expanded="false" aria-label=""><i class="bi bi-github"></i></a>
+      <ul class="dropdown-menu" aria-labelledby="quarto-navigation-tool-dropdown-0">
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://github.com/latentnetworks/vimure">
+            Source Code
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://github.com/latentnetworks/vimure/discussions">
+            Ask Questions
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item sidebar-tools-main-item" href="https://github.com/latentnetworks/vimure/issues/new/choose">
+            Report a Bug
+            </a>
+          </li>
+      </ul>
+    </div>
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+    </div>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">🏠 Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../latest/install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">📦 Installation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../latest/tutorials.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">💻 Tutorials</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../../latest/pkg-docs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">📚 Documentation</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../latest/pkg-docs/python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">🐍 Python</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../../latest/people.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">📟 Contact</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">⚙️ Setup</a></li>
+  <li><a href="#step-1-ensure-you-have-suitable-data-and-a-fitted-vimure-model" id="toc-step-1-ensure-you-have-suitable-data-and-a-fitted-vimure-model" class="nav-link" data-scroll-target="#step-1-ensure-you-have-suitable-data-and-a-fitted-vimure-model">📥 Step 1: Ensure you have suitable data and a fitted <code>VIMuRe</code> model</a></li>
+  <li><a href="#step-2-interpreting-the-variable-rho" id="toc-step-2-interpreting-the-variable-rho" class="nav-link" data-scroll-target="#step-2-interpreting-the-variable-rho">📊 Step 2: Interpreting the variable <span class="math inline">\(\rho\)</span></a>
+  <ul class="collapse">
+  <li><a href="#a-note-about-the-parameter-k" id="toc-a-note-about-the-parameter-k" class="nav-link" data-scroll-target="#a-note-about-the-parameter-k">A note about the parameter <span class="math inline">\(K\)</span></a></li>
+  <li><a href="#visualising-rho" id="toc-visualising-rho" class="nav-link" data-scroll-target="#visualising-rho">Visualising <code>rho</code></a></li>
+  </ul></li>
+  <li><a href="#step-3-obtaining-a-simple-point-estimate" id="toc-step-3-obtaining-a-simple-point-estimate" class="nav-link" data-scroll-target="#step-3-obtaining-a-simple-point-estimate">🎲 Step 3: Obtaining a simple point estimate</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">💻 <strong>Tutorial 03</strong>: Extracting point estimates from the posterior distribution</h1>
+<p class="subtitle lead">VIMuRe v0.1.1 (latest)</p>
+  <div class="quarto-categories">
+    <div class="quarto-category">basics</div>
+    <div class="quarto-category">python</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    How to extract point estimates from the posterior distribution of the latent network model fitted by VIMuRe
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If you use <code>VIMuRe</code> in your research, please cite <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span>.</p>
+</div>
+</div>
+<p>TLDR: By the end of this tutorial, you will be able to:</p>
+<ul>
+<li>Extract point estimates of the latent network structure using the mean of the posterior distribution</li>
+<li>Visualize the resulting network using <span class="math inline">\(\rho\)</span>, a measure of edge strength</li>
+<li>Sample from the posterior distribution and obtain uncertainty estimates</li>
+<li>Compare different models using information criteria</li>
+</ul>
+<p>Found an interesting use case for <code>VIMuRe</code>? Let us know! Open a <a href="https://github.com/latentnetworks/vimure/discussions">discussion</a> on our GitHub repository.</p>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">⚙️ Setup</h2>
+<p>Import packages</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> vimure <span class="im">as</span> vm</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> igraph <span class="im">as</span> ig</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>⚠️ Ensure you have installed the latest version of <code>VIMuRe</code> before running this tutorial. Follow the 📦 <a href="../../../latest/install.html">Installation instructions</a> if you haven’t already.</p>
+</section>
+<section id="step-1-ensure-you-have-suitable-data-and-a-fitted-vimure-model" class="level2">
+<h2 class="anchored" data-anchor-id="step-1-ensure-you-have-suitable-data-and-a-fitted-vimure-model">📥 Step 1: Ensure you have suitable data and a fitted <code>VIMuRe</code> model</h2>
+<p>This tutorial assumes that you have completed 💻 <a href="../../../latest/tutorials/python/tutorial01-data-preparation.html">Tutorial 1</a> and 💻 <a href="../../../latest/tutorials/python/tutorial02-introduction-to-vimure.html">Tutorial 02</a> and that, therefore, you have an <code>edgelist</code> data frame and a fitted model object called <code>model</code> loaded in your Python environment.</p>
+<p>We have selected a particular village to focus on. The dataset contains information on four different types of relationships: money, advice, visit and kerorice. We stored all the data in a single data frame, edgelist, which looks like this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">edgelist.sample</span>(<span class="at">n=</span><span class="dv">10</span>, <span class="at">random_state=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<table class="table">
+<thead>
+<tr class="header">
+<th style="text-align: right;">ego</th>
+<th style="text-align: right;">alter</th>
+<th style="text-align: right;">reporter</th>
+<th style="text-align: left;">tie_type</th>
+<th style="text-align: left;">layer</th>
+<th style="text-align: right;">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">107303</td>
+<td style="text-align: right;">107307</td>
+<td style="text-align: right;">107307</td>
+<td style="text-align: left;">helpdecision</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">116402</td>
+<td style="text-align: right;">115702</td>
+<td style="text-align: right;">116402</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">103202</td>
+<td style="text-align: right;">117301</td>
+<td style="text-align: right;">103202</td>
+<td style="text-align: left;">giveadvice</td>
+<td style="text-align: left;">advice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">116201</td>
+<td style="text-align: right;">110401</td>
+<td style="text-align: right;">116201</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">114606</td>
+<td style="text-align: right;">109701</td>
+<td style="text-align: right;">109701</td>
+<td style="text-align: left;">keroricego</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">101302</td>
+<td style="text-align: right;">116201</td>
+<td style="text-align: right;">101302</td>
+<td style="text-align: left;">visitcome</td>
+<td style="text-align: left;">visit</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">111204</td>
+<td style="text-align: right;">110701</td>
+<td style="text-align: right;">111204</td>
+<td style="text-align: left;">lendmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">108304</td>
+<td style="text-align: right;">111502</td>
+<td style="text-align: right;">108304</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">117301</td>
+<td style="text-align: right;">113901</td>
+<td style="text-align: right;">113901</td>
+<td style="text-align: left;">borrowmoney</td>
+<td style="text-align: left;">money</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">106201</td>
+<td style="text-align: right;">116105</td>
+<td style="text-align: right;">106201</td>
+<td style="text-align: left;">keroricecome</td>
+<td style="text-align: left;">kerorice</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<p>We then ran VIMuRe on this data frame to fit a latent network model:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> vimure <span class="im">as</span> vm</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the model</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> vm.model.VimureModel()</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>model.fit(edgelist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you have both objects in your environment, you are ready to go!</p>
+</section>
+<section id="step-2-interpreting-the-variable-rho" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-interpreting-the-variable-rho">📊 Step 2: Interpreting the variable <span class="math inline">\(\rho\)</span></h2>
+<p>In this step, our main focus is to analyze the posterior distribution of the latent variable known as <code>rho</code>, which is included in the list of posterior estimates of the model.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rho <span class="op">=</span> model.get_posterior_estimates()[<span class="st">'rho'</span>]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>rho.shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>(4, 417, 417, 2)</code></pre>
+<p>The variable <code>rho</code> is represented as a tensor with dimensions L x N x N x K. Each entry in the tensor can be denoted as <span class="math inline">\(\rho_{lijk}\)</span>, which corresponds to the geometric expectation of the probability of a directed tie with weight <span class="math inline">\(k-1\)</span> existing between nodes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> on a specific layer <span class="math inline">\(l\)</span>.</p>
+<section id="a-note-about-the-parameter-k" class="level3">
+<h3 class="anchored" data-anchor-id="a-note-about-the-parameter-k">A note about the parameter <span class="math inline">\(K\)</span></h3>
+<p>The final dimension of the tensor, denoted by <span class="math inline">\(K\)</span>, represents the strength of a tie. By default, the model assumes that the interest is in the presence or absence of ties rather than their weight, resulting in a default value of <span class="math inline">\(K=2\)</span>. Consequently, for each potential edge, there are two values of <span class="math inline">\(\rho\)</span>: <span class="math inline">\(\rho_{lijk=1}\)</span> and <span class="math inline">\(\rho_{lijk=2}\)</span>, corresponding to edges with weights 0 and 1 (<span class="math inline">\(k-1\)</span>) respectively.</p>
+<p>To make this clearer, let’s consider a specific example. Suppose we want to determine the probability of a directed tie with weight 1 existing between nodes 10 and 15 on layer 1 (‘advice’) of our network. We can examine the following entry in the tensor:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># rho for layer 1, ego 10, alter 15</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>rho[<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">15</span>, :] </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The result would be:</p>
+<pre class="text"><code>array([1.00000000e+00, 4.21007361e-13])</code></pre>
+<p>This suggests that the model assigns a high probability (approximately 100%) to the absence of a directed tie between nodes 10 and 15 on layer 1 (<span class="math inline">\(\rho_{lijk=1} \approx 1\)</span>). Conversely, it assigns a low probability (approximately 0%) to the presence of a directed tie between nodes 10 and 15 on layer 1 (<span class="math inline">\(\rho_{lijk=2} \approx 0\)</span>). Based on this, we can conclude that node 10 does not provide advice to node 15.</p>
+<p>If you are modelling weighted networks, you can specify a different value for <span class="math inline">\(K\)</span>, as shown below. Just note that K must be an integer.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the model with a different value for K</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> vm.model.VimureModel()</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>model.fit(edgelist, K<span class="op">=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="visualising-rho" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-rho">Visualising <code>rho</code></h3>
+<p>Since the probability of <span class="math inline">\(K=1\)</span> and <span class="math inline">\(K=2\)</span> are complementary, we can plot the probability of a directed tie existing between nodes <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> on layer <span class="math inline">\(l\)</span> as a function of <span class="math inline">\(\rho_{lijk=2}\)</span>. But before we proceed to the plot, let’s take a look at the summary statistics of the values of <span class="math inline">\(\rho\)</span> per layer:</p>
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#The code below converts from adjacency matrix to edge list </span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># then summarises the values of rho per layer</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>pd.concat(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    [pd.DataFrame(rho[l,:,:,<span class="dv">1</span>])</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      .reset_index()<span class="op">\</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      .melt(id_vars<span class="op">=</span>[<span class="st">'index'</span>])<span class="op">\</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      .assign(l<span class="op">=</span>l)<span class="op">\</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>      .rename(columns<span class="op">=</span>{<span class="st">'index'</span>:<span class="st">'i'</span>, <span class="st">'variable'</span>: <span class="st">'j'</span>}) </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(rho.shape[<span class="dv">0</span>])]</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>).groupby([<span class="st">'l'</span>])[<span class="st">'value'</span>].describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<table class="table">
+<colgroup>
+<col style="width: 5%">
+<col style="width: 9%">
+<col style="width: 12%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">l</th>
+<th style="text-align: right;">count</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">std</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">25%</th>
+<th style="text-align: right;">50%</th>
+<th style="text-align: right;">75%</th>
+<th style="text-align: right;">max</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">173889</td>
+<td style="text-align: right;">0.00211962</td>
+<td style="text-align: right;">0.0427501</td>
+<td style="text-align: right;">1.42201e-13</td>
+<td style="text-align: right;">3.61097e-13</td>
+<td style="text-align: right;">4.64657e-13</td>
+<td style="text-align: right;">6.28092e-13</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">173889</td>
+<td style="text-align: right;">0.00232455</td>
+<td style="text-align: right;">0.039379</td>
+<td style="text-align: right;">1.5432e-13</td>
+<td style="text-align: right;">5.06778e-13</td>
+<td style="text-align: right;">7.39753e-13</td>
+<td style="text-align: right;">8.88974e-13</td>
+<td style="text-align: right;">0.999831</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">173889</td>
+<td style="text-align: right;">0.00218808</td>
+<td style="text-align: right;">0.0409045</td>
+<td style="text-align: right;">1.45914e-13</td>
+<td style="text-align: right;">4.10353e-13</td>
+<td style="text-align: right;">6.37707e-13</td>
+<td style="text-align: right;">8.39875e-13</td>
+<td style="text-align: right;">0.999873</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">173889</td>
+<td style="text-align: right;">0.00253843</td>
+<td style="text-align: right;">0.0433122</td>
+<td style="text-align: right;">1.43865e-13</td>
+<td style="text-align: right;">4.45755e-13</td>
+<td style="text-align: right;">6.87587e-13</td>
+<td style="text-align: right;">8.60819e-13</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<p>The expected values of <span class="math inline">\(\rho\)</span> are very small, with a mean of approximately 0.002. The inferred network is sparse, as can be expected from a social network of this type. Observe how the minimum value is close but never truly zero, which is a consequence of the Bayesian approach. The standard deviation is also very small, with a mean of approximately 0.04. This suggests that the posterior distribution of <span class="math inline">\(\rho\)</span> is very concentrated around its mean.</p>
+<p>Let’s look at how the values of <span class="math inline">\(\rho\)</span> are distributed across layers. We can do this by plotting the distribution of <span class="math inline">\(\rho_{lijk=2}\)</span> for each layer:</p>
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> igraph <span class="im">as</span> ig</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a figure with 2 x 2 subplots</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">10</span>))</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop over the layers</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the subplot index</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    i <span class="op">=</span> k <span class="op">//</span> <span class="dv">2</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    j <span class="op">=</span> k <span class="op">%</span> <span class="dv">2</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Get the rho matrix for the layer</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    rho_k <span class="op">=</span> rho[k,:,:,<span class="dv">1</span>]</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    axes[i,j].imshow(rho_k, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>, cmap<span class="op">=</span><span class="st">'Blues'</span>, aspect<span class="op">=</span><span class="st">'equal'</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    axes[i,j].set_xlabel(<span class="st">'Alter'</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    axes[i,j].set_ylabel(<span class="st">'Ego'</span>)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add a title with the layer name</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    axes[i,j].set_title(<span class="ss">f'Layer: </span><span class="sc">{</span>model<span class="sc">.</span>layerNames[k]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/tutorial03_fig01.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure 1. Distribution of <span class="math inline">\(\rho_{lijk=2}\)</span></figcaption>
+</figure>
+</div>
+<p>The plots above give us an idea of how sparse the network is, but without any meaningful node ordering, it’s hard to see its structure. In the next section, we’ll use <span class="math inline">\(\rho_{lijk=2}\)</span> as a measure of edge strength and treat it as a point estimate for our model. This will help us get a clearer picture of this multi-layered network.</p>
+</section>
+</section>
+<section id="step-3-obtaining-a-simple-point-estimate" class="level2">
+<h2 class="anchored" data-anchor-id="step-3-obtaining-a-simple-point-estimate">🎲 Step 3: Obtaining a simple point estimate</h2>
+<p>We can treat the probability values represented by <span class="math inline">\(\rho_{lijk=2}\)</span> directly as a point estimate, but since most of the entries are very small and none of them is zero, this would lead to a dense network. Instead, it could be more appropriate to apply a thresholding approach and set the lower values to zero.</p>
+<p>However, determining the appropriate threshold value <span class="math inline">\(t_{\rho}\)</span> is not as straightforward as it initially seems. While a suggestion of setting <span class="math inline">\(t_{\rho}=0.5\)</span> may arise based on the assumption of complementarity between <span class="math inline">\(\rho_{lijk=2}\)</span> and <span class="math inline">\(\rho_{lijk=1}\)</span>, our research paper <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023, 10–11</a>)</span> reveals the need for adjusting the threshold based on the inferred mutuality, <span class="math inline">\(\eta_{est}\)</span> (represented by the latent variable <span class="math inline">\(\nu\)</span>), to achieve a similar level of reciprocity — a network property of interest — as observed in the ground truth network. In other words, tailoring the threshold becomes necessary to ensure that the inferred network accurately captures the desired network property.</p>
+<p>In the paper, we found that the threshold <span class="math inline">\(t_{\rho}\)</span> should be set to <span class="math inline">\(t_{\rho} = 0.33 \times \eta_{est} + 0.10\)</span> was a good heuristic to capture reciprocity in simulated synthetic networks with reciprocity. Let’s use this same value here to obtain a point estimate of our network:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>threshold <span class="op">=</span> <span class="fl">0.33</span> <span class="op">*</span> model.get_posterior_estimates()[<span class="st">'nu'</span>] <span class="op">+</span> <span class="fl">0.10</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>threshold</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>0.3075564363103252</code></pre>
+<p>We can then apply the threshold to the values of <span class="math inline">\(\rho_{lijk=2}\)</span> to obtain a point estimate of the network:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply the threshold</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>rho_point_estimate <span class="op">=</span> rho[:,:,:,<span class="dv">1</span>] <span class="op">&gt;</span> threshold</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To get the network to look consistent across layers, let’s create a layout from the union of all nodes and edges across layers:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>layout <span class="op">=</span> (</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    ig.Graph.Adjacency(rho_point_estimate.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>).tolist(), mode<span class="op">=</span><span class="st">'directed'</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    .layout_fruchterman_reingold()</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre class="text"><code>&lt;Layout with 417 vertices and 2 dimensions&gt;</code></pre>
+<p>Finally, we can plot the network using the layout and the thresholded values of <span class="math inline">\(\rho_{lijk=2}\)</span>:</p>
+<details>
+<summary>
+Show code
+</summary>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a figure with 2 x 2 subplots</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>,<span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">7</span>))</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>axes <span class="op">=</span> axes.ravel()</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop over the layers</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>num_layers <span class="op">=</span> rho_point_estimate.shape[<span class="dv">0</span>]</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>gs <span class="op">=</span> [ig.Graph.Adjacency(rho_point_estimate[l,:,:].tolist(), mode<span class="op">=</span><span class="st">'directed'</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(num_layers)]</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>visual_style <span class="op">=</span> {</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"edge_width"</span>: <span class="fl">0.6</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">#"vertex_size": 0.8,</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"opacity"</span>: <span class="fl">0.7</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"palette"</span>: <span class="st">"heat"</span>,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"layout"</span>: layout</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>max_degree <span class="op">=</span> <span class="bu">max</span>([<span class="bu">max</span>(g.degree()) <span class="cf">for</span> g <span class="kw">in</span> gs])</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> g, ax <span class="kw">in</span> <span class="bu">zip</span>(gs, axes):</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">=</span> np.array(g.degree())</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Scale degree to the interval [0.4 - 1.2]</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    degree <span class="op">=</span> degree <span class="op">/</span> <span class="bu">max</span>(degree) <span class="op">*</span> <span class="fl">0.8</span> <span class="op">+</span> <span class="fl">0.4</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    ig.plot(g, target<span class="op">=</span>ax, vertex_size<span class="op">=</span>degree, <span class="op">**</span>visual_style)</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add a title with the layer name</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    axes[l].set_title(<span class="ss">f'Layer: </span><span class="sc">{</span>model<span class="sc">.</span>layerNames[l]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/tutorial03_fig02.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure 2. A point estimate of the four layers of the network, obtained by thresholding <span class="math inline">\(\rho_{lijk=2}\)</span>. Node sizes are scaled according to their degree in the network layer.</figcaption>
+</figure>
+</div>
+</section>
+<section id="next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="next-steps">Next steps</h2>
+<p>🚧 <strong>TODO</strong>: Which network properties can we infer from the networks obtained above?</p>
+<p>🚧 <strong>TODO</strong>: How does that compare to <span class="math inline">\(t_{\rho}=0.5\)</span>?</p>
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-de_bacco_latent_2023" class="csl-entry" role="listitem">
+De Bacco, Caterina, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Gabriela Lima Borges, Diego Baptista, Tracy Sweet, et al. 2023. <span>“Latent Network Models to Account for Noisy, Multiply Reported Social Network Data.”</span> <em>Journal of the Royal Statistical Society Series A: Statistics in Society</em>, February, qnac004. <a href="https://doi.org/10.1093/jrsssa/qnac004">https://doi.org/10.1093/jrsssa/qnac004</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var filterRegex = new RegExp("^(?:http:|https:)\/\/(?:latentnetworks\.github\.io\/|localhost)");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+          // target, if specified
+          link.setAttribute("target", "_blank");
+          // default icon
+          link.classList.add("external");
+      }
+    }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center"><div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>
