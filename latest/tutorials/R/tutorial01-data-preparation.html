@@ -949,7 +949,15 @@ Click here to expand the code for the <code>get_karnataka_survey_data()</code> f
 <span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">edgelist=</span>edgelist, <span class="at">reporters=</span>reporters))</span>
 <span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a>get_indivinfo <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">metadata_file =</span> DEFAULT_METADATA_FILEPATH){</span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a>    indivinfo <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_dta</span>(metadata_file)</span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>    <span class="do">## one individual (6109803) is repeated twice. Remove the duplicate</span></span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a>    indivinfo <span class="ot">&lt;-</span> indivinfo[<span class="sc">!</span><span class="fu">duplicated</span>(indivinfo<span class="sc">$</span>pid) <span class="sc">==</span> <span class="cn">TRUE</span>, ]</span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(indivinfo)</span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </section>
 <section id="getting-an-edgelist-per-layer" class="level2">
