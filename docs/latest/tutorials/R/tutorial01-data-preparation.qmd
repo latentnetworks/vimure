@@ -369,6 +369,14 @@ get_karnataka_survey_data <- function(
 
 }
 
+get_indivinfo <- function(metadata_file = DEFAULT_METADATA_FILEPATH){
+    indivinfo <- haven::read_dta(metadata_file)
+    ## one individual (6109803) is repeated twice. Remove the duplicate
+    indivinfo <- indivinfo[!duplicated(indivinfo$pid) == TRUE, ]
+    return(indivinfo)
+}
+
+
 ```
 
 </details>
