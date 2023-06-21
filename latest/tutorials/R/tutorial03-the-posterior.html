@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="How to extract point estimates from the posterior distribution of the latent network model fitted by VIMuRe">
+<meta name="description" content="How to extract point estimates from the posterior distribution of the latent network model fitted using VIMuRe">
 
 <title>VIMuRe - 💻 Tutorial 03: Extracting point estimates from the posterior distribution</title>
 <style>
@@ -148,7 +148,7 @@ cookieconsent.run({
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <meta name="twitter:title" content="VIMuRe - 💻 Tutorial 03: Extracting point estimates from the posterior distribution">
-<meta name="twitter:description" content="How to extract point estimates from the posterior distribution of the latent network model fitted by VIMuRe">
+<meta name="twitter:description" content="How to extract point estimates from the posterior distribution of the latent network model fitted using VIMuRe">
 <meta name="twitter:image" content="https://latentnetworks.github.io/vimure/latest/tutorials/R/figures/tutorial03_fig01.png">
 <meta name="twitter:image-height" content="3042">
 <meta name="twitter:image-width" content="3042">
@@ -289,7 +289,7 @@ cookieconsent.run({
 
 <div>
   <div class="description">
-    How to extract point estimates from the posterior distribution of the latent network model fitted by VIMuRe
+    How to extract point estimates from the posterior distribution of the latent network model fitted using VIMuRe
   </div>
 </div>
 
@@ -319,7 +319,7 @@ Note
 </div>
 <p>TLDR: By the end of this tutorial, you will be able to:</p>
 <ul>
-<li>Extract point estimates of the latent network structure using the mean of the posterior distribution</li>
+<li>Extract point estimates of latent network structure using the mean of the posterior distribution</li>
 <li>Visualize the resulting network using <span class="math inline">\(\rho\)</span>, a measure of edge strength</li>
 <li>Sample from the posterior distribution and obtain uncertainty estimates</li>
 <li>Compare different models using information criteria</li>
@@ -498,7 +498,7 @@ Show code
 <span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">Layer =</span> <span class="fu">factor</span>(Layer, <span class="at">labels =</span> model<span class="sc">$</span>layerNames))</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the distribution of rho for k=2</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(rho_df, <span class="fu">aes</span>(<span class="at">x =</span> Ego, <span class="at">y =</span> Alter, <span class="at">fill =</span> Value)) <span class="sc">+</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(rho_df, <span class="fu">aes</span>(<span class="at">x =</span> Ego, <span class="at">y =</span> Alter, <span class="at">fill =</span> Value)) <span class="sc">+</span></span>
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
 <span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span> Layer, <span class="at">labeller =</span> label_both) <span class="sc">+</span></span>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"#f7fbff"</span>, <span class="at">high =</span> <span class="st">"blue"</span>, <span class="at">name =</span> <span class="fu">expression</span>(rho), <span class="at">limits=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)) <span class="sc">+</span></span>
@@ -510,7 +510,7 @@ Show code
 <span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>          <span class="at">strip.text=</span><span class="fu">element_text</span>(<span class="at">size=</span><span class="fu">rel</span>(<span class="fl">1.5</span>)),</span>
 <span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>          <span class="at">plot.background =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="st">"transparent"</span>, <span class="at">colour =</span> <span class="cn">NA</span>),</span>
 <span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>          <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>()) <span class="ot">-&gt;</span> g</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>          <span class="at">panel.grid.major =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -523,7 +523,7 @@ Show code
 </section>
 <section id="step-3-obtaining-a-simple-point-estimate" class="level2">
 <h2 class="anchored" data-anchor-id="step-3-obtaining-a-simple-point-estimate">🎲 Step 3: Obtaining a simple point estimate</h2>
-<p>We can treat the probability values represented by <span class="math inline">\(\rho_{lijk=2}\)</span> directly as a point estimate, but since most of the entries are very small and none of them is zero, this would lead to a dense network. Instead, it could be more appropriate to apply a thresholding approach and set the lower values to zero.</p>
+<p>We can treat the probability values represented by <span class="math inline">\(\rho_{lijk=2}\)</span> directly as a point estimate, but since most of the entries are very small and none of them are zero, this would lead to a dense network. Instead, it might be more appropriate to apply a thresholding approach and set lower values to zero.</p>
 <p>However, determining the appropriate threshold value <span class="math inline">\(t_{\rho}\)</span> is not as straightforward as it initially seems. While a suggestion of setting <span class="math inline">\(t_{\rho}=0.5\)</span> may arise based on the assumption of complementarity between <span class="math inline">\(\rho_{lijk=2}\)</span> and <span class="math inline">\(\rho_{lijk=1}\)</span>, our research paper <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023, 10–11</a>)</span> reveals the need for adjusting the threshold based on the inferred mutuality, <span class="math inline">\(\eta_{est}\)</span> (represented by the latent variable <span class="math inline">\(\nu\)</span>), to achieve a similar level of reciprocity — a network property of interest — as observed in the ground truth network. In other words, tailoring the threshold becomes necessary to ensure that the inferred network accurately captures the desired network property.</p>
 <p>In the paper, we found that the threshold <span class="math inline">\(t_{\rho}\)</span> should be set to <span class="math inline">\(t_{\rho} = 0.33 \times \eta_{est} + 0.10\)</span> was a good heuristic to capture reciprocity in simulated synthetic networks with reciprocity. Let’s use this same value here to obtain a point estimate of our network:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>threshold <span class="ot">&lt;-</span> <span class="fl">0.33</span> <span class="sc">*</span> model<span class="sc">$</span><span class="fu">get_posterior_estimates</span>()<span class="sc">$</span>nu <span class="sc">+</span> <span class="fl">0.10</span></span>
