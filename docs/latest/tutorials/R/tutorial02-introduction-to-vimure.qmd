@@ -399,6 +399,9 @@ ggsave(plot=g, filename="tutorial02_fig01.png", width=6, height=8, dpi=300)
 
 ```
 
+</details>
+
+
 ![](/latest/tutorials/R/figures/tutorial02_fig01.png){width=60%}
 
 
