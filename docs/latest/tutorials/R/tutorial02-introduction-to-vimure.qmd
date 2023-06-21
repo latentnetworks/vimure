@@ -694,7 +694,7 @@ ggsave(plot=g, filename="theta_reporters.png", width=7, height=9, dpi=300)
 
 </details>
 
-![](figures/theta_reporters.png)
+![](figures/theta_reporters.png){width="60%"}
 
 **How should we interpret the values?**
 

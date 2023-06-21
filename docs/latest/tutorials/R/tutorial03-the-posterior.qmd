@@ -170,7 +170,7 @@ g <- ggplot(rho_df, aes(x = Ego, y = Alter, fill = Value)) +
 ```
 </details>
 
-![Figure 1. Distribution of $\rho_{lijk=2}$](figures/tutorial03_fig01.png)
+![Figure 1. Distribution of $\rho_{lijk=2}$](figures/tutorial03_fig01.png){width=80%}
 
 The plots above give us an idea of how sparse the network is, but without any meaningful node ordering, it's hard to see its structure. In the next section, we'll use $\rho_{lijk=2}$ as a measure of edge strength and treat it as a point estimate for our model. This will help us get a clearer picture of this multi-layered network.
 
@@ -250,7 +250,6 @@ for (l in 1:num_layers) {
 </details>
 
 ![Figure 2. A point estimate of the four layers of the network, obtained by thresholding $\rho_{lijk=2}$. Node sizes are scaled according to their degree in the network layer.](figures/tutorial03_fig02.png)
-
 
 ## Next steps
 
