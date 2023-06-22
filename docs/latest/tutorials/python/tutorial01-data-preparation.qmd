@@ -167,19 +167,19 @@ The survey that produced this data collected information on a number of differen
 - visitcome
 - visitgo
 
-Each of these relationships is stored in a separate file. For example, the file `lendmoney1.csv` contains information on who reported lending money to whom in village 1.
+Each of these relationships is stored in a separate file. For example, the file `lendmoney1.csv` contains information on who reported lending money to whom in village 1. We can read each of these files using the `pd.read_csv()` function. 
 
-We can read each of these files using the `pd.read_csv()` function. For example:
+First, we look over the data and specify an `ALL_NA_CODES` variable. This is a vector of all the codes that, after inspection, we identified were used to represent missing values in the data:
+
+```python
+ALL_NA_CODES = ["9999999", "5555555", "7777777", "0"]
+```
+
+We can then read in the data:
 
 ```python
 filepath_lendmoney = os.path.join(RAW_CSV_FOLDER, f"lendmoney{selected_village}.csv")
 lendmoney = pd.read_csv(filepath_lendmoney, header=None, na_values=ALL_NA_CODES, dtype=str)
-```
-
-The `ALL_NA_CODES` variable is a vector of all the codes that, after inspection, we identified were used to represent missing values in the data:
-
-```python
-ALL_NA_CODES = ["9999999", "5555555", "7777777", "0"]
 ```
 
 **What the data look like**
@@ -199,7 +199,7 @@ The data is stored here as a node list, but it will need to be further pre-proce
 
 :::
 
-Each row represents reports made by a single individual; the first number is the `pid` (the "person identifier") of the individual who reported the relationship, whereas the remaining however many numbers listed in the same row are the `pid`s of the individuals who were reported to be involved in the relationship.
+Each row represents reports made by a single individual. The numbers in the first column are the `pid` (the "person identifier") of the individual who reported the relationship. The remaining however many numbers listed in the same row are the pids of the individuals who were reported to be involved in the relationship.
 
 ## 3.4. Pre-process the data to build the edge list
 

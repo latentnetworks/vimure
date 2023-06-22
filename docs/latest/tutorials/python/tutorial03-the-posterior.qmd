@@ -2,7 +2,7 @@
 title: "💻 **Tutorial 03**: Extracting point estimates from the posterior distribution"
 subtitle: "VIMuRe v0.1.1 (latest)"
 categories: [basics, python]
-description: "How to extract point estimates from the posterior distribution of the latent network model fitted by VIMuRe"
+description: "How to extract point estimates from the posterior distribution of the latent network model fitted using VIMuRe"
 ---
 
 ::: callout-note
@@ -176,7 +176,7 @@ The plots above give us an idea of how sparse the network is, but without any me
 
 ## 🎲 Step 3: Obtaining a simple point estimate
 
-We can treat the probability values represented by $\rho_{lijk=2}$ directly as a point estimate, but since most of the entries are very small and none of them is zero, this would lead to a dense network. Instead, it could be more appropriate to apply a thresholding approach and set the lower values to zero.
+We can treat the probability values represented by $\rho_{lijk=2}$ directly as a point estimate, but since most of the entries are very small and none of them are zero, this would lead to a dense network. Instead, it might be more appropriate to apply a thresholding approach and set the lower values to zero.
 
 However, determining the appropriate threshold value $t_{\rho}$ is not as straightforward as it initially seems. While a suggestion of setting $t_{\rho}=0.5$ may arise based on the assumption of complementarity between $\rho_{lijk=2}$ and $\rho_{lijk=1}$, our research paper [@de_bacco_latent_2023, pages 10-11] reveals the need for adjusting the threshold based on the inferred mutuality, $\eta_{est}$ (represented by the latent variable $\nu$), to achieve a similar level of reciprocity — a network property of interest — as observed in the ground truth network. In other words, tailoring the threshold becomes necessary to ensure that the inferred network accurately captures the desired network property.
 

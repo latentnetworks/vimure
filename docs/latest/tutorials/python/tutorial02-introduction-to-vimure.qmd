@@ -2,7 +2,7 @@
 title: "💻 **Tutorial 02**: Introduction to VIMuRe in Python"
 subtitle: "VIMuRe v0.1.1 (latest)"
 categories: [basics, python]
-description: "If you have an edge list, or a set of igraph objects, VIMuRe can help you model the latent network structure."
+description: "If you have network data that is formatted as an edge list, or a set of igraph objects, you can apply VIMuRe model the latent structure of your network."
 ---
 
 ::: callout-note
@@ -32,9 +32,9 @@ import vimure as vm
 
 # 📥 Step 1: Load the data
 
-Here, we'll use the `VIMuRe` package to model social networks from a village in Karnataka, India, gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1]. See 💻  [Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) for more details on how to prepare data for `VIMuRe`.
+Here, we'll use the `VIMuRe` package to model social networks data from a village in Karnataka, India, which were gathered as part of a project studying the adoption of microfinance [@banerjee_diffusion_2013]. The data files we use here are derived from those openly-available on the Harvard Dataverse page [@banerjee_diffusion_2013-1] and raw data files available on [Matthew O. Jackson's website](https://web.stanford.edu/~jacksonm/). See 💻  [Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) for more details on how to prepare data for `VIMuRe`.
 
-We have selected a particular village to focus on. The dataset contains information on multiple different types of relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship. If everyone in the network is being surveyed, then this should mean that we are eliciting information on a relationship twice (hence, "double sampling"): we're asking `ego` if they go to `alter` for help, and also asking `ego` if `alter` comes to them for help.
+We have selected a particular village to focus on. The dataset contains information on multiple different types of social relationships. We are interested in relationships that were "double-sampled" in the original survey, meaning those elicited through two different prompts. For example, respondents were asked both _"If you needed to borrow kerosene or rice, to whom would you go?"_ as well as _"Who would come to you if he/she needed to borrow kerosene or rice?"_ These two different prompts should give us different perspectives on what could be the same relationship. If everyone in the network is being surveyed, then this should mean that we are eliciting information on a relationship twice (hence, "double sampling"): we're asking `ego` if they go to `alter` for help, and also asking `ego` if `alter` comes to them for help.
 
 Four different tie types (or "layers") were double-sampled in this way (i.e., elicited with two prompts). Here, we will use all four layers to model the latent network structure. The four layers are:
 
@@ -204,7 +204,7 @@ Number of reporters:  203
 
 ## 2.3: Average number of ties per reporter
 
-There are a couple of things to note about this dataset: reporters could name a maximum of four alters for each question, and reporters can only report on ties that they are a part of (e.g., if a reporter is not part of a tie, they cannot report on it). Because we are modelling double-sampled questions, each reporter can report a maximum of 8 ties.
+There are a couple of things to note about this dataset: reporters could name a maximum of four alters for each question, and reporters can only report on ties that they are involved in (e.g., if a reporter is involved, they cannot report on it). Because we are modelling double-sampled questions, each reporter can report a maximum of 8 ties.
 
 Let's create a plot to visualise the distribution of the number of ties per reporter:
 
@@ -355,7 +355,7 @@ ggsave(g, "tutorial02_fig01.png", width=6, height=8, dpi=300)
 </details>
 
 
-![](/latest/tutorials/python/tutorial02_fig01.png){width=75%}
+![](/latest/tutorials/python/tutorial02_fig01.png){width=60%}
 
 ::: {.callout-caution collapse="false"}
 
@@ -369,7 +369,7 @@ VIMuRe will consider all nodes in the network, even if they are not present in t
 
 ## 2.4: Union vs. Intersection and the concept of Concordance
 
-Concordance is the proportion of the ties in the network that both reporters report. It measures the extent to which the two reporters agree about the tie (see [@ready_measuring_2021] for a discussion of concordance in the Karnataka network data). It is calculated as follows:
+Concordance is the proportion of ties in a network that both reporters report. It measures the extent to which the two reporters agree about the tie (see [@ready_measuring_2021] for a discussion of concordance in the Karnataka network data). It is calculated as follows:
 
 
 $$
@@ -503,7 +503,7 @@ If you want to extract a quick point estimate of the inferred network, you can s
 rho = posterior_estimates['rho'][0,:,:,1]
 ```
 
-The code above will return a $N \times N$ weighted adjacency matrix which can be thought of as the probability of a tie between individuals $i$ and $j$ on layer $l = 0$ (Tutorial 03 will go into more detail about how to interpret the $\rho$ parameter.)
+The code above will return a $N \times N$ weighted adjacency matrix, which can be thought of as the probability of a tie between individuals $i$ and $j$ on layer $l = 0$ (Tutorial 03 will go into more detail about how to interpret the $\rho$ parameter.)
 
 Now let's look at parameters $\nu$ and $\theta_{lm}$:
 
@@ -535,7 +535,7 @@ posterior_estimates['theta'].shape
 (4, 417)
 ```
 
-We only have one layer, so the first dimension is 1. The second dimension is the number of reporters in the network. In our case, this shows that VIMuRe infers that there are 417 reporters in the network.
+We have four layers, so the first dimension is 4. The second dimension is the number of reporters in the network. In our case, this shows that VIMuRe infers that there are 417 reporters in the network.
 
 This parameter, combined with $\lambda_{lk}$ represents the "reliability" of a reporter $m$ on layer $l$: 
 
@@ -549,7 +549,7 @@ posterior_estimates['lambda'].shape
 
 The first dimension is the number of layers $l$, and the second dimension is the strength of the tie, which in this case can assume the values $k \in \{0, 1\}$. We only have two possible values for $k$ because that is the default setting for the `VimureModel` class. If you want to model more than two possible values for $k$, you can set the `K` parameter when running the fit function: `model.fit(..., K=3)`. 
 
-Combined, these two parameters indicate the probability that a reporter will _tend_ to report ties, in general, for a given layer (recall the expected value of the VIMuRe model shown in Section [3.1: Posterior Estimates](#posterior-estimates)). Loosely speaking, we can think of this value as the "reliability" of a reporter on a given layer.
+These two parameters combined indicate the probability that a reporter will _tend_ to report ties, in general, for a given layer (recall the expected value of the VIMuRe model shown in Section [3.1: Posterior Estimates](#posterior-estimates)). Loosely speaking, we can think of this value as the "reliability" of a reporter on a given layer.
 
 ::: { .callout-note collapse="true"}
 
