@@ -618,12 +618,12 @@ Note
 <li>visitcome</li>
 <li>visitgo</li>
 </ul>
-<p>Each of these relationships is stored in a separate file. For example, the file <code>lendmoney1.csv</code> contains information on who reported lending money to whom in village 1.</p>
-<p>We can read each of these files using the <code>pd.read_csv()</code> function. For example:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>filepath_lendmoney <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"lendmoney</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>lendmoney <span class="op">=</span> pd.read_csv(filepath_lendmoney, header<span class="op">=</span><span class="va">None</span>, na_values<span class="op">=</span>ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>The <code>ALL_NA_CODES</code> variable is a vector of all the codes that, after inspection, we identified were used to represent missing values in the data:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ALL_NA_CODES <span class="op">=</span> [<span class="st">"9999999"</span>, <span class="st">"5555555"</span>, <span class="st">"7777777"</span>, <span class="st">"0"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Each of these relationships is stored in a separate file. For example, the file <code>lendmoney1.csv</code> contains information on who reported lending money to whom in village 1. We can read each of these files using the <code>pd.read_csv()</code> function.</p>
+<p>First, we look over the data and specify an <code>ALL_NA_CODES</code> variable. This is a vector of all the codes that, after inspection, we identified were used to represent missing values in the data:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ALL_NA_CODES <span class="op">=</span> [<span class="st">"9999999"</span>, <span class="st">"5555555"</span>, <span class="st">"7777777"</span>, <span class="st">"0"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We can then read in the data:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>filepath_lendmoney <span class="op">=</span> os.path.join(RAW_CSV_FOLDER, <span class="ss">f"lendmoney</span><span class="sc">{</span>selected_village<span class="sc">}</span><span class="ss">.csv"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>lendmoney <span class="op">=</span> pd.read_csv(filepath_lendmoney, header<span class="op">=</span><span class="va">None</span>, na_values<span class="op">=</span>ALL_NA_CODES, dtype<span class="op">=</span><span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>What the data look like</strong></p>
 <p>The data is stored here as a node list, but it will need to be further pre-processed as an edge list:</p>
 <div style="width:60%;">
@@ -700,7 +700,7 @@ Note
 </tbody>
 </table>
 </div>
-<p>Each row represents reports made by a single individual; the first number is the <code>pid</code> (the “person identifier”) of the individual who reported the relationship, whereas the remaining however many numbers listed in the same row are the <code>pid</code>s of the individuals who were reported to be involved in the relationship.</p>
+<p>Each row represents reports made by a single individual. The numbers in the first column are the <code>pid</code> (the “person identifier”) of the individual who reported the relationship. The remaining however many numbers listed in the same row are the pids of the individuals who were reported to be involved in the relationship.</p>
 </section>
 <section id="pre-process-the-data-to-build-the-edge-list" class="level2">
 <h2 class="anchored" data-anchor-id="pre-process-the-data-to-build-the-edge-list">3.4. Pre-process the data to build the edge list</h2>
