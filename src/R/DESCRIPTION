@@ -1,6 +1,6 @@
 Package: vimure
 Title: VIMuRe: Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: c(
     person("Caterina", "de Bacco", , "caterina.debacco@tuebingen.mpg.de", role = c("aut"),
            comment = c(ORCID = "0000-0002-8634-0211")),
