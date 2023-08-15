@@ -32,30 +32,26 @@
 #' random_net <- gm_StandardSBM(N = 100, M = 100, L = 1)
 #' Y <- random_net$Y$toarray()
 #' dim(Y)
-gm_StandardSBM <- function(N = 100,
-                           M = 100,
-                           K = 2,
-                           L = 1,
-                           C = 2,
-                           avg_degree = 10,
-                           sparsify = TRUE,
-                           overlapping = 0,
-                           seed = 10) {
-
-  INT_ARGS <- c(N = N, M = M, K = K, L = L, C = C,
-                avg_degree = avg_degree, seed = seed)
-  mode(INT_ARGS) <- "integer"
+gm_standard_sbm <- function(N = 100,
+                            M = 100,
+                            K = 2,
+                            L = 1,
+                            C = 2,
+                            avg_degree = 10,
+                            sparsify = TRUE,
+                            overlapping = 0,
+                            seed = 10) {
 
   synthetic <- vimureP$synthetic$StandardSBM(
-    N = INT_ARGS["N"],
-    M = INT_ARGS["M"],
-    K = INT_ARGS["K"],
-    L = INT_ARGS["L"],
-    C = INT_ARGS["C"],
-    avg_degree = INT_ARGS["avg_degree"],
-    sparsify = sparsify,
-    overlapping = overlapping,
-    seed = INT_ARGS["seed"]
+    N = as.integer(N),
+    M = as.integer(M),
+    K = as.integer(K),
+    L = as.integer(L),
+    C = as.integer(C),
+    avg_degree = as.numeric(avg_degree),
+    sparsify = as.logical(sparsify),
+    overlapping = as.numeric(overlapping),
+    seed = as.integer(seed)
   )
 
   return(synthetic)
@@ -84,31 +80,29 @@ gm_StandardSBM <- function(N = 100,
 #' random_net <- gm_DegreeCorrectedSBM(exp_in = 2, exp_out = 2.5)
 #' Y <- random_net$Y$toarray()
 #' dim(Y)
-gm_DegreeCorrectedSBM <- function(N = 100,
-                                  M = 100,
-                                  K = 2,
-                                  L = 1,
-                                  C = 2,
-                                  avg_degree = 10,
-                                  exp_in = 2,
-                                  exp_out = 2.5,
-                                  sparsify = TRUE,
-                                  seed = 10) {
+gm_degree_corrected_sbm <- function(N = 100,
+                                    M = 100,
+                                    K = 2,
+                                    L = 1,
+                                    C = 2,
+                                    avg_degree = 10,
+                                    exp_in = 2,
+                                    exp_out = 2.5,
+                                    sparsify = TRUE,
+                                    seed = 10) {
 
-  INT_ARGS <- c(N = N, M = M, K = K, C = C, L = L, seed = seed)
-  mode(INT_ARGS) <- "integer"
 
   synthetic <- vimureP$synthetic$DegreeCorrectedSBM(
-    N = INT_ARGS["N"],
-    M = INT_ARGS["M"],
-    K = INT_ARGS["K"],
-    L = INT_ARGS["L"],
-    C = INT_ARGS["C"],
-    avg_degree = avg_degree,
-    sparsify = sparsify,
-    exp_in = exp_in,
-    exp_out = exp_out,
-    seed = INT_ARGS["seed"]
+    N = as.integer(N),
+    M = as.integer(M),
+    K = as.integer(K),
+    L = as.integer(L),
+    C = as.integer(C),
+    avg_degree = as.numeric(avg_degree),
+    sparsify = as.logical(sparsify),
+    exp_in = as.numeric(exp_in),
+    exp_out = as.numeric(exp_out),
+    seed = as.integer(seed)
   )
 
   return(synthetic)
@@ -137,30 +131,26 @@ gm_DegreeCorrectedSBM <- function(N = 100,
 #' random_net <- gm_Multitensor(N = 100, M = 100, L = 1, eta = 0.5)
 #' Y <- random_net$Y$toarray()
 #' dim(Y)
-gm_Multitensor <- function(N = 100,
-                           M = 100,
-                           K = 2,
-                           L = 1,
-                           C = 2,
-                           avg_degree = 10,
-                           sparsify = TRUE,
-                           eta = 0.99,
-                           seed = 10) {
-
-  INT_ARGS <- c(N = N, M = M, K = K, L = L, C = C,
-                avg_degree = avg_degree, seed = seed)
-  mode(INT_ARGS) <- "integer"
+gm_crep <- function(N = 100,
+                    M = 100,
+                    K = 2,
+                    L = 1,
+                    C = 2,
+                    avg_degree = 10,
+                    sparsify = TRUE,
+                    eta = 0.99,
+                    seed = 10) {
 
   synthetic <- vimureP$synthetic$Multitensor(
-    N = INT_ARGS["N"],
-    M = INT_ARGS["M"],
-    K = INT_ARGS["K"],
-    L = INT_ARGS["L"],
-    C = INT_ARGS["C"],
-    avg_degree = INT_ARGS["avg_degree"],
-    sparsify = sparsify,
-    eta = eta,
-    seed = INT_ARGS["seed"]
+    N = as.integer(N),
+    M = as.integer(M),
+    K = as.integer(K),
+    L = as.integer(L),
+    C = as.integer(C),
+    avg_degree = as.numeric(avg_degree),
+    sparsify = as.logical(sparsify),
+    eta = as.numeric(eta),
+    seed = as.integer(seed)
   )
 
   return(synthetic)
