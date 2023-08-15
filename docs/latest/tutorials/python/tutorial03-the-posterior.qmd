@@ -1,0 +1,262 @@
+---
+title: "💻 **Tutorial 03**: Extracting point estimates from the posterior distribution"
+subtitle: "VIMuRe v0.1.1 (latest)"
+categories: [basics, python]
+description: "How to extract point estimates from the posterior distribution of the latent network model fitted using VIMuRe"
+---
+
+::: callout-note
+
+If you use `VIMuRe` in your research, please cite [@de_bacco_latent_2023].
+
+:::
+
+TLDR: By the end of this tutorial, you will be able to:
+
+- Extract point estimates of the latent network structure using the mean of the posterior distribution
+- Visualize the resulting network using $\rho$, a measure of edge strength
+- Sample from the posterior distribution and obtain uncertainty estimates
+- Compare different models using information criteria
+
+Found an interesting use case for `VIMuRe`? Let us know! Open a [discussion](https://github.com/latentnetworks/vimure/discussions) on our GitHub repository.
+
+## ⚙️ Setup
+
+Import packages
+
+```python
+import numpy as np
+import pandas as pd
+import vimure as vm
+import igraph as ig
+
+import matplotlib.pyplot as plt
+```
+
+⚠️ Ensure you have installed the latest version of `VIMuRe` before running this tutorial. Follow the 📦 [Installation instructions](/latest/install.qmd) if you haven't already.
+
+## 📥 Step 1: Ensure you have suitable data and a fitted `VIMuRe` model
+
+This tutorial assumes that you have completed 💻  [Tutorial 1](/latest/tutorials/python/tutorial01-data-preparation.qmd) and 💻 [Tutorial 02](/latest/tutorials/python/tutorial02-introduction-to-vimure.qmd) and that, therefore, you have an `edgelist` data frame and a fitted model object called `model` loaded in your Python environment.
+
+We have selected a particular village to focus on. The dataset contains information on four different types of relationships: money, advice, visit and kerorice. We stored all the data in a single data frame, edgelist, which looks like this:
+
+```r
+edgelist.sample(n=10, random_state=1)
+```
+
+|    ego |   alter |   reporter | tie_type     | layer    |   weight |
+|-------:|--------:|-----------:|:-------------|:---------|---------:|
+| 107303 |  107307 |     107307 | helpdecision | advice   |        1 |
+| 116402 |  115702 |     116402 | keroricecome | kerorice |        1 |
+| 103202 |  117301 |     103202 | giveadvice   | advice   |        1 |
+| 116201 |  110401 |     116201 | keroricecome | kerorice |        1 |
+| 114606 |  109701 |     109701 | keroricego   | kerorice |        1 |
+| 101302 |  116201 |     101302 | visitcome    | visit    |        1 |
+| 111204 |  110701 |     111204 | lendmoney    | money    |        1 |
+| 108304 |  111502 |     108304 | keroricecome | kerorice |        1 |
+| 117301 |  113901 |     113901 | borrowmoney  | money    |        1 |
+| 106201 |  116105 |     106201 | keroricecome | kerorice |        1 |
+
+We then ran VIMuRe on this data frame to fit a latent network model:
+
+```python
+import vimure as vm
+
+# Run the model
+model = vm.model.VimureModel()
+model.fit(edgelist)
+```
+
+If you have both objects in your environment, you are ready to go!
+
+## 📊 Step 2: Interpreting the variable $\rho$
+
+In this step, our main focus is to analyze the posterior distribution of the latent variable known as `rho`, which is included in the list of posterior estimates of the model.
+
+```python
+rho = model.get_posterior_estimates()['rho']
+
+rho.shape
+```
+
+```text
+(4, 417, 417, 2)
+```
+The variable `rho` is represented as a tensor with dimensions L x N x N x K. Each entry in the tensor can be denoted as $\rho_{lijk}$, which corresponds to the geometric expectation of the probability of a directed tie with weight $k-1$ existing between nodes $i$ and $j$ on a specific layer $l$.
+
+### A note about the parameter $K$
+
+The final dimension of the tensor, denoted by $K$, represents the strength of a tie. By default, the model assumes that the interest is in the presence or absence of ties rather than their weight, resulting in a default value of $K=2$. Consequently, for each potential edge, there are two values of $\rho$: $\rho_{lijk=1}$ and $\rho_{lijk=2}$, corresponding to edges with weights 0 and 1 ($k-1$) respectively.
+
+To make this clearer, let's consider a specific example. Suppose we want to determine the probability of a directed tie with weight 1 existing between nodes 10 and 15 on layer 1 ('advice') of our network. We can examine the following entry in the tensor:
+
+```python
+# rho for layer 1, ego 10, alter 15
+rho[0, 10, 15, :] 
+```
+
+The result would be:
+
+```text
+array([1.00000000e+00, 4.21007361e-13])
+```
+
+This suggests that the model assigns a high probability (approximately 100%) to the absence of a directed tie between nodes 10 and 15 on layer 1 ($\rho_{lijk=1} \approx 1$). Conversely, it assigns a low probability (approximately 0%) to the presence of a directed tie between nodes 10 and 15 on layer 1 ($\rho_{lijk=2} \approx 0$). Based on this, we can conclude that node 10 does not provide advice to node 15.
+
+If you are modelling weighted networks, you can specify a different value for $K$, as shown below. Just note that K must be an integer.
+
+```python
+# Fit the model with a different value for K
+
+model = vm.model.VimureModel()
+model.fit(edgelist, K=10)
+```
+
+### Visualising `rho` 
+
+Since the probability of $K=1$ and $K=2$ are complementary, we can plot the probability of a directed tie existing between nodes $i$ and $j$ on layer $l$ as a function of $\rho_{lijk=2}$. But before we proceed to the plot, let's take a look at the summary statistics of the values of $\rho$ per layer:
+
+<details><summary>Show code</summary>
+
+```python
+#The code below converts from adjacency matrix to edge list 
+# then summarises the values of rho per layer
+pd.concat(
+    [pd.DataFrame(rho[l,:,:,1])
+      .reset_index()\
+      .melt(id_vars=['index'])\
+      .assign(l=l)\
+      .rename(columns={'index':'i', 'variable': 'j'}) 
+      for l in range(rho.shape[0])]
+).groupby(['l'])['value'].describe()
+```
+
+</details>
+
+|   l |   count |       mean |       std |         min |         25% |         50% |         75% |      max |
+|----:|--------:|-----------:|----------:|------------:|------------:|------------:|------------:|---------:|
+|   0 |  173889 | 0.00211962 | 0.0427501 | 1.42201e-13 | 3.61097e-13 | 4.64657e-13 | 6.28092e-13 | 1        |
+|   1 |  173889 | 0.00232455 | 0.039379  | 1.5432e-13  | 5.06778e-13 | 7.39753e-13 | 8.88974e-13 | 0.999831 |
+|   2 |  173889 | 0.00218808 | 0.0409045 | 1.45914e-13 | 4.10353e-13 | 6.37707e-13 | 8.39875e-13 | 0.999873 |
+|   3 |  173889 | 0.00253843 | 0.0433122 | 1.43865e-13 | 4.45755e-13 | 6.87587e-13 | 8.60819e-13 | 1        |
+
+The expected values of $\rho$ are very small, with a mean of approximately 0.002. The inferred network is sparse, as can be expected from a social network of this type. Observe how the minimum value is close but never truly zero, which is a consequence of the Bayesian approach. The standard deviation is also very small, with a mean of approximately 0.04. This suggests that the posterior distribution of $\rho$ is very concentrated around its mean.
+
+Let's look at how the values of $\rho$ are distributed across layers. We can do this by plotting the distribution of $\rho_{lijk=2}$ for each layer:
+
+<details><summary>Show code</summary>
+
+```python
+import igraph as ig
+import matplotlib.pyplot as plt
+
+# Create a figure with 2 x 2 subplots
+fig, axes = plt.subplots(2,2, figsize=(10,10))
+
+# Loop over the layers
+for k in range(4):
+    # Get the subplot index
+    i = k // 2
+    j = k % 2
+    # Get the rho matrix for the layer
+    rho_k = rho[k,:,:,1]
+    axes[i,j].imshow(rho_k, vmin=0, vmax=1, cmap='Blues', aspect='equal')
+    axes[i,j].set_xlabel('Alter')
+    axes[i,j].set_ylabel('Ego')
+    # Add a title with the layer name
+    axes[i,j].set_title(f'Layer: {model.layerNames[k]}')
+plt.show()
+```
+</details>
+
+![Figure 1. Distribution of $\rho_{lijk=2}$](figures/tutorial03_fig01.png)
+
+The plots above give us an idea of how sparse the network is, but without any meaningful node ordering, it's hard to see its structure. In the next section, we'll use $\rho_{lijk=2}$ as a measure of edge strength and treat it as a point estimate for our model. This will help us get a clearer picture of this multi-layered network.
+
+## 🎲 Step 3: Obtaining a simple point estimate
+
+We can treat the probability values represented by $\rho_{lijk=2}$ directly as a point estimate, but since most of the entries are very small and none of them are zero, this would lead to a dense network. Instead, it might be more appropriate to apply a thresholding approach and set the lower values to zero.
+
+However, determining the appropriate threshold value $t_{\rho}$ is not as straightforward as it initially seems. While a suggestion of setting $t_{\rho}=0.5$ may arise based on the assumption of complementarity between $\rho_{lijk=2}$ and $\rho_{lijk=1}$, our research paper [@de_bacco_latent_2023, pages 10-11] reveals the need for adjusting the threshold based on the inferred mutuality, $\eta_{est}$ (represented by the latent variable $\nu$), to achieve a similar level of reciprocity — a network property of interest — as observed in the ground truth network. In other words, tailoring the threshold becomes necessary to ensure that the inferred network accurately captures the desired network property.
+
+In the paper, we found that the threshold $t_{\rho}$ should be set to $t_{\rho} = 0.33 \times \eta_{est} + 0.10$ was a good heuristic to capture reciprocity in simulated synthetic networks with reciprocity. Let's use this same value here to obtain a point estimate of our network:
+
+```python
+threshold = 0.33 * model.get_posterior_estimates()['nu'] + 0.10
+threshold
+```
+
+```text
+0.3075564363103252
+```
+
+We can then apply the threshold to the values of $\rho_{lijk=2}$ to obtain a point estimate of the network:
+
+```python
+# Apply the threshold
+rho_point_estimate = rho[:,:,:,1] > threshold
+```
+
+To get the network to look consistent across layers, let's create a layout from the union of all nodes and edges across layers:
+
+```python
+layout = (
+    ig.Graph.Adjacency(rho_point_estimate.sum(axis=0).tolist(), mode='directed')
+    .layout_fruchterman_reingold()
+)
+```
+
+```text
+<Layout with 417 vertices and 2 dimensions>
+```
+
+Finally, we can plot the network using the layout and the thresholded values of $\rho_{lijk=2}$:
+
+<details><summary>Show code</summary>
+
+```python
+# Create a figure with 2 x 2 subplots
+fig, axes = plt.subplots(2,2, figsize=(10, 7))
+axes = axes.ravel()
+
+# Loop over the layers
+num_layers = rho_point_estimate.shape[0]
+gs = [ig.Graph.Adjacency(rho_point_estimate[l,:,:].tolist(), mode='directed')
+      for l in range(num_layers)]
+
+visual_style = {
+    "edge_width": 0.6,
+    #"vertex_size": 0.8,
+    "opacity": 0.7,
+    "palette": "heat",
+    "layout": layout
+}
+
+
+max_degree = max([max(g.degree()) for g in gs])
+
+for g, ax in zip(gs, axes):
+    degree = np.array(g.degree())
+    # Scale degree to the interval [0.4 - 1.2]
+    degree = degree / max(degree) * 0.8 + 0.4
+    ig.plot(g, target=ax, vertex_size=degree, **visual_style)
+
+for l in range(4):
+    # Add a title with the layer name
+    axes[l].set_title(f'Layer: {model.layerNames[l]}')
+
+plt.show()
+```
+
+
+</details>
+
+![Figure 2. A point estimate of the four layers of the network, obtained by thresholding $\rho_{lijk=2}$. Node sizes are scaled according to their degree in the network layer.](figures/tutorial03_fig02.png)
+
+
+## Next steps
+
+🚧 **TODO**: Which network properties can we infer from the networks obtained above?
+
+🚧 **TODO**: How does that compare to $t_{\rho}=0.5$?

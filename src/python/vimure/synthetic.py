@@ -961,6 +961,221 @@ class HollandLaskeyLeinhardtModel(BaseSyntheticNetwork):
         raise NotImplementedError
 
 
+class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
+    """
+    Generates data (X) from posterior estimates
+    Author: @mcontisc (Martina Contisciani) in the private repo
+    """
+
+    def __init__(self, model, seed_Y):
+        self.prng = np.random.default_rng(seed_Y)
+        self.rho = model.rho_f
+        self.theta_shp = model.gamma_shp_f
+        self.theta_rte = model.gamma_rte_f
+        self.lambda_shp = model.phi_shp_f
+        self.lambda_rte = model.phi_rte_f
+        self.mutuality_shp = model.nu_shp_f
+        self.mutuality_rte = model.nu_rte_f
+
+        self.L,self.N,self.N,self.K = self.rho.shape
+        self.M = self.theta_shp.shape[1]
+
+    def build_Y(self):
+            """
+            Generate Y from the Categorical posterior with parameter rho
+            """
+            
+            self.Y = self.prng.multinomial(n = 1, pvals = self.rho,size = (self.L,self.N,self.N))
+            self.Y = self.Y.argmax(axis=-1)
+
+            # cut-off, max entry has to be equal to K - 1
+            self.Y[self.Y > self.K - 1] = self.K - 1
+            self.Y = preprocess(self.Y)
+
+
+    def build_X(
+        self,
+        Rinput: None,
+        flag_self_reporter: bool = True,
+        cutoff_X: bool = False,
+        Q: int = None,
+        seed_X: int = None,
+        verbose: bool = True,
+    ):
+        """
+        Any object inhereted from PosteriorSyntheticNetwork will have a ground truth network Y.
+        Given that Y, generate the observed network X.
+
+
+        Parameters
+        ----------
+        gt_network : A PosteriorSyntheticNetwork object that represents the ground-truth network
+
+        Returns
+        -------
+        X : ndarray
+            Observed network.
+        """
+
+        if self.theta_rte.any() == 0:
+            msg = "theta_rte has some zero entries!"
+            raise ValueError(msg)
+        if self.lambda_rte.any() == 0:
+            msg = "lambda_rte has some zero entries!"
+            raise ValueError(msg)
+        if self.mutuality_rte.any() == 0:
+            msg = "mutuality_rte has some zero entries!"
+            raise ValueError(msg)
+
+        # generate_x uses its own pseudo-random seed generator, so we can better control the generation of theta.
+        # We can generate the same theta, while varying mutuality (to check how X change);
+        if seed_X is None:
+            seed_X = np.random(90)
+        self.seed_X = seed_X
+        prng = np.random.RandomState(self.seed_X)
+
+        Y = self.Y
+        Y_subs = Y.subs
+
+        theta = prng.gamma(shape = self.theta_shp, scale = 1. / self.theta_rte, size=(self.L,self.M))
+        lambda_k = prng.gamma(shape = self.lambda_shp, scale = 1. / self.lambda_rte, size=(self.L,self.K))
+        mutuality = prng.gamma(shape = self.mutuality_shp, scale = 1. / self.mutuality_rte, size=1)[0]
+
+        lambda_k_auxiliary = np.ones(shape=Y.shape).astype("float") * lambda_k[0, 0]
+        for k in range(0, self.K):
+            vals_k = np.argwhere(Y.vals == k).flatten()
+            lij = (Y_subs[0][vals_k], Y_subs[1][vals_k], Y_subs[2][vals_k])
+            lambda_k_auxiliary[lij] = lambda_k[Y_subs[0][vals_k],k]
+
+        M_X = np.einsum("lm,lij->lijm", theta, lambda_k_auxiliary)
+        MM =  (M_X + mutuality * np.transpose(M_X, axes=(0, 2, 1, 3))) / (1.0 - mutuality * mutuality)
+
+        X = np.zeros_like(MM).astype("int")
+
+        if cutoff_X and Q is None:
+            Q = self.K
+
+        if flag_self_reporter:
+            if Rinput is None:
+                R = build_self_reporter_mask(self)
+            else:
+                try:
+                    R = Rinput.toarray()
+                except:
+                    R = Rinput
+
+            for l in range(self.L):
+                for m in range(self.M):
+                    subs_nz = np.where(R[l, :, :, m] > 0)
+                    len_subs_nz = subs_nz[0].shape[0]
+                    for n in range(len_subs_nz):
+                        i, j = subs_nz[0][n], subs_nz[1][n]
+                        r = prng.rand(1)[0]
+
+                        # for those reporters that report perfectly, i.e. theta=1, do not extract from a poisson.
+                        # Rather, assign the X deterministically using the mean of the poisson
+                        if np.allclose(theta[l, m], 1.0) == False:
+                            if r < 0.5:
+                                X[l, i, j, m] = prng.poisson(MM[l, i, j, m] * R[l, i, j, m])
+                                if cutoff_X:
+                                    if X[l, i, j, m] > Q - 1:
+                                        X[l, i, j, m] = Q - 1
+                                cond_exp = M_X[l, j, i, m] * R[l, i, j, m] + mutuality * X[l, i, j, m]
+                                X[l, j, i, m] = prng.poisson(cond_exp)
+                            else:
+                                X[l, j, i, m] = prng.poisson(MM[l, j, i, m] * R[l, j, i, m])
+                                if cutoff_X:
+                                    if X[l, j, i, m] > Q - 1:
+                                        X[l, j, i, m] = Q - 1
+                                cond_exp = M_X[l, i, j, m] * R[l, j, i, m] + mutuality * X[l, j, i, m]
+                                X[l, i, j, m] = prng.poisson(cond_exp)
+                        else:
+                            if r < 0.5:
+                                X[l, i, j, m] = MM[l, i, j, m] * R[l, i, j, m]
+                                if cutoff_X == True:
+                                    if X[l, i, j, m] > Q - 1:
+                                        X[l, i, j, m] = Q - 1
+                                cond_exp = M_X[l, j, i, m] * R[l, i, j, m] + mutuality * X[l, i, j, m]
+                                X[l, j, i, m] = cond_exp
+                            else:
+                                X[l, j, i, m] = MM[l, j, i, m] * R[l, j, i, m]
+                                if cutoff_X == True:
+                                    if X[l, j, i, m] > Q - 1:
+                                        X[l, j, i, m] = Q - 1
+                                cond_exp = M_X[l, i, j, m] * R[l, j, i, m] + mutuality * X[l, j, i, m]
+                                X[l, i, j, m] = cond_exp
+
+        else:
+            R = np.ones((self.L, self.N, self.N, self.M))
+            for l in range(self.L):
+                for m in range(self.M):
+                    for i in range(self.N):
+                        for j in range(i + 1, self.N):
+                            r = prng.rand(1)[0]
+                            if r < 0.5:
+                                X[l, i, j, m] = prng.poisson(MM[l, i, j, m])
+                                if cutoff_X:
+                                    if X[l, i, j, m] > Q - 1:
+                                        X[l, i, j, m] = Q - 1
+                                cond_exp = M_X[l, j, i, m] + mutuality * X[l, i, j, m]
+                                X[l, j, i, m] = prng.poisson(cond_exp)
+                            else:
+                                X[l, j, i, m] = prng.poisson(MM[l, j, i, m])
+                                if cutoff_X:
+                                    if X[l, j, i, m] > Q - 1:
+                                        X[l, j, i, m] = Q - 1
+                                cond_exp = M_X[l, i, j, m] + mutuality * X[l, j, i, m]
+                                X[l, i, j, m] = prng.poisson(cond_exp)
+
+        if cutoff_X:
+            X[X > Q - 1] = Q - 1  # cut-off, max entry has to be equal to K - 1
+
+        self.X = preprocess(X)
+        self.R = preprocess(R)
+        self.theta = theta
+        self.lambda_k = lambda_k
+        self.lambda_k_auxiliary = lambda_k_auxiliary
+        self.mutuality = mutuality
+
+        subs_lijm = self.X.subs
+
+        """
+        BASELINE: UNION
+        """
+        lij = (subs_lijm[0], subs_lijm[1], subs_lijm[2])
+        all_ties = np.stack(lij).T  # dim ((lij)_subs, 3)
+        union_ties, count_ties = np.unique(all_ties, axis=0, return_counts=True)
+
+        # Convert (l,i,j) to format understood by sktensor
+        union_subs = tuple(np.moveaxis(union_ties, 1, 0))
+        X_union = skt.sptensor(
+            subs=union_subs,
+            vals=np.ones(union_ties.shape[0]),
+            shape=self.X.shape,
+            dtype=np.int8,
+        )
+        self.X_union = X_union
+
+        """
+        BASELINE: INTERSECTION
+        """
+        # If count_ties == 2, it means all reporters agree (intersection) because it is binary
+        # TODO: Double check if count_ties == 2 should be count_ties == M (given the R) instead
+        intersection_ties = union_ties[np.argwhere(count_ties == 2).flatten()]
+        intersection_subs = tuple(np.moveaxis(intersection_ties, 1, 0))
+
+        X_intersection = skt.sptensor(
+            subs=intersection_subs,
+            vals=np.ones(intersection_ties.shape[0]),
+            shape=self.X.shape,
+            dtype=np.int8,
+        )
+        self.X_intersection = X_intersection
+
+        # TODO: Rethink the baseline union & intersections for the case that X is not a binary matrix (or even if Y is binary)
+
+        return self
+
 """
 FUNCTIONS TO GENERATE X (OBSERVED NETWORK) FROM A GENERATED GROUND TRUTH NETWORK, Y
 """

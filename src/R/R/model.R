@@ -1,3 +1,66 @@
+#' Check reporters mask
+#'
+#' Check if reporters mask is valid. That is, if it is an array with four
+#' dimensions, if the second, third, and fourth dimensions have the same
+#' length, and if it is either entirely TRUE/FALSE or entirely 0s/1s.
+#'
+#' @family vimure
+#' @param R Reporters mask (TRUE/FALSE) indicating whether a node
+#' _CAN_ report on a particular tie, with dimensions L x N x N x N.
+#' @return TRUE if reporters mask is valid, FALSE otherwise.
+#'
+#' @export
+#'
+check_reporters_mask <- function(R){
+  # CHECK 01: if R is an array
+  is_sptensor <- inherits(R, "sktensor.sptensor.sptensor")
+  is_R_array  <- is.array(R)
+
+  if (!(is_sptensor || is_R_array)) {
+      stop("Invalid type='", class(R), "' for parameter R. R must be an array!")
+  }
+
+  # CHECK 02: if R has four dimensions
+  valid_mask <- TRUE
+  if (is_sptensor) {
+    if (R$ndim != 4) {
+      valid_mask <- FALSE
+    }
+  } else if (length(dim(R)) != 4) {
+    valid_mask <- FALSE
+  }
+
+  if (!valid_mask) {
+    stop("R must have four dimensions.")
+  }
+
+  # CHECK 03: if second, third, and fourth dimensions have the same length
+  dims <- if (is_sptensor) {
+    unlist(R$shape)
+  } else {
+    dim(R)
+  }
+  N <- dims[2]
+  if (any(dims[2:4] != N)) {
+    stop("The 2nd, 3rd, and 4th dimensions of R must have the same length.")
+  }
+
+  # CHECK 04: if R is either entirely TRUE/FALSE or entirely 0s/1s
+  vals <- if (is_sptensor) {
+    R$vals
+  } else {
+    R
+  }
+
+  if (!all(vals == TRUE | vals == FALSE) && !all(vals == 0 | vals == 1)) {
+    stop("R must be either entirely made of TRUE/FALSE or of 0s/1s.")
+  }
+
+  # if all conditions are met, return TRUE
+  return(TRUE)
+}
+
+
 #' ViMuRe
 #'
 #' Fit a probabilistic generative model to double sampled networks.
@@ -75,9 +138,7 @@ vimure <-
   }
 
   if (length(R) > 0) {
-    if (!any(class(R) %in% c("sktensor.sptensor.sptensor", "array"))){
-      stop("invalid 'type'", class(R), "of argument")
-    }
+    check_reporters_mask(R)
 
     model$fit(
       X = x, R = R, K = K, theta_prior = theta_prior,

@@ -153,6 +153,7 @@ parse_graph_from_igraph <- function(
   parse_graph_from_edgelist(df_edges, directed=directed, weighted=weighted)
 }
 
+
 #' Reciprocity of networks
 #'
 #' Calculates the reciprocity of adjancency matrix

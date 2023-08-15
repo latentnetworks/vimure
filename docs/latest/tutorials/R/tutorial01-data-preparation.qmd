@@ -177,15 +177,17 @@ Each of these relationships is stored in a separate file. For example, the file 
 
 We can read each of these files using the `read.csv()` function. For example:
 
-```r
-filepath_lendmoney <- file.path(RAW_CSV_FOLDER, paste("lendmoney", selected_village, ".csv", sep=""))
-lendmoney <- read.csv(filepath_lendmoney, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
-```
-
-The `ALL_NA_CODES` variable is a vector of all the codes that, after inspection, we identified were used to represent missing values in the data:
+First we look over the data and specifying a `ALL_NA_CODES` variable. This is a vector of all the codes that, after inspection, we identified were used to represent missing values in the data:
 
 ```r
 ALL_NA_CODES <- c("9999999", "5555555", "7777777", "0")
+```
+
+We can then read in the data:
+
+```r
+filepath_lendmoney <- file.path(RAW_CSV_FOLDER, paste("lendmoney", selected_village, ".csv", sep=""))
+lendmoney <- read.csv(filepath_lendmoney, header = FALSE, as.is = TRUE, na = ALL_NA_CODES)
 ```
 
 **What the data look like**
@@ -205,7 +207,7 @@ The data is stored here as a node list, but it will need to be further pre-proce
 
 :::
 
-Each row represents reports made by a single individual; the first number is the `pid` (the "person identifier") of the individual who reported the relationship, whereas the remaining however many numbers listed in the same row are the `pid`s of the individuals who were reported to be involved in the relationship.
+Each row represents reports made by a single individual. The numbers in the first column are the pid (the “person identifier”) of the individual who reported the relationship. The remaining however many numbers listed in the same row are the pids of the individuals who were reported to be involved in the relationship.
 
 ## 3.4. Pre-process the data to build the edge list
 
@@ -368,6 +370,14 @@ get_karnataka_survey_data <- function(
   return(list(edgelist=edgelist, reporters=reporters))
 
 }
+
+get_indivinfo <- function(metadata_file = DEFAULT_METADATA_FILEPATH){
+    indivinfo <- haven::read_dta(metadata_file)
+    ## one individual (6109803) is repeated twice. Remove the duplicate
+    indivinfo <- indivinfo[!duplicated(indivinfo$pid) == TRUE, ]
+    return(indivinfo)
+}
+
 
 ```
 

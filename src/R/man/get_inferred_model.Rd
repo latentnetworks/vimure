@@ -10,7 +10,8 @@ get_inferred_model(object, method = "rho_max", threshold = NULL)
 \item{object}{A "vimure" object.}
 
 \item{method}{A character string indicating which method is to be computed.
-One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshold".}
+One of "rho_max" (default), "rho_mean", "fixed_threshold"
+or "heuristic_threshold".}
 
 \item{threshold}{A threshold to be used when method = "fixed_threshold".}
 }
@@ -18,17 +19,21 @@ One of "rho_max" (default), "rho_mean", "fixed_threshold" or "heuristic_threshol
 Estimate Y
 }
 \details{
-Use this function to reconstruct the Y matrix with a fitted vimure model.
+Use this function to reconstruct the Y matrix
+with a fitted vimure model.
 It will use \code{model$rho_f} values to extract an estimated Y matrix.
 \itemize{
 \item{\emph{rho_max}: }{Assign the value of the highest probability}
 \item{\emph{rho_mean}: }{Expected value of the discrete distribution}
-\item{\emph{fixed_threshold}: }{Check if the probability is higher than a threshold (Only for 2 categories)}
-\item{\emph{heuristic_threshold}: }{Calculate and use the best threshold (Only for 2 categories)}
+\item{\emph{fixed_threshold}: }{Check if the probability is higher than
+a threshold (Only for 2 categories)}
+\item{\emph{heuristic_threshold}: }{Calculate and use the best threshold
+(Only for 2 categories)}
 }
 }
 \seealso{
 Other vimure: 
+\code{\link{check_reporters_mask}()},
 \code{\link{summary.vimure.model.VimureModel}()},
 \code{\link{vimure}()}
 }

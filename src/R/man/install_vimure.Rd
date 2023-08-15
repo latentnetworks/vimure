@@ -7,7 +7,7 @@
 install_vimure(
   method = c("auto", "virtualenv", "conda"),
   conda = "auto",
-  version = "develop",
+  version = "main",
   envname = NULL,
   restart_session = TRUE,
   conda_python_version = NULL,
@@ -29,10 +29,10 @@ See \strong{Finding Conda} and \code{\link[reticulate:conda_binary]{conda_binary
 
 \item{version}{Vimure version to install. Valid values include:
 \itemize{
-\item \code{"default"} installs  \verb{develop branch}
-\item A version specification like \code{"2.4"} or \code{"2.4.0"}. Note that if the patch
+\item \code{"default"} installs the version from the \code{main} branch
+\item A version specification like \code{"0.1"} or \code{"0.1.0"}. Note that if the patch
 version is not supplied, the latest patch release is installed (e.g.,
-\code{"2.4"} today installs version "2.4.2")
+\code{"0.1"} today installs version "0.1.1")
 \item The full URL or path to a installer binary or python *.whl file.
 }}
 

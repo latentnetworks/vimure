@@ -26,7 +26,7 @@ build_X <- function(
   synthetic, mutuality=0.5, sh_theta=2, sc_theta=0.5, theta=NULL, flag_self_reporter=T,
   Q=NULL, cutoff_X=F, lambda_diff=NULL, verbose=T, ...
 ){
-  synthetic$build_X(
+  synthetic$`_build_X`(
     mutuality=mutuality,
     sh_theta=sh_theta,
     sc_theta=sc_theta,
