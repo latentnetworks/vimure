@@ -180,3 +180,4 @@ vignettes/*.pdf
 _site/
 *unnamed-chunk*.png
 data/
+.vscode
