@@ -30,9 +30,11 @@ library(vimure)
 vimure::install_vimure()
 ```
 
+``` text
     #> Using virtual environment '/home/gabriela-borges/Git/vimure/Python/venv' ...
     #> 
     #> Installation complete.
+```
 
 You can confirm that the installation succeeded with:
 
@@ -41,7 +43,9 @@ library(vimure)
 vimureP$utils$is_sparse(matrix(c(1:50), ncol=10))
 ```
 
+```text
     #> [1] FALSE
+```
 
 This will provide you with a default installation of VIMuRe suitable for use with the vimure R package.
 
@@ -82,19 +86,31 @@ X <- build_X(random_net, flag_self_reporter=T, cutoff_X=F, seed=10L)
 paste("Reciprocity Y:", round(overall_reciprocity(Y[1,,]),3))
 ```
 
+```text
+
     #> [1] "Reciprocity Y: 0.788"
+
+```
 
 ``` r
 paste("Reciprocity X (intersection):", round(overall_reciprocity(random_net$X_intersection$toarray()[1,,]),3))
 ```
 
+```text
+
     #> [1] "Reciprocity X (intersection): 0.688"
+
+```
 
 ``` r
 paste("Reciprocity X (union):", round(overall_reciprocity(random_net$X_union$toarray()[1,,]),3))
 ```
 
+```text
+
     #> [1] "Reciprocity X (union): 0.722"
+
+```
 
 ## Python interface
 
@@ -107,11 +123,15 @@ Use the function `class` to check if a object is stored in Python.
 class(random_net)
 ```
 
+```text
+
     #> [1] "vimure.synthetic.Multitensor"         
     #> [2] "vimure.synthetic.StandardSBM"         
     #> [3] "vimure.synthetic.BaseSyntheticNetwork"
     #> [4] "vimure.io.BaseNetwork"                
     #> [5] "python.builtin.object"
+
+```
 
 `random_net` is stored as a Python object. You can access its attributes using the dollar sign `$` or using our `extract_*` functions which always will return a R object.
 
@@ -123,6 +143,8 @@ In R we can construct and fit the vimure model by using the `vimure` function. T
 model <- vimure(random_net$X, random_net$R, mutuality=T, K=2, num_realisations=1, max_iter=150)
 diag <- summary(model)
 ```
+
+```text
 
     #> ---------------
     #> - DIAGNOSTICS -
@@ -145,3 +167,4 @@ diag <- summary(model)
     #> Optimisation:
     #> 
     #>    Elbo: 1120.418888338589
+```
