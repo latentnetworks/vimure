@@ -1,5 +1,3 @@
-<!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
-
 # vimure 0.1.2 (2023-08-16)
 
 - (R) Add minimal vignettes for synthetic models

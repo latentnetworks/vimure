@@ -1,0 +1,29 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "vimure"
+version = "0.1.2"
+authors = [
+  "Jon Cardoso-Silva <J.Cardoso-Silva@lse.ac.uk>",
+  "Caterina de Bacco <caterina.debacco@tuebingen.mpg.de>",
+  "Gabriela Borges <gabilimaborges@hotmail.com>"
+]
+description = "VIMuRe: Latent Network Models to Account for Noisy, Multiply-Reported Social Network Data"
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = "<=1.24.2"
+scipy = "<=1.10.1"
+pandas = "<2.0.0"
+scikit-learn = "<=1.2.1"
+scikit-tensor-py3 = {url = "https://github.com/jonjoncardoso/scikit-tensor-py3/archive/master.zip"}
+networkx = "<3.0.0"
+igraph = ">=0.10.4"
+
+[project.urls]
+"Homepage" = "https://latentnetworks.github.io/"
+"Bug Tracker" = "https://github.com/latentnetworks/vimure/issues"
