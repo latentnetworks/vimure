@@ -3,7 +3,7 @@
 # vimure 0.1.2 (2023-08-16)
 
 - (R) Add minimal vignettes for synthetic models
-- (R) Synthetic network models have better names
+- (R) Synthetic network models have better names + modify unit tests
 - (Python) no changes
 
 

@@ -21,7 +21,9 @@ Suggests:
     dplyr,
     tidyr,
     magrittr,
-    knitr
+    knitr,
+    testthat,
+    rstudioapi
 Config/testthat/edition: 3
 Imports: 
     reticulate
