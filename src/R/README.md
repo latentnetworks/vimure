@@ -73,7 +73,7 @@ install_vimure(version = "~/Git/vimure/src/python")
 Simply create an object with the desired synthetic network class:
 
 ``` r
-random_net <- gm_Multitensor(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)
+random_net <- gm_crep(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)
 Y <- extract_Y(random_net)
 X <- build_X(random_net, flag_self_reporter=T, cutoff_X=F, seed=10L)
 
