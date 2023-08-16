@@ -13,7 +13,7 @@ VIMuRe package is available in R and Python.
 
 ```r
 install.packages("devtools")
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="main")
 ```
 
 ## Feedback
