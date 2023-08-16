@@ -60,7 +60,7 @@ Note that `install_vimure()` isn’t required to use VIMuRe with the package. If
   Sys.setenv("RETICULATE_PYTHON" = "~/path/to/python-env/bin/python")
 ```
 
-By default, `install_vimure()` install the latest *develop* branch of VIMuRe You can override this behavior by specifying the version parameter. For example:
+By default, `install_vimure()` install the latest *main* branch of VIMuRe You can override this behavior by specifying the version parameter. For example:
 
 ``` r
 install_vimure(version = "master")

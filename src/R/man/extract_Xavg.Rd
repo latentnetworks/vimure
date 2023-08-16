@@ -16,7 +16,7 @@ A matrix
 Average value of observed network X over reporter mask.
 }
 \examples{
-random_net <- gm_Multitensor(N=100, M=100, L=1, eta=0.99)
+random_net <- gm_crep(N=100, M=100, L=1, eta=0.99)
 X <- build_X(random_net)
 Xavg <- extract_Xavg(random_net)
 dim(Xavg)

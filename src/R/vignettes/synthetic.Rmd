@@ -18,7 +18,7 @@ The goal of this article is to illustrate how to generate and use synthetic netw
 
 # Generating Ground Truth Networks - `Y`
 
-Simply create an object with the desired synthetic network class (more info about arguments and others synthetic models in `help(gm_Multitensor)`):
+Simply create an object with the desired synthetic network class (more info about arguments and others synthetic models in `help(gm_crep)`):
 
 ```r
 random_net <- gm_crep(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)

@@ -49,7 +49,7 @@ check_affinity_matrix <- function(synth_net){
 }
 
 check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
-  another_synth_net <- gm_DegreeCorrectedSBM(
+  another_synth_net <- gm_degree_corrected_sbm(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,
@@ -61,7 +61,7 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
     sparsify=FALSE
   )
 
-  another_sparse_synth_net <- gm_DegreeCorrectedSBM(
+  another_sparse_synth_net <- gm_degree_corrected_sbm(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,
@@ -88,7 +88,7 @@ check_Y_change_for_exp_in_ou_change <- function(synth_net, sparse_synth_net){
 test_that("Multitensor - Check default values and adjacency matrix structure", {
   skip_if_no_vimure()
 
-  synth_net <- gm_Multitensor(
+  synth_net <- gm_crep(
     N = DEFAULT_N,
     M = DEFAULT_M,
     K = DEFAULT_K,
@@ -103,10 +103,10 @@ test_that("Multitensor - Check default values and adjacency matrix structure", {
   expect_false(is.null(synth_net$ExpM))
 })
 
-test_that("gm_StandardSBM - Check default values, adjacency matrix and affinity matrix structure", {
+test_that("gm_standard_sbm - Check default values, adjacency matrix and affinity matrix structure", {
   skip_if_no_vimure()
 
-  synth_net <- gm_StandardSBM(
+  synth_net <- gm_standard_sbm(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,
@@ -120,10 +120,10 @@ test_that("gm_StandardSBM - Check default values, adjacency matrix and affinity 
   check_affinity_matrix(synth_net)
 })
 
-test_that("gm_DegreeCorrectedSBM - Check default values and adjacency matrix", {
+test_that("gm_degree_corrected_sbm - Check default values and adjacency matrix", {
   skip_if_no_vimure()
 
-  synth_net <- gm_DegreeCorrectedSBM(
+  synth_net <- gm_degree_corrected_sbm(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,
@@ -133,7 +133,7 @@ test_that("gm_DegreeCorrectedSBM - Check default values and adjacency matrix", {
     sparsify=FALSE
   )
 
-  sparse_synth_net <- gm_DegreeCorrectedSBM(
+  sparse_synth_net <- gm_degree_corrected_sbm(
     N=DEFAULT_N,
     M=DEFAULT_M,
     L=DEFAULT_L,

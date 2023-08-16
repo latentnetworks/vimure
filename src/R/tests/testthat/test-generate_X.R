@@ -32,7 +32,7 @@ check_R <- function(synth_net){
 test_that("Check X generation", {
   skip_if_no_vimure()
 
-  synth_net <- gm_StandardSBM(
+  synth_net <- gm_standard_sbm(
     N=20,
     M=20,
     L=1,
