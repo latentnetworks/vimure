@@ -7,16 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
 The goal of vimure is to make available latent network models to account for noisy, multiply-reported social network Data.
 
-```{r setup}
+```r
 library(vimure)
 library(igraph)
 library(ggcorrplot)
@@ -26,7 +20,7 @@ library(ggcorrplot)
 
 First create an object with the desired synthetic network class:
 
-```{r}
+```r
 net <- gm_crep(N=100, M=100, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.5)
 
 # Ground Truth Network
@@ -51,13 +45,13 @@ As a `python.builtin.object`, you can access all object's attributes as it is in
 
 Use the function `class` to check if a object is stored in Python.
 
-```{r}
+```r
 class(net)
 ```
 
 `net` is stored as a Python object. You can access its attributes using the dollar sign `$`.
 
-```{r}
+```r
 net$Y # still a python object because it is a sptensor
 
 Y <- net$Y$toarray() # Convert to array
@@ -66,7 +60,7 @@ class(Y)
 
 Calculate some network statistics from the adjacency matrix:
 
-```{r}
+```r
 message(
   "Nodes: ", length(V(graph)),
   " | Edges: ", gsize(graph),
@@ -77,13 +71,13 @@ message(
 
 Then, given a network Y, we can generate N observed adjacency matrices as would have been reported by reporting nodes $m$ for $m \in N$ This is achieved by the function `build_X`. Example:
 
-```{r}
+```r
 X <- build_X(net, flag_self_reporter=T, cutoff_X=F, seed=10L)
 dim(X)
 ```
 Use the code below to explore the network from the point of view of different reporting nodes:
 
-```{r}
+```r
 reporter_id <- 31
 message("Reporter ID=", reporter_id," | theta= ", net$theta[layer, reporter_id])
 
@@ -102,7 +96,7 @@ See more info about arguments in `help(vimure)`.
 
 In R, the `vimure` takes as data input an adjancency matrix or an igraph object.
 
-```{r}
+```r
 model <- vimure(net$X, net$R, mutuality=T, K=2, num_realisations=5, max_iter=1000)
 ```
 
@@ -113,14 +107,14 @@ model <- vimure(net$X, net$R, mutuality=T, K=2, num_realisations=5, max_iter=100
 Use `summary` to produce result summaries of the results of the model. The output of `summary` is a R list that contains vimure's priors and posteriors and more. You can access the results to plot and analyse the final model. 
 Open an issue in our [repository](https://github.com/latentnetworks/vimure/issues/new) to make request new metrics in `summary`.
 
-```{r}
+```r
 diag <- summary(model)
 ```
 ## Inferred model
 
 Use `get_inferred_model()` and `sample_inferred_model()` to reconstruct the Y matrix using the distribution of rho_f. 
 
-```{r}
+```r
 Y_hat <- get_inferred_model(model)
 
 # Compared Y_hat to ground truth Y

@@ -12,12 +12,6 @@ body {
 text-align: justify}
 </style>
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
 
 Vimure requires R >= 3.3.0.  If you do not already have a R environment configured on your computer, please see the instructions for installing [R and Rstudio](http://web.cs.ucla.edu/~gulzar/rstudio/).
 
@@ -46,7 +40,7 @@ vimure::install_vimure()
 
 You can confirm that the installation succeeded with:
 
-```{r warning=FALSE}
+```r 
 library(vimure)
 vimure::vm_config()
 ```
@@ -59,18 +53,19 @@ VIMuRe is distributed as a Python package and so needs to be installed within a 
 
 Note that `install_vimure()` isn’t required to use VIMuRe with the package. If you manually configure a python environment with the required dependencies, you can tell R to use it by pointing reticulate at it, commonly by setting an environment variable:
   
-  ``` r
+``` r
 Sys.setenv("RETICULATE_PYTHON" = "~/path/to/python-env/bin/python")
 ```
 
 By default, `install_vimure()` install the latest *develop* branch of VIMuRe You can override this behavior by specifying the version parameter. For example:
   
-  ``` r
+``` r
 install_vimure(version = "master")
 ```
 
 You can also install a local version of VIMuRe by specifying a URL/Path to a VIMuRe binary. For example:
   
-  ``` r
+
+``` r
 install_vimure(version = "~/Git/vimure/src/python")
 ```
