@@ -27,7 +27,7 @@ library(ggcorrplot)
 First create an object with the desired synthetic network class:
 
 ```{r}
-net <- gm_Multitensor(N=100, M=100, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.5)
+net <- gm_crep(N=100, M=100, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.5)
 
 # Ground Truth Network
 Y <- net$Y$toarray()

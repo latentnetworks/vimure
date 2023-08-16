@@ -25,11 +25,11 @@
 #'    It has to be in [0, 1).
 #' @param seed Pseudo random generator seed to use
 #'
-#' @return gm_StandardSBM model
+#' @return gm_standard_sbm model
 #' @export
 #'
 #' @examples
-#' random_net <- gm_StandardSBM(N = 100, M = 100, L = 1)
+#' random_net <- gm_standard_sbm(N = 100, M = 100, L = 1)
 #' Y <- random_net$Y$toarray()
 #' dim(Y)
 gm_standard_sbm <- function(N = 100,
@@ -71,13 +71,13 @@ gm_standard_sbm <- function(N = 100,
 #'
 #' @param exp_in Exponent power law of in-degree distribution
 #' @param exp_out Exponent power law of out-degree distribution
-#' @inheritParams gm_StandardSBM
+#' @inheritParams gm_standard_sbm
 #'
-#' @return gm_DegreeCorrectedSBM model
+#' @return gm_degree_corrected_sbm model
 #' @export
 #'
 #' @examples
-#' random_net <- gm_DegreeCorrectedSBM(exp_in = 2, exp_out = 2.5)
+#' random_net <- gm_degree_corrected_sbm(exp_in = 2, exp_out = 2.5)
 #' Y <- random_net$Y$toarray()
 #' dim(Y)
 gm_degree_corrected_sbm <- function(N = 100,
@@ -122,13 +122,13 @@ gm_degree_corrected_sbm <- function(N = 100,
 #'
 #' @param eta Initial value for the reciprocity coefficient.
 #'  Eta has to be in [0, 1).
-#' @inheritParams gm_StandardSBM
+#' @inheritParams gm_standard_sbm
 #'
-#' @return gm_Multitensor model
+#' @return gm_crep model
 #' @export
 #'
 #' @examples
-#' random_net <- gm_Multitensor(N = 100, M = 100, L = 1, eta = 0.5)
+#' random_net <- gm_crep(N = 100, M = 100, L = 1, eta = 0.5)
 #' Y <- random_net$Y$toarray()
 #' dim(Y)
 gm_crep <- function(N = 100,
