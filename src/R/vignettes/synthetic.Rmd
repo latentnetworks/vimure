@@ -7,15 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```r
 library(vimure)
 library(ggplot2)
 library(ggcorrplot)
@@ -26,10 +18,10 @@ The goal of this article is to illustrate how to generate and use synthetic netw
 
 # Generating Ground Truth Networks - `Y`
 
-Simply create an object with the desired synthetic network class (more info about arguments and others synthetic models in `help(gm_Multitensor)`):
+Simply create an object with the desired synthetic network class (more info about arguments and others synthetic models in `help(gm_crep)`):
 
-```{r}
-random_net <- gm_Multitensor(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)
+```r
+random_net <- gm_crep(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)
 
 Y <- random_net$Y$toarray()
 
@@ -39,7 +31,7 @@ ggcorrplot(Y[1, ,]) +
 
 Plot the network data:
 
-```{r}
+```r
 graph <- graph_from_adjacency_matrix(Y[1, , ], mode = "directed")
 graph <- set_graph_attr(graph, "layout", layout_with_fr(graph, niter=600))
 plot(graph,
@@ -52,7 +44,7 @@ plot(graph,
 
 Calculate some network statistics from the adjacency matrix:
 
-```{r}
+```r
 message(
   "Nodes: ", length(V(graph)),
   " | Edges: ", gsize(graph),
@@ -65,7 +57,7 @@ message(
 
 Given a network Y, we can generate N observed adjacency matrices as would have been reported by reporting nodes $m$ for $m \in N$. This is achieved by the function `build_X`. Example:
 
-```{r}
+```r
 X <- build_X(random_net, flag_self_reporter=T, cutoff_X=F, seed=10L)
 dim(X)
 ```
@@ -88,7 +80,7 @@ build_X(random_net, sh_theta=2.0, sc_theta=0.5) # Default values
 
 The distribution looks as follow:
 
-```{r}
+```r
 theta <- rgamma(2000, shape = 2, scale = 0.5)
 hist(theta, breaks=50, prob = T, xlab = "Reliability parameter (theta)")
 lines(density(theta), col="red", lwd=2) 
@@ -96,7 +88,7 @@ lines(density(theta), col="red", lwd=2)
 
 > This setup aims to represent 'reliable' reporters as having $\theta = 1.0$. Reporters with very low $\theta$ ($\theta \to 0$) will tend to under-report while those with high $\theta$ (unbounded) will over-report their social ties.
 
-```{r}
+```r
 layer <- 1
 reporter_id <- 31 # Change this to view the network from the point of view of different reporters
 
@@ -111,7 +103,7 @@ ggcorrplot( X_current) +
 
 If we take the average of X (considering the reporter's mask), it will look like this:
 
-```{r}
+```r
 Xavg <- extract_Xavg(random_net)
 
 ggcorrplot( Xavg[layer, ,]) + 
@@ -122,7 +114,7 @@ ggcorrplot( Xavg[layer, ,]) +
 
 Instead of drawing $\theta$ from a Gamma distribution, one could just simply pass a list of reliability parameters per each node. It is used to simulate exaggeration scenarios (under-reporters and over-reporters).
 
-```{r}
+```r
 theta_ratio <- 0.20 # percentage of reporters that are exaggerators
 exaggeration_type <- "over" # exaggerators are over-reporters
 
@@ -138,7 +130,7 @@ custom_theta
 
 If using a custom theta, pass it to function build_X:
 
-```{r}
+```r
 X_custom <- build_X(
   random_net,
   flag_self_reporter=T,
@@ -160,7 +152,7 @@ The mutuality parameter ($\eta$) models people’s propensity of naming of the s
 
 **An example of impossibly High Mutuality on X**
 
-```{r}
+```r
 X_custom <- build_X(random_net, cutoff_X=T, mutuality=0.99, flag_self_reporter=T, seed=10L)
 Xavg <- extract_Xavg(random_net)
 ggcorrplot( Xavg[1, ,]) + 
@@ -169,7 +161,7 @@ ggcorrplot( Xavg[1, ,]) +
 
 **An example of NO mutuality on X ($\eta = 0.0$)**
 
-```{r}
+```r
 X_custom <- build_X(random_net, cutoff_X=T, mutuality=0, flag_self_reporter=T, seed=10L)
 Xavg <- extract_Xavg(random_net)
 

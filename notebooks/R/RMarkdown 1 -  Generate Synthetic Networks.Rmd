@@ -22,7 +22,7 @@ library(igraph)
 Simply create an object with the desired synthetic network class:
 
 ```{r}
-random_net <- gm_Multitensor(N=100,
+random_net <- gm_crep(N=100,
             M=100,
             L=1,
             C=2,

@@ -21,8 +21,6 @@ jobs:
         with:
           use-public-rspm: true
 
-      - uses: r-lib/actions/setup-renv@v2
-
       - name: Install devtools
         run: install.packages("devtools")
         shell: Rscript {0}
@@ -43,7 +41,7 @@ jobs:
         run: pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
 
       - name: Install vimure
-        run: devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop");vimure::install_vimure()
+        run: devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="main");vimure::install_vimure()
         shell: Rscript {0}
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

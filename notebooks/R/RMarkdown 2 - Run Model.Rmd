@@ -22,11 +22,11 @@ library(devtools)
 
 (see RMarkdown 01 for more information about the synthetic network models used in the study)
 
-Let us generate a synthetic network with reciprocity (`gm_Multitensor`):
+Let us generate a synthetic network with reciprocity (`gm_crep`):
 
 ```{r}
 # Eta is the expected reciprocity on the network
-random_net <- gm_Multitensor(N=100, M=100, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.2) 
+random_net <- gm_crep(N=100, M=100, L=1, C=2, K=2, avg_degree=10, seed=24, sparsify=T, eta=0.2) 
 
 layer <- 1
 Y <- extract_Y(random_net)

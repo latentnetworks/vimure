@@ -25,5 +25,5 @@ A L x M matrix for theta
 }
 \description{
 Instead of the regular generative model for theta (theta ~ Gamma(sh, sc)),
-create a more extreme scenario where some percentage of reporters are exaggerating.
+create a more extreme scenario where some percentage of reporters exaggerates
 }

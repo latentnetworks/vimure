@@ -41,7 +41,7 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   seed <- 25
   K <- 2
 
-  synth_net <- gm_Multitensor(N=100, M=100, L=1, C=2,
+  synth_net <- gm_crep(N=100, M=100, L=1, C=2,
                                K=K, avg_degree=5, sparsify=T, seed=seed, eta=eta
   )
 
@@ -84,7 +84,7 @@ test_that("Check reporters' mask", {
 
   N <- 20
   nodes <- 1:N
-  synth_net <- gm_StandardSBM(N = N, M = 20, L = 1, K = 3, C = 2,
+  synth_net <- gm_standard_sbm(N = N, M = 20, L = 1, K = 3, C = 2,
                               avg_degree = 2, sparsify = FALSE)
 
   # specify some sort of mask
@@ -98,7 +98,7 @@ test_that("Check reporters' mask", {
 
   reporter_mask[, , , reporters] <- "clearly_wrong"
 
-  expect_error(vimure(edgelist, R = reporter_mask), 
+  expect_error(vimure(adj_matrix, R = reporter_mask), 
                "R must be either entirely made of TRUE/FALSE or of 0s/1s.")
 
 })
@@ -106,7 +106,7 @@ test_that("Check reporters' mask", {
 test_that("Check vimure model with standard_sbm", {
   skip_if_no_vimure()
 
-  synth_net <- gm_StandardSBM(N=20, M=20, L=1, K=3, C=2, avg_degree=2, sparsify=F)
+  synth_net <- gm_standard_sbm(N=20, M=20, L=1, K=3, C=2, avg_degree=2, sparsify=F)
   X <- build_X(synth_net, flag_self_reporter=T)
   model <- vimure(synth_net$X, R=synth_net$R, K=synth_net$K, verbose=F)
   check_parameters(model, synth_net)
@@ -130,7 +130,7 @@ test_that("Check vimure model for invalid inputs", {
 
 
 test_that("Check inferred model", {
-  synth_net <- gm_StandardSBM(N=20, M=20, sparsify = F, K=2)
+  synth_net <- gm_standard_sbm(N=20, M=20, sparsify = F, K=2)
   X <- build_X(synth_net, flag_self_reporter = T, cutoff_X = T)
 
   model <- vimure(synth_net$X, synth_net$R, num_realisations=1, max_iter=500, mutuality = T, verbose=F)

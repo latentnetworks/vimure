@@ -138,7 +138,7 @@ parse_graph_from_igraph <- function(
   }
 
 
-  if(class(graph) != "igraph"){
+  if(inherits(graph, "igraph")){
     stop("invalid 'type' (", class(graph), ") of argument")
   }
 
