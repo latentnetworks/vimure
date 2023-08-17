@@ -24,7 +24,7 @@ The VIMuRe R package wraps the [VIMuRe](https://github.com/latentnetworks/vimure
 First, install the vimure R package from GitHub as follows:
 
 ```r
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="develop")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="main")
 ```
 
 Then, use the `install_vimure()` function on R to install the python package its dependencies.  

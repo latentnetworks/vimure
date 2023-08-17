@@ -1,4 +1,4 @@
 from . import model
 from . import synthetic
 
-VERSION = 'v0.1.1'
+VERSION = 'v0.1.2'
