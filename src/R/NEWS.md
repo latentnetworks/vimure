@@ -1,5 +1,9 @@
 <!-- NEWS.md is maintained by https://cynkra.github.io/fledge, do not edit -->
 
+# vimure 0.1.2.9000 (2023-08-16)
+
+- (R) Experimental stage: embedding the Python installation and full setup directly into the R package, so that the user does not need to install Python separately.
+
 # vimure 0.1.2 (2023-08-16)
 
 - (R) Add minimal vignettes for synthetic models

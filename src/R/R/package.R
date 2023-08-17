@@ -1,23 +1,66 @@
 vimureP <- NULL
 
-# globals
-.globals <- new.env(parent = emptyenv())
-.globals$tensorboard <- NULL
+# An adaptation of https://github.com/rstudio/reticulate/blob/fd9301ff77575227336d421f099c580ed68ab1b2/R/miniconda.R#L302 # nolint
+miniconda_conda <- function(path = reticulate::miniconda_path()) {
+  exe <- if (Sys.info()["sysname"] == "Windows") {
+    "condabin/conda.bat"
+  } else {
+    "bin/conda"
+  }
+  file.path(path, exe)
+}
+
+conda_path <- miniconda_conda()
+env_name <- "r-vimure"
+
+github_repo <- "https://github.com/latentnetworks/vimure.git"
+py_pkg_suffix <- "#egg=vimure&subdirectory=src/python/"
 
 .onLoad <- function(libname, pkgname) {
+
+  reticulate::use_condaenv(env_name, required = TRUE, conda = conda_path)
+
   vimureP <<- reticulate::import("vimure", delay_load = list(
-    priority = 5,
-    environment = "r-reticulate",
-    on_load = function(){
-      version <- vm_version()
+    on_load = function() {
+      print("Loaded")
+      pkg_version <- get_pkg_version()
       emit <- get("packageStartupMessage") # R CMD check
-      emit("Loaded vimure version ", version)
+      emit("Loaded vimure version ", pkg_version)
     },
     on_error = function(e) {
       config <- vm_config()
       stop(config$error_message, call. = FALSE)
     }
   ))
+}
+
+
+
+check_installation <- function() {
+  if (is.null(vimureP)) {
+    config <- reticulate::py_config()
+    if (length(config$python_versions) > 0) {
+      message <- paste0(
+        "Valid installation of `vimure` not found.\n\n",
+        "Python environments searched for 'vimure' package:\n"
+      )
+      python_versions <- paste0(" ", normalizePath(config$python_versions, mustWork = FALSE),
+        collapse = "\n"
+      )
+      message <- paste0(message, python_versions, sep = "\n")
+    } else {
+      message <- "Valid installation of `vimure` not found."
+    }
+    stop(message)
+  }
+}
+
+get_pkg_version <- function() {
+  # To understand how this works, see:
+  # https://r-pkgs.org/data.html#sec-data-system-file
+  descpath <- system.file("DESCRIPTION", package = "vimure")
+  pkg_version <- read.dcf(descpath, all = TRUE)$Version
+  return(pkg_version)
 }
 
 #' Vimure configuration information
@@ -28,47 +71,18 @@ vimureP <- NULL
 #'
 #' @keywords internal
 #' @export
-vm_config <- function(){
-  # first check if we found vimure
-  have_vimure <- reticulate::py_module_available("vimure")
-
-  # get py config
+vm_config <- function() {
   config <- reticulate::py_config()
+  pkg_version <- get_pkg_version()
 
-  # found it!
-  if (have_vimure) {
-    # get version
-    if (reticulate::py_has_attr(vimureP, "VERSION"))
-      version_raw <- vimureP$VERSION
-    else
-      version_raw <- ""
-
-    structure(class = "vimure_config", list(
-      available = TRUE,
-      version = version_raw,
-      version_str = version_raw,
-      location = config$required_module_path,
-      python = config$python,
-      python_version = config$version
-    ))
-  } else {
-    structure(class = "vimure_config", list(
-      available = FALSE,
-      python_versions = config$python_versions,
-      error_message = vm_config_error_message()
-    ))
-  }
-}
-
-#' @rdname vm_config
-#' @keywords internal
-#' @export
-vm_version <- function() {
-  config <- vm_config()
-  if (config$available)
-    config$version
-  else
-    NULL
+  structure(class = "vimure_config", list(
+    available = TRUE,
+    version = pkg_version,
+    version_str = pkg_version,
+    location = config$required_module_path,
+    python = config$python,
+    python_version = config$version
+  ))
 }
 
 #' @export
@@ -83,36 +97,42 @@ print.vimure_config <- function(x, ...) {
 }
 
 # Build error message for Vimure configuration errors
-vm_config_error_message <- function(){
+vm_config_error_message <- function() {
   message <- "Valid installation of `vimure` not found."
   config <- reticulate::py_config()
   if (!is.null(config)) {
     if (length(config$python_versions) > 0) {
-      message <- paste0(message,
-                        "\n\nPython environments searched for 'vimure' package:\n")
+      message <- paste0(
+        message,
+        "\n\nPython environments searched for 'vimure' package:\n"
+      )
       python_versions <- paste0(" ", normalizePath(config$python_versions, mustWork = FALSE),
-                                collapse = "\n")
+        collapse = "\n"
+      )
       message <- paste0(message, python_versions, sep = "\n")
     }
   }
 
-  python_error <- tryCatch({
-    reticulate::import("vimure")
-    list(message = NULL)
-  },
-  error = function(e) {
-    on.exit(reticulate::py_clear_last_error())
-    reticulate::py_last_error()
-  })
+  python_error <- tryCatch(
+    {
+      reticulate::import("vimure")
+      list(message = NULL)
+    },
+    error = function(e) {
+      on.exit(reticulate::py_clear_last_error())
+      reticulate::py_last_error()
+    }
+  )
 
-  message <- paste0(message,
-                    "\nPython exception encountered:\n ",
-                    python_error$message, "\n")
+  message <- paste0(
+    message,
+    "\nPython exception encountered:\n ",
+    python_error$message, "\n"
+  )
 
-  message <- paste0(message,
-                    "\nYou can install `vimure` using the install_vimure() function.\n")
+  message <- paste0(
+    message,
+    "\nYou can install `vimure` using the install_vimure() function.\n"
+  )
   message
 }
-
-
-
