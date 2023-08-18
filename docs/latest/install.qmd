@@ -1,22 +1,11 @@
 ---
 title: "📦 Installation"
-subtitle: "VIMuRe v0.1.1 (latest)"
+subtitle: "VIMuRe v0.1.3 (latest)"
 ---
 
-::: callout-note
-
- If you use `VIMuRe` in your research, please cite [@de_bacco_latent_2023].
-
-:::
 
 VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.
 
-::: callout-note
-
-## 📢 Note
-
-If your preferred language is R, we would like to hear from you. Please add a message [to this discussion](https://github.com/latentnetworks/vimure/discussions/66) to tell us whether you would like to see an easier installation process for R.
-:::
 
 Choose your language:
 
@@ -25,72 +14,15 @@ Choose your language:
 
 # R
 
-<details><summary>Step 01: Install `reticulate`</summary>
-
-## Step 01: Install `reticulate`
-
-Open your R console and type the following command:
-
-```r
-install.packages("reticulate")
-```
-
-::: {.callout-note collapse="true"}
-## Why do I need this package?
-
-- Our core code is written in python, so we use `reticulate` to integrate our model in R. This package allows you to use Python within your R session in a seamless, high-performance interoperable way. 
-
-- `reticulate` will look for the python installed on your computer. If for some reason it cannot find it, you may be prompted to download and install [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
-
-    - [miniconda](https://docs.conda.io/en/latest/miniconda.html) is the recommended installation method for most users, as it is easier to ensure that the newly installed python is isolated from other python installs you have in your system. 
-
-    - If you initially declined the [miniconda](https://docs.conda.io/en/latest/miniconda.html) installation prompt, you can later manually install [miniconda](https://docs.conda.io/en/latest/miniconda.html) by running `reticulate::install_miniconda()`.
-
-:::
-
-<p style="margin-bottom: 2rem;"></p>
-</details>
+`vimure` is not yet available on CRAN, but you can still it with [devtools](https://devtools.r-lib.org/).
 
 
-<details><summary>Step 02: Install the latest `vimure` (v0.1) </summary>
-
-## Step 02: Install the latest `vimure` (v0.1)
-
-In your R console, type the following commands:
+Install the latest `vimure` (v0.1.3) with the following command:
 
 ```r
 require(devtools)
-devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="main")
+devtools::install_github("latentnetworks/vimure", subdir="src/R", ref="v0.1.3")
 ```
-
-Check out [devtools](https://devtools.r-lib.org/) package documentation if you are not familiar with it.
-
-<p style="margin-bottom: 2rem;"></p>
-
-</details>
-
-<details><summary>Step 03: Install the Python package</summary>
-
-## Step 03: Install the Python package 
-
-You **must** install the python package before using the R package. This is because the R package is a wrapper around the Python package. You can do this without leaving R, though. Just type the following command in your R console:
-
-```r
-require(vimure)
-vimure::install_vimure()
-```
-
-If you are not using RStudio, i.e., you are using R in the terminal, you may need to restart your R session after installing the Python package.
-
-Not a fan of having to do this python setup? Please add a message [to this discussion](https://github.com/latentnetworks/vimure/discussions/66) to tell us you would like to see an easier installation process for R.
-
-<p style="margin-bottom: 2rem;"></p>
-
-</details>
-
-<details><summary>Step 04: Check the installation</summary>
-
-### Step 04: Check the installation
 
 To confirm that the installation was successful, run the following command:
 
@@ -101,27 +33,23 @@ vimure::vm_config()
 
 You should see something like the following:
 
-```r
-#> Loaded vimure version
-#> Vimure v (...)
-#> Python v3.x (...)
+```text
+Python version: v3.9 (~/Library/r-miniconda-arm64/envs/r-vimure/bin/python)
+Python version of vimure: 0.1.3
 ```
 
-</details>
-
+Underneath it all, our R package runs on [reticulate](https://rstudio.github.io/reticulate/), which is a package that allows R to interface with Python. The `vm_config()` function above shows you the Python version that is being used by `vimure`. We took the executive decision to manage the Python installation for you, so you don't have to worry about it and so that it doesn't clash with your existing Python installation. 
 
 # Python
 
 `vimure` is not yet available on PyPI, so to install the latest development version, follow the instructions below.
 
-Install the latest `vimure` (v0.1) with the following command:
+Install the latest `vimure` (v0.1.3) with the following command:
 
 ```bash
 pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
 ```
 
-This Python package was tested on Python >= 3.8, and it is expected to work fine in all OSes.
-
-Read more about the Python setup for development [here](https://github.com/latentnetworks/vimure/blob/develop/src/python/README.md).
+This Python package was tested on Python >= 3.8, and it is expected to work fine in all major OSes (Windows, Mac, Ubuntu).
 
 :::

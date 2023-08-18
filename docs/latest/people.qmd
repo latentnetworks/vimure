@@ -1,6 +1,6 @@
 ---
 title: "People"
-subtitle: "VIMuRe v0.1.1 (latest)"
+subtitle: "VIMuRe v0.1.3 (latest)"
 ---
 
 # Who we are

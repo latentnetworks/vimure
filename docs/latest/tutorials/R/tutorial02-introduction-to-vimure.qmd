@@ -1,6 +1,6 @@
 ---
 title: "💻 **Tutorial 02**: Introduction to VIMuRe in R"
-subtitle: "VIMuRe v0.1.1 (latest)"
+subtitle: "VIMuRe v0.1.3 (latest)"
 categories: [basics, R]
 tags: 
   - basics
