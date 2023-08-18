@@ -54,26 +54,7 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-/* CSS for citations */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-}
-.hanging-indent div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}</style>
+</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -147,7 +128,7 @@ cookieconsent.run({
 
 
 <meta name="twitter:title" content="VIMuRe - 📦 Installation">
-<meta name="twitter:description" content="VIMuRe v0.1.1 (latest)">
+<meta name="twitter:description" content="VIMuRe v0.1.3 (latest)">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -260,7 +241,7 @@ cookieconsent.run({
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">📦 Installation</h1>
-<p class="subtitle lead">VIMuRe v0.1.1 (latest)</p>
+<p class="subtitle lead">VIMuRe v0.1.3 (latest)</p>
 </div>
 
 
@@ -275,136 +256,36 @@ cookieconsent.run({
 
 </header>
 
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>If you use <code>VIMuRe</code> in your research, please cite <span class="citation" data-cites="de_bacco_latent_2023">(<a href="#ref-de_bacco_latent_2023" role="doc-biblioref">De Bacco et al. 2023</a>)</span>.</p>
-</div>
-</div>
 <p>VIMuRe is available in both R and Python. The R implementation is a wrapper around the Python implementation. Both packages are in active development and are not yet on CRAN or PyPI. Use the installation instructions below to install the latest development version.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-📢 Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>If your preferred language is R, we would like to hear from you. Please add a message <a href="https://github.com/latentnetworks/vimure/discussions/66">to this discussion</a> to tell us whether you would like to see an easier installation process for R.</p>
-</div>
-</div>
 <p>Choose your language:</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" aria-current="page">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Python</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<details>
-<summary>
-Step 01: Install <code>reticulate</code>
-</summary>
-<section id="step-01-install-reticulate" class="level2">
-<h2 class="anchored" data-anchor-id="step-01-install-reticulate">Step 01: Install <code>reticulate</code></h2>
-<p>Open your R console and type the following command:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"reticulate"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Why do I need this package?
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-3" class="callout-3-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<ul>
-<li><p>Our core code is written in python, so we use <code>reticulate</code> to integrate our model in R. This package allows you to use Python within your R session in a seamless, high-performance interoperable way.</p></li>
-<li><p><code>reticulate</code> will look for the python installed on your computer. If for some reason it cannot find it, you may be prompted to download and install <a href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a>.</p>
-<ul>
-<li><p><a href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a> is the recommended installation method for most users, as it is easier to ensure that the newly installed python is isolated from other python installs you have in your system.</p></li>
-<li><p>If you initially declined the <a href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a> installation prompt, you can later manually install <a href="https://docs.conda.io/en/latest/miniconda.html">miniconda</a> by running <code>reticulate::install_miniconda()</code>.</p></li>
-</ul></li>
-</ul>
-</div>
-</div>
-</div>
-<p style="margin-bottom: 2rem;">
-</p>
-</section></details>
-<details>
-<summary>
-Step 02: Install the latest <code>vimure</code> (v0.1)
-</summary>
-
-<section id="step-02-install-the-latest-vimure-v0.1" class="level2">
-<h2 class="anchored" data-anchor-id="step-02-install-the-latest-vimure-v0.1">Step 02: Install the latest <code>vimure</code> (v0.1)</h2>
-<p>In your R console, type the following commands:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(devtools)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"latentnetworks/vimure"</span>, <span class="at">subdir=</span><span class="st">"src/R"</span>, <span class="at">ref=</span><span class="st">"main"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>Check out <a href="https://devtools.r-lib.org/">devtools</a> package documentation if you are not familiar with it.</p>
-<p style="margin-bottom: 2rem;">
-</p>
-</section></details>
-<details>
-<summary>
-Step 03: Install the Python package
-</summary>
-
-<section id="step-03-install-the-python-package" class="level2">
-<h2 class="anchored" data-anchor-id="step-03-install-the-python-package">Step 03: Install the Python package</h2>
-<p>You <strong>must</strong> install the python package before using the R package. This is because the R package is a wrapper around the Python package. You can do this without leaving R, though. Just type the following command in your R console:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(vimure)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>vimure<span class="sc">::</span><span class="fu">install_vimure</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>If you are not using RStudio, i.e., you are using R in the terminal, you may need to restart your R session after installing the Python package.</p>
-<p>Not a fan of having to do this python setup? Please add a message <a href="https://github.com/latentnetworks/vimure/discussions/66">to this discussion</a> to tell us you would like to see an easier installation process for R.</p>
-<p style="margin-bottom: 2rem;">
-</p>
-</section></details>
-<details>
-<summary>
-Step 04: Check the installation
-</summary>
-<section id="step-04-check-the-installation" class="level3">
-<h3 class="anchored" data-anchor-id="step-04-check-the-installation">Step 04: Check the installation</h3>
+<p><code>vimure</code> is not yet available on CRAN, but you can still it with <a href="https://devtools.r-lib.org/">devtools</a>.</p>
+<p>Install the latest <code>vimure</code> (v0.1.3) with the following command:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(devtools)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"latentnetworks/vimure"</span>, <span class="at">subdir=</span><span class="st">"src/R"</span>, <span class="at">ref=</span><span class="st">"v0.1.3"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>To confirm that the installation was successful, run the following command:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vimure)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>vimure<span class="sc">::</span><span class="fu">vm_config</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vimure)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>vimure<span class="sc">::</span><span class="fu">vm_config</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>You should see something like the following:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Loaded vimure version</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Vimure v (...)</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Python v3.x (...)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section></details>
-
-
+<pre class="text"><code>Python version: v3.9 (~/Library/r-miniconda-arm64/envs/r-vimure/bin/python)
+Python version of vimure: 0.1.3</code></pre>
+<p>Underneath it all, our R package runs on <a href="https://rstudio.github.io/reticulate/">reticulate</a>, which is a package that allows R to interface with Python. The <code>vm_config()</code> function above shows you the Python version that is being used by <code>vimure</code>. We took the executive decision to manage the Python installation for you, so you don’t have to worry about it and so that it doesn’t clash with your existing Python installation.</p>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p><code>vimure</code> is not yet available on PyPI, so to install the latest development version, follow the instructions below.</p>
-<p>Install the latest <code>vimure</code> (v0.1) with the following command:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"git+https://github.com/latentnetworks/vimure.git#egg=vimure&amp;subdirectory=src/python/"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>This Python package was tested on Python &gt;= 3.8, and it is expected to work fine in all OSes.</p>
-<p>Read more about the Python setup for development <a href="https://github.com/latentnetworks/vimure/blob/develop/src/python/README.md">here</a>.</p>
+<p>Install the latest <code>vimure</code> (v0.1.3) with the following command:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install <span class="st">"git+https://github.com/latentnetworks/vimure.git#egg=vimure&amp;subdirectory=src/python/"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This Python package was tested on Python &gt;= 3.8, and it is expected to work fine in all major OSes (Windows, Mac, Ubuntu).</p>
 </div>
 </div>
 </div>
 
 
 
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-de_bacco_latent_2023" class="csl-entry" role="listitem">
-De Bacco, Caterina, Martina Contisciani, Jonathan Cardoso-Silva, Hadiseh Safdari, Gabriela Lima Borges, Diego Baptista, Tracy Sweet, et al. 2023. <span>“Latent Network Models to Account for Noisy, Multiply Reported Social Network Data.”</span> <em>Journal of the Royal Statistical Society Series A: Statistics in Society</em>, February, qnac004. <a href="https://doi.org/10.1093/jrsssa/qnac004">https://doi.org/10.1093/jrsssa/qnac004</a>.
-</div>
-</div></section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
