@@ -6,8 +6,15 @@ env_name <- "r-vimure"
 github_repo <- "https://github.com/latentnetworks/vimure.git"
 py_pkg_suffix <- "#egg=vimure&subdirectory=src/python/"
 
-
 #### FUNCTIONS ####
+
+get_pkg_version <- function() {
+  # To understand how this works, see:
+  # https://r-pkgs.org/data.html#sec-data-system-file
+  descpath <- system.file("DESCRIPTION", package = "vimure")
+  pkg_version <- read.dcf(descpath, all = TRUE)$Version
+  return(pkg_version)
+}
 
 miniconda_conda <- function(path = reticulate::miniconda_path()) {
   exe <- if (Sys.info()["sysname"] == "Windows") {
@@ -24,10 +31,8 @@ get_current_module_version <- function(module_name) {
 }
 
 install_python_vimure <- function() {
-  # To understand how this works, see:
-  # https://r-pkgs.org/data.html#sec-data-system-file
-  descpath <- system.file("DESCRIPTION", package = "vimure")
-  pkg_version <- read.dcf(descpath, all = TRUE)$Version
+  pkg_version <- get_pkg_version()
+
   py_pkg_url <- paste0("git+", github_repo, "@v", pkg_version, py_pkg_suffix)
 
   emit <- get("packageStartupMessage") # R CMD check
@@ -72,7 +77,7 @@ tryCatch(
 
 if (!reticulate::py_module_available("vimure")) {
   install_python_vimure()
-} else if (get_current_module_version("vimure") != pkg_version) {
+} else if (get_current_module_version("vimure") != get_pkg_version()) {
   install_python_vimure()
 } else {
   emit <- get("packageStartupMessage") # R CMD check
