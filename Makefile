@@ -8,4 +8,4 @@ endif
 
 create-patch-version:
 	@echo "Creating patch version"
-	@bump2version --no-commit --current-version 0.1.2 patch src/python/VERSION
+	@bump2version --no-commit --current-version 0.1.2 dev src/python/VERSION
