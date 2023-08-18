@@ -5,10 +5,12 @@ on:
     branches: [main, develop]
     paths:
       - src/R/**
+      - .github/workflows/r_check.yml
   pull_request:
     branches: [main, develop]
     paths:
       - src/R/**
+      - .github/workflows/r_check.yml
 
 name: R-CMD-check
 
