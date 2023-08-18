@@ -1,6 +1,6 @@
 ---
 title: "💻 **Tutorial 03**: Extracting point estimates from the posterior distribution"
-subtitle: "VIMuRe v0.1.1 (latest)"
+subtitle: "VIMuRe v0.1.3 (latest)"
 categories: [basics, python]
 description: "How to extract point estimates from the posterior distribution of the latent network model fitted using VIMuRe"
 ---

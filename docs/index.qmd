@@ -5,7 +5,11 @@ subtitle: "Latent Network Models to Account for Noisy, Multiply-Reported Social 
 
 ::: callout-note
 
- If you use `VIMuRe` in your research, please cite [@de_bacco_latent_2023].
+The latest version (v0.1.3) simplifies the installation process for the R package. Check out the 📦 [Installation page](/latest/install.html) for more details. 
+
+If you give it a go, [write to us](https://github.com/latentnetworks/vimure/discussions) if you have any questions or comments about the package!
+
+If you want to see what we have planned for the future, check out the [Roadmap](https://github.com/latentnetworks/vimure/milestones?direction=asc&sort=title&state=open) on GitHub.
 
 :::
 
@@ -25,5 +29,5 @@ The model in the **VIMuRe** package is our proposed solution to this problem. It
 
 ## Getting started
 
-- Head to the [📦 Installation](./latest/install.qmd) page to learn how to install the package (either R or Python).
-- Check out the [💻 Tutorials](./latest/tutorials.html) page to learn how to use the package.
+- Head to the 📦 [Installation](./latest/install.qmd) page to learn how to install the package (either R or Python).
+- Check out the 💻 [Tutorials](./latest/tutorials.html) page to learn how to use the package.

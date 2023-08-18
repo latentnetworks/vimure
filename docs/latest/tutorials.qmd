@@ -1,6 +1,6 @@
 ---
 title: "💻 Tutorials"
-subtitle: "VIMuRe v0.1.1 (latest)"
+subtitle: "VIMuRe v0.1.3 (latest)"
 ---
 
 Choose your favourite language:

@@ -2,12 +2,9 @@
 % Please edit documentation in R/package.R
 \name{vm_config}
 \alias{vm_config}
-\alias{vm_version}
 \title{Vimure configuration information}
 \usage{
 vm_config()
-
-vm_version()
 }
 \value{
 List with information on the current configuration of Vimure

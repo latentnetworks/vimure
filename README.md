@@ -23,7 +23,7 @@ VIMuRe package is available in R and Python. Check out the 📦 [Installation pa
 ## 🗣️ Feedback
 
 - Join or create a new [**discussion**](https://github.com/latentnetworks/vimure/discussions) if you have general queries or comments.
-- Open [an issue](https://github.com/latentnetworks/vimure/issues/new/choose) here on Github if you want to report a bug or suggest a new feature
+- Open [an issue](https://github.com/latentnetworks/vimure/issues/new/choose) here on GitHub if you want to report a bug or suggest a new feature
 
 ## ✋ Do you want to contribute to this project?
 
