@@ -1,5 +1,14 @@
 require(reticulate)
 
+#### CONSTANTS ####
+
+env_name <- "r-vimure"
+github_repo <- "https://github.com/latentnetworks/vimure.git"
+py_pkg_suffix <- "#egg=vimure&subdirectory=src/python/"
+
+
+#### FUNCTIONS ####
+
 miniconda_conda <- function(path = reticulate::miniconda_path()) {
   exe <- if (Sys.info()["sysname"] == "Windows") {
     "condabin/conda.bat"
@@ -9,12 +18,27 @@ miniconda_conda <- function(path = reticulate::miniconda_path()) {
   file.path(path, exe)
 }
 
-conda_path <- miniconda_conda()
-env_name <- "r-vimure"
-py_pkg_version <- "0.1.2"
+get_current_module_version <- function(module_name) {
+  all_pkgs <- reticulate::py_list_packages()
+  all_pkgs[all_pkgs["package"] == module_name][2]
+}
 
-github_repo <- "https://github.com/latentnetworks/vimure.git"
-py_pkg_suffix <- "#egg=vimure&subdirectory=src/python/"
+install_python_vimure <- function() {
+  # To understand how this works, see:
+  # https://r-pkgs.org/data.html#sec-data-system-file
+  descpath <- system.file("DESCRIPTION", package = "vimure")
+  pkg_version <- read.dcf(descpath, all = TRUE)$Version
+  py_pkg_url <- paste0("git+", github_repo, "@v", pkg_version, py_pkg_suffix)
+
+  emit <- get("packageStartupMessage") # R CMD check
+  emit("Installing vimure version ", pkg_version, " from ", py_pkg_url)
+  reticulate::conda_install(py_pkg_url, pip = TRUE, envname = env_name,
+                            conda = conda_path)
+}
+
+#### MINICONDA AND CONDA ENV SETUP ####
+
+conda_path <- miniconda_conda()
 
 tryCatch(
   {
@@ -39,20 +63,18 @@ tryCatch(
   },
   error = function(e) {
     reticulate::conda_create(env_name, conda = conda_path)
+    reticulate::use_condaenv(env_name, required = TRUE, conda = conda_path)
   }
 )
 
 
-if (!reticulate::py_module_available("vimure")) {
-  # To understand how this works, see:
-  # https://r-pkgs.org/data.html#sec-data-system-file
-  #   descpath <- system.file("DESCRIPTION", package = "vimure")
-  #   pkg_version <- read.dcf(descpath, all = TRUE)$Version
-  py_pkg_url <- paste0("git+", github_repo, "@v", py_pkg_version, py_pkg_suffix)
+#### INSTALL VIMURE ####
 
-  emit <- get("packageStartupMessage") # R CMD check
-  emit("Installing vimure version ", py_pkg_version, " from ", py_pkg_url)
-  reticulate::conda_install(py_pkg_url, pip = TRUE, envname = env_name, conda = conda_path)
+if (!reticulate::py_module_available("vimure")) {
+  install_python_vimure()
+} else if (get_current_module_version("vimure") != pkg_version) {
+  install_python_vimure()
 } else {
-  print("vimure already installed")
+  emit <- get("packageStartupMessage") # R CMD check
+  emit("VIMuRe already installed")
 }
