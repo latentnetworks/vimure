@@ -19,7 +19,14 @@ def suppress_stdout_stderr():
 def karnataka_edgelist_vil1():
 
     import sys
-    sys.path.insert(0, "notebooks/python/experiments/")
+    # Before inserting, we need to check if we're currently at <some-place>/vimure or at <some-place>/vimure/src/python
+    current_path = sys.path[0]
+    if current_path.endswith("vimure"):
+        sys.path.insert(0, "notebooks/python/experiments/")
+    elif current_path.endswith("src/python"):
+        sys.path.insert(0, "../../notebooks/python/experiments/")
+    else:
+        raise Exception("Could not find the correct path to vimure")
 
     from karnataka import read_village_data # type: ignore
     df, nodes, reporters = read_village_data("vil1", 
@@ -30,13 +37,22 @@ def karnataka_edgelist_vil1():
 @pytest.fixture()
 def karnataka_edgelist_vil1_money():
 
-    import sys
-    sys.path.insert(0, "notebooks/python/experiments/")
+    import os, sys;
+    # Before inserting, we need to check if we're currently at <some-place>/vimure or at <some-place>/vimure/src/python
+    current_path = os.getcwd()
+    if current_path.endswith("vimure"):
+        sys.path.insert(0, "notebooks/python/experiments/")
+        data_folder = "data/input/india_microfinance/formatted/"
+    elif current_path.endswith("python"):
+        sys.path.insert(0, "../../notebooks/python/experiments/")
+        data_folder = "../../data/input/india_microfinance/formatted/"
+    else:
+        raise Exception("Could not find the correct path to vimure")
 
     from karnataka import read_village_data # type: ignore
     df, nodes, reporters = read_village_data("vil1", 
                                              filter_layer="money",
-                                             data_folder="data/input/india_microfinance/formatted/")
+                                             data_folder=data_folder)
     df.rename(columns={"Ego": "ego", "Alter": "alter"}, inplace=True)
     yield df, nodes, reporters
 
