@@ -1,4 +1,5 @@
 require(testthat)
+require(reticulate)
 
 skip_if_no_vimure <- function() {
   have_vimure <- reticulate::py_module_available("vimure")
@@ -110,6 +111,68 @@ test_that("Check vimure model with standard_sbm", {
   X <- build_X(synth_net, flag_self_reporter=T)
   model <- vimure(synth_net$X, R=synth_net$R, K=synth_net$K, verbose=F)
   check_parameters(model, synth_net)
+})
+
+# Motivated by https://github.com/latentnetworks/vimure/issues/92
+test_that("Check custom reporters' mask are enforced", {
+  skip_if_no_vimure()
+
+  L <- 1
+  N <- 20
+  nodes <- 1:N
+  synth_net <- gm_standard_sbm(N = N, M = 20, L = L, K = 3, C = 2,
+                               avg_degree = 2, sparsify = FALSE)
+
+  X <- build_X(synth_net, flag_self_reporter = TRUE)
+
+  # Essentially all 1:M are reporters
+  all_reporters <- unique(synth_net$R$subs[[4]])
+
+  reporter_mask <- array(0, dim = c(1, N, N, N),
+                         dimnames = list("layer", 1:N, 1:N, 1:N))
+
+  # I made it so that only egos are reporters
+  for (l in 1:L) {
+    for (i in 1:N) {
+      for (j in 1:N) {
+        for (m in seq_along(all_reporters)) {
+          if (i == all_reporters[m]) {
+            reporter_mask[l, i, j, m] <- 1
+          }
+        }
+      }
+    }
+  }
+
+  model <- vimure(synth_net$X,
+                  R = reporter_mask,
+                  K = synth_net$K,
+                  verbose = TRUE)
+  check_parameters(model, synth_net)
+
+  # The object reporter_mask is already a native R matrix
+  # Now I need to convert model$R from python to R
+
+  # I will need numpy
+  np <- import("numpy", convert = FALSE)
+
+  # Initialise an empty 4D numpy array
+  model_R <- np$zeros(shape = as.integer(c(L, N, N, N)))
+
+  # Get the keys (a 4D list) of the python object model$R
+  model_R_keys <- model$R$subs
+
+  #For each key, assign the corresponding value to the numpy array
+  for (i in seq_along(model_R_keys[[1]])) {
+    model_R[model_R_keys[[1]][i], model_R_keys[[2]][i],
+             model_R_keys[[3]][i], model_R_keys[[4]][i]] <- 1
+  }
+
+  model_R <- as.array(model_R)
+  dimnames(model_R) <- list("layer", 1:N, 1:N, 1:N)
+
+  expect_equal(model_R, reporter_mask)
+
 })
 
 test_that("Check vimure model in extreme scenarios of under reporting", {

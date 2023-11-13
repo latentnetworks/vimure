@@ -106,7 +106,7 @@ vimure <-
            verbose = FALSE,
            ...) {
 
-  valid_classes <- c("sktensor.sptensor.sptensor", "array",
+  valid_classes <- c("sktensor.sptensor.sptensor", "array", "numpy.ndarray",
                      "igraph", "data.frame", "tbl_df")
   if (!any(class(x) %in% valid_classes)) {
     stop("invalid 'type'", class(x), "of argument")
