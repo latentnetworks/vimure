@@ -175,6 +175,91 @@ test_that("Check custom reporters' mask are enforced", {
 
 })
 
+# Motivated by https://github.com/latentnetworks/vimure/issues/92
+test_that("Check custom reporters' mask are enforced when input is edgelist", {
+  skip_if_no_vimure()
+
+  L <- 1
+  N <- 20
+  nodes <- 1:N
+  synth_net <- gm_standard_sbm(N = N, M = 20, L = L, K = 3, C = 2,
+                               avg_degree = 3, sparsify = FALSE)
+
+  X <- build_X(synth_net, flag_self_reporter = TRUE)
+
+  ############################################
+  # Now that I created a synthetic network,  #
+  # I will convert it to an edgelist         #
+  # to emulate the input of a user           #
+  ############################################
+  indices <- expand.grid(l = 1:L, i = 1:N, j = 1:N, k = 1:N)
+
+  # Check which X dimensions are non-zero
+  non_zero_indices <- which(X > 0)
+
+  # Create the edgelist
+  edgelist <- indices[non_zero_indices, ]
+  colnames(edgelist) <- c("layer", "ego", "alter", "reporter")
+
+  # Replicate the offending behaviour
+  unique_nodes <- dplyr::union(edgelist$ego, edgelist$alter) %>% unique()
+
+  ego <- unique_nodes
+  alter <- unique_nodes
+  reporter <- unique_nodes
+
+  # Assuming edgelist$reporter contains the list of reporters
+  reporters <- unique(edgelist$reporter)
+
+  # Create an empty array filled with zeros
+  reporter_mask <- array(0, dim = c(1, N, N, N),
+                         dimnames = list("layer", ego, alter, reporter))
+
+  # Populate the array according to the specified conditions
+  for (l in 1:L) {
+    for (i in 1:N) {
+      for (j in 1:N) {
+        for (m in seq_along(reporters)) {
+          if (ego[i] == reporters[m] | alter[j] == reporters[m]) {
+            reporter_mask[l, i, j, m] <- 1
+          }
+        }
+      }
+    }
+  }
+
+
+  model <- vimure(edgelist,
+                  R = reporter_mask,
+                  K = synth_net$K,
+                  verbose = TRUE)
+  check_parameters(model, synth_net)
+
+  # The object reporter_mask is already a native R matrix
+  # Now I need to convert model$R from python to R
+
+  # I will need numpy
+  np <- import("numpy", convert = FALSE)
+
+  # Initialise an empty 4D numpy array
+  model_R <- np$zeros(shape = as.integer(c(L, N, N, N)))
+
+  # Get the keys (a 4D list) of the python object model$R
+  model_R_keys <- model$R$subs
+
+  #For each key, assign the corresponding value to the numpy array
+  for (i in seq_along(model_R_keys[[1]])) {
+    model_R[model_R_keys[[1]][i], model_R_keys[[2]][i],
+             model_R_keys[[3]][i], model_R_keys[[4]][i]] <- 1
+  }
+
+  model_R <- as.array(model_R)
+  dimnames(model_R) <- list("layer", 1:N, 1:N, 1:N)
+
+  expect_equal(model_R, reporter_mask)
+
+})
+
 test_that("Check vimure model in extreme scenarios of under reporting", {
   check_extreme_scenarios("under", 0.97)
 })
