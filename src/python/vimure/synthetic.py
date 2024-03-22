@@ -165,6 +165,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
             Q = self.K
 
         if flag_self_reporter:
+            #TODO: Change this according to one of the three reporting_scenario
             R = build_self_reporter_mask(self)
 
             for l in range(L):

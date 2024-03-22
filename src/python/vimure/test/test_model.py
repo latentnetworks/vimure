@@ -73,10 +73,10 @@ def check_reporting_mask(model, net_obj, reporting_scenario):
         # Assuming model.R is a 4D tensor (sktensor.sptensor), I will work directly with the nonzero indices
         R = pd.DataFrame(np.stack(model.R.subs).T, columns=['l', 'i', 'j', 'm'])
 
-        # Check that all nonzero indices are on the ego and alter sides (remove self-loop)
+        # The only possible values for m are i and j
         assert R.query("m == i | m == j").shape[0] == R.shape[0]
 
-        # In other words
+        # Or, in other words
         assert R.query("m != i & m != j").empty
 
     elif reporting_scenario == 3:
@@ -88,13 +88,12 @@ def check_reporting_mask(model, net_obj, reporting_scenario):
         raise ValueError(f"Invalid reporting_scenario: {reporting_scenario}. Must be one of 1, 2, 3.")
 
 
-
 class TestVimureWithRandomNetworks:
     """
     Tests of the VimureModel class
     """
 
-    def test_vimure_model_with_standard_sbm(self):
+    def test_vimure_model_with_standard_sbm_reporting_scenario1(self):
         """
         Tests the VimureModel class with a known synthetic network
         """
@@ -370,7 +369,6 @@ class TestVimureWithRandomNetworks:
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
 
         assert np.allclose(f1_score(Y_true, Y_rec), 0.97, atol=1e-2)
-
 
 class TestVimureWithReadData:
     """
