@@ -51,6 +51,44 @@ def check_final_parameters(model, net_obj):
     assert type(model.nu_rte) == np.float64
     assert model.nu_rte >= 0
 
+def check_reporting_mask(model, net_obj, reporting_scenario):
+    """
+    If reporting_scenario == 1, then the model.R should only allow self-reporting on the ego side
+
+    If reporting_scenario == 2, then the model.R should only allow self-reporting, both on ego and alter sides (double-sampling)
+
+    If reporting_scenario == 3, then the model.R should only allow self-reporting on any ties
+    
+    """
+
+    if reporting_scenario == 1:
+        
+        # Assuming model.R is a 4D tensor (sktensor.sptensor), I will work directly with the nonzero indices
+        R = pd.DataFrame(np.stack(model.R.subs).T, columns=['l', 'i', 'j', 'm'])
+        # Check that all nonzero indices are on the ego side (remove self-loop)
+        assert R.query("m == i & i < j").shape[0] == R.shape[0]
+
+    elif reporting_scenario == 2:
+        
+        # Assuming model.R is a 4D tensor (sktensor.sptensor), I will work directly with the nonzero indices
+        R = pd.DataFrame(np.stack(model.R.subs).T, columns=['l', 'i', 'j', 'm'])
+
+        # Check that all nonzero indices are on the ego and alter sides (remove self-loop)
+        assert R.query("m == i | m == j").shape[0] == R.shape[0]
+
+        # In other words
+        assert R.query("m != i & m != j").empty
+
+    elif reporting_scenario == 3:
+        
+        # model R should be a 4D tensor full of 1s with the exception of the diagonal
+        assert model.R.subs.shape[0] == model.L * model.N * model.N * (model.M - 1)
+
+    else:
+        raise ValueError(f"Invalid reporting_scenario: {reporting_scenario}. Must be one of 1, 2, 3.")
+
+
+
 class TestVimureWithRandomNetworks:
     """
     Tests of the VimureModel class
@@ -480,3 +518,21 @@ class TestVimureRealData:
         with pytest.warns(None) as record:
             net_obj = vm._io.read_from_edgelist(df, K=2)
         check_final_parameters(model, net_obj)
+
+    def test_data_as_edgelist_reporting_scenario_2(self, karnataka_edgelist_vil1_money):
+    
+        REPORTING_SCENARIO = 2 # The default
+
+        df, _, _ = karnataka_edgelist_vil1_money
+
+        with pytest.warns(None) as record:
+            net_obj = vm._io.read_from_edgelist(df, K=2)
+
+        model = vm.model.VimureModel()
+
+        with suppress_stdout_stderr():
+            model.fit(net_obj.X, K=net_obj.K, R=net_obj.R, reporting_scenario=REPORTING_SCENARIO)
+
+        check_final_parameters(model, net_obj)
+
+        check_reporting_mask(model, net_obj, reporting_scenario=REPORTING_SCENARIO)
