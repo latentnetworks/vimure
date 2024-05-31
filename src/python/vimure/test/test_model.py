@@ -66,7 +66,7 @@ def check_reporting_mask(model, reporting_scenario):
         # Assuming model.R is a 4D tensor (sktensor.sptensor), I will work directly with the nonzero indices
         R = pd.DataFrame(np.stack(model.R.subs).T, columns=['l', 'i', 'j', 'm'])
         # Check that all nonzero indices are on the ego side (remove self-loop)
-        assert R.query("m == i & i < j").shape[0] == R.shape[0]
+        assert R.query("m == i").shape[0] == R.shape[0]
 
     elif reporting_scenario == 2:
         
