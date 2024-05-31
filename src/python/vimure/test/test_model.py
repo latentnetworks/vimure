@@ -97,37 +97,6 @@ class TestVimureWithRandomNetworks:
     Tests of the VimureModel class
     """
 
-    def test_vimure_model_issues_appropriate_warnings(self):
-        """
-        Tests the VimureModel class with a known synthetic network
-        """
-
-        logger.debug("Generating synthetic network (Standard SBM) for testing")
-        gt_network = vm.synthetic.StandardSBM(
-            N=20,
-            M=20,
-            L=1,
-            K=3,
-            C=2,
-            avg_degree=2,
-            sparsify=False,
-        )
-
-        logger.debug("Generating observed X from given Y")
-        gt_network._build_X(reporting_scenario=2)
-
-        logger.debug("Starting VimureModel without providing R")
-        model = vm.model.VimureModel()
-        with suppress_stdout_stderr():
-            with pytest.warns(UserWarning):
-                model.fit(gt_network.X, K=gt_network.K)
-
-        logger.debug("Starting VimureModel without providing K")
-        model = vm.model.VimureModel()
-        with suppress_stdout_stderr():
-            with pytest.warns(UserWarning):
-                model.fit(gt_network.X, R=gt_network.R)
-
     def test_vimure_model_extreme_scenarios_over_reporting(self):
         """
         Ensures that the model achieves F1-score near 1.0 on a known

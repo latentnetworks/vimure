@@ -217,7 +217,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
                     "ignoring the reporting_scenario parameter set in the VimureModel object."
                 )
                 warnings.warn(msg, UserWarning)
-                self.logger.warn(msg)
+                self.logger.warning(msg)
 
                 R = extra_params["R"]
                 if R.shape != (self.L, self.N, self.N, self.M):
