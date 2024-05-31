@@ -222,7 +222,6 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
                                 X[l, i, j, m] = cond_exp
 
         else:
-            R = np.ones((L, N, N, M))
             for l in range(L):
                 for m in range(M):
                     for i in range(N):
@@ -1226,7 +1225,8 @@ def build_self_reporter_mask(gt_network, reporting_scenario=2):
         raise ValueError(f"Unrecognised reporting scenario: {reporting_scenario}")
 
     for l in range(gt_network.L):
-        np.fill_diagonal(R[l], 0)
+        for m in range(gt_network.M):
+            np.fill_diagonal(R[l,:,:, m], 0)
 
     return R
 

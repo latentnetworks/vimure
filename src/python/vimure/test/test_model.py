@@ -1,12 +1,14 @@
 from typing import Any
 import pytest
 import logging
+import sktensor
 
 import numpy as np
 import pandas as pd
 import vimure as vm
 
 from sklearn.metrics import f1_score
+
 
 from . import karnataka_edgelist_vil1_money, suppress_stdout_stderr
 
@@ -81,8 +83,10 @@ def check_reporting_mask(model, reporting_scenario):
 
     elif reporting_scenario == 3:
         
+        assert isinstance(model.R, sktensor.dtensor)
+
         # model R should be a 4D tensor full of 1s with the exception of the diagonal
-        assert model.R.subs.shape[0] == model.L * model.N * model.N * (model.M - 1)
+        assert len(model.R.nonzero()[0]) == model.L * model.N * model.N * (model.M - 1)
 
     else:
         raise ValueError(f"Invalid reporting_scenario: {reporting_scenario}. Must be one of 1, 2, 3.")

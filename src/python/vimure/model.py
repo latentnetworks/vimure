@@ -25,6 +25,34 @@ DEFAULT_MAX_ITER = 500
 DEFAULT_NUM_REALISATIONS = 1
 
 
+def __build_self_reporter_mask(reporting_scenario, L, N, M):
+    """
+    Build the reporters' mask according to one of the 3 reporting scenarios.
+
+    1. A reporter `m` can report only the ties in which she is ego:   `m --> i`
+    2. A reporter `m` can report only the ties they are involved in, either as ego or alter:   `m --> j` or `i --> m`
+    3. A reporter `m` can report all ties, even those she is not involved.
+    """
+
+    if reporting_scenario in [1, 2]:
+        mask = np.zeros((L, N, N, M))
+    elif reporting_scenario == 3:
+        mask = np.ones((L, N, N, M))
+    else:
+        raise ValueError(f"Invalid reporting scenario: {reporting_scenario}")
+    
+    if reporting_scenario == 1:
+        mask[:, np.arange(M), :, np.arange(M)] = 1
+    elif reporting_scenario == 2:
+        mask[:, :, np.arange(M), np.arange(M)] = 1
+    
+    for l in range(L):
+        for m in range(M):
+            np.fill_diagonal(mask[l,:,:, m], 0)
+
+    import ipdb; ipdb.set_trace()
+    return mask
+
 class VimureModel(TransformerMixin, BaseEstimator):
     """
     **ViMuRe**
@@ -42,6 +70,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         mutuality: bool = True,
         convergence_tol: float = 0.1,
         decision: int = 1,
+        reporting_scenario: int = 2,
         verbose: bool = False,
     ):
         """
@@ -53,9 +82,20 @@ class VimureModel(TransformerMixin, BaseEstimator):
             Whether to use the mutuality parameter.
         convergence_tol : float
             Controls when to stop the optimisation algorithm (CAVI)
+        reporting_scenario : int
+            Scenario to consider for the reporters. Either 1, 2 or 3.
+            Scenario 1: Reporters report only on ties they are involved in as ego (excluding self-loops).
+            Scenario 2: Reporters report on all ties they are involved in, as either ego or alter (double sampling, excluding self-loops).
+            Scenario 3: Ego reports on any ties, even those they are not involved in (excludes self-loops).
         """
 
         self.undirected = undirected
+
+        if reporting_scenario not in [1, 2, 3]:
+            msg = "reporting_scenario must be 1, 2 or 3"
+            self.logger.error(msg)
+            raise ValueError(msg)
+        self.reporting_scenario = reporting_scenario
 
         if undirected:
             msg = "Overriding mutuality to False because the network is undirected"
@@ -198,17 +238,22 @@ class VimureModel(TransformerMixin, BaseEstimator):
         # If X was not passed as a DataFrame nor an igraph object...
         if not hasattr(self, "R"):
             if "R" in extra_params:
+
+                msg = (
+                    "The parameter R was passed to the fit() method. "
+                    "The model will use this matrix to determine the reporters' mask, "
+                    "ignoring the reporting_scenario parameter set in the VimureModel object."
+                )
+                warnings.warn(msg, UserWarning)
+                self.logger.warn(msg)
+
                 R = extra_params["R"]
                 if R.shape != (self.L, self.N, self.N, self.M):
                     msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
                     self.logger.error(msg)
                     raise ValueError(msg)
             else:
-                msg = "Reporters Mask was not informed (parameter R). "
-                msg += "The model will assume that every reporter can report on any tie."
-
-                warnings.warn(msg, UserWarning)
-                R = np.ones((self.L, self.N, self.N, self.M))
+                R = __build_self_reporter_mask(self.reporting_scenario, self.L, self.N, self.M)
 
             self.R = preprocess(R)
 
