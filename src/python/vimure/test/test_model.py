@@ -374,7 +374,7 @@ class TestSyntheticWithReportingScenarios:
         gt_network._build_X(reporting_scenario=reporting_scenario)
 
         logger.debug("Starting VimureModel")
-        model = vm.model.VimureModel()
+        model = vm.model.VimureModel(reporting_scenario=reporting_scenario)
         with pytest.warns(None) as record:
             with suppress_stdout_stderr():
                 model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)

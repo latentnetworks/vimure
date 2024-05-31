@@ -49,8 +49,6 @@ def __build_self_reporter_mask(reporting_scenario, L, N, M):
     for l in range(L):
         for m in range(M):
             np.fill_diagonal(mask[l,:,:, m], 0)
-
-    import ipdb; ipdb.set_trace()
     return mask
 
 class VimureModel(TransformerMixin, BaseEstimator):
