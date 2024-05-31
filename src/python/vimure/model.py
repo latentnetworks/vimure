@@ -25,32 +25,6 @@ DEFAULT_MAX_ITER = 500
 DEFAULT_NUM_REALISATIONS = 1
 
 
-def __build_self_reporter_mask(reporting_scenario, L, N, M):
-    """
-    Build the reporters' mask according to one of the 3 reporting scenarios.
-
-    1. A reporter `m` can report only the ties in which she is ego:   `m --> i`
-    2. A reporter `m` can report only the ties they are involved in, either as ego or alter:   `m --> j` or `i --> m`
-    3. A reporter `m` can report all ties, even those she is not involved.
-    """
-
-    if reporting_scenario in [1, 2]:
-        mask = np.zeros((L, N, N, M))
-    elif reporting_scenario == 3:
-        mask = np.ones((L, N, N, M))
-    else:
-        raise ValueError(f"Invalid reporting scenario: {reporting_scenario}")
-    
-    if reporting_scenario == 1:
-        mask[:, np.arange(M), :, np.arange(M)] = 1
-    elif reporting_scenario == 2:
-        mask[:, :, np.arange(M), np.arange(M)] = 1
-    
-    for l in range(L):
-        for m in range(M):
-            np.fill_diagonal(mask[l,:,:, m], 0)
-    return mask
-
 class VimureModel(TransformerMixin, BaseEstimator):
     """
     **ViMuRe**
@@ -251,7 +225,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
                     self.logger.error(msg)
                     raise ValueError(msg)
             else:
-                R = __build_self_reporter_mask(self.reporting_scenario, self.L, self.N, self.M)
+                R = self.__build_self_reporter_mask(self.reporting_scenario, self.L, self.N, self.M)
 
             self.R = preprocess(R)
 
@@ -1335,6 +1309,31 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         return rho_PoissonMean
 
+    def __build_self_reporter_mask(self, reporting_scenario, L, N, M):
+        """
+        Build the reporters' mask according to one of the 3 reporting scenarios.
+
+        1. A reporter `m` can report only the ties in which she is ego:   `m --> i`
+        2. A reporter `m` can report only the ties they are involved in, either as ego or alter:   `m --> j` or `i --> m`
+        3. A reporter `m` can report all ties, even those she is not involved.
+        """
+
+        if reporting_scenario in [1, 2]:
+            mask = np.zeros((L, N, N, M))
+        elif reporting_scenario == 3:
+            mask = np.ones((L, N, N, M))
+        else:
+            raise ValueError(f"Invalid reporting scenario: {reporting_scenario}")
+        
+        if reporting_scenario == 1:
+            mask[:, np.arange(M), :, np.arange(M)] = 1
+        elif reporting_scenario == 2:
+            mask[:, :, np.arange(M), np.arange(M)] = 1
+        
+        for l in range(L):
+            for m in range(M):
+                np.fill_diagonal(mask[l,:,:, m], 0)
+        return mask
 
 """
 UTIL FUNCTIONS FOR INFERENCE
