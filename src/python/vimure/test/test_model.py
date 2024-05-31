@@ -93,37 +93,6 @@ class TestVimureWithRandomNetworks:
     Tests of the VimureModel class
     """
 
-    def test_vimure_model_with_standard_sbm_reporting_scenario_1(self):
-        """
-        Tests the VimureModel class with a known synthetic network
-        """
-
-        REPORTING_SCENARIO = 1 # Reporters only report on ties they are involved in as ego
-
-        logger.debug("Generating synthetic network (Standard SBM) for testing")
-        gt_network = vm.synthetic.StandardSBM(
-            N=20,
-            M=20,
-            L=1,
-            K=3,
-            C=2,
-            avg_degree=2,
-            sparsify=False,
-        )
-
-        logger.debug("Generating observed X from given Y")
-        gt_network._build_X(reporting_scenario=REPORTING_SCENARIO)
-
-        logger.debug("Starting VimureModel")
-        model = vm.model.VimureModel()
-        with pytest.warns(None) as record:
-            with suppress_stdout_stderr():
-                model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
-
-        check_final_parameters(model, gt_network)
-
-        check_reporting_mask(model, reporting_scenario=REPORTING_SCENARIO)
-
     def test_vimure_model_issues_appropriate_warnings(self):
         """
         Tests the VimureModel class with a known synthetic network
@@ -373,6 +342,76 @@ class TestVimureWithRandomNetworks:
         Y_rec = vm.utils.apply_rho_threshold(model, threshold=0.5)[0].flatten()
 
         assert np.allclose(f1_score(Y_true, Y_rec), 0.97, atol=1e-2)
+
+class TestSyntheticWithReportingScenarios:
+    """
+    Tests, using SBMs, the three reporting scenarios
+    
+    1 - Only ego can report on their own ties (excluding self-loops)
+    2 - Both ego and alter can report on their own ties (double-sampling, excluding self-loops)
+    3 - Any tie can be reported on (except self-loops) 
+
+    """
+
+    def __common_test(self, reporting_scenario):
+        
+        logger.debug("Generating synthetic network (Standard SBM) for testing")
+        gt_network = vm.synthetic.StandardSBM(
+            N=20,
+            M=20,
+            L=1,
+            K=3,
+            C=2,
+            avg_degree=2,
+            sparsify=False,
+        )
+
+        logger.debug("Generating observed X from given Y")
+        gt_network._build_X(reporting_scenario=reporting_scenario)
+
+        logger.debug("Starting VimureModel")
+        model = vm.model.VimureModel()
+        with pytest.warns(None) as record:
+            with suppress_stdout_stderr():
+                model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
+
+        check_final_parameters(model, gt_network)
+
+        check_reporting_mask(model, reporting_scenario)
+
+    def test_reporting_scenario_1(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
+        # Reporters only report on ties they are involved in as ego
+        self.__common_test(reporting_scenario=1)
+ 
+    def test_reporting_scenario_2(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
+        # Reporters report on ties they are involved in as ego and alter
+        self.__common_test(reporting_scenario=2)
+
+    def test_reporting_scenario_3(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
+        # Reporters report on any tie
+        self.__common_test(reporting_scenario=3)
+
+    def tests_invalid_reporting_scenario(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
+        # Reporters report on any tie
+        with pytest.raises(ValueError) as e_info:
+            self.__common_test(reporting_scenario=4)
+            assert str(e_info.value) == "Invalid reporting_scenario: 4. Must be one of 1, 2, 3."
 
 class TestVimureWithReadData:
     """
