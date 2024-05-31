@@ -102,7 +102,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         for extra_param in extra_params:
             if extra_param not in available_extra_params:
                 msg = "Ignoring unrecognised parameter %s." % extra_param
-                self.logger.warn(msg)
+                self.logger.warning(msg)
 
         if isinstance(X, pd.DataFrame) or isinstance(X, ig.Graph):
 

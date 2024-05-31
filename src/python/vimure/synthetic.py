@@ -838,7 +838,7 @@ class Multitensor(StandardSBM):
         Returns
         -------
         M : numpy.array
-            Mean `\lambda^{0}_{ij}` for all entries.
+            Mean `\\lambda^{0}_{ij}` for all entries.
         """
 
         M = np.einsum("ik,jq->ijkq", u, v)

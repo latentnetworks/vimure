@@ -57,7 +57,7 @@ def check_reporting_mask(model, net_obj, reporting_scenario):
 
     If reporting_scenario == 2, then the model.R should only allow self-reporting, both on ego and alter sides (double-sampling)
 
-    If reporting_scenario == 3, then the model.R should only allow self-reporting on any ties
+    If reporting_scenario == 3, then the model.R should allow self-reporting on any ties
     
     """
 
@@ -93,10 +93,12 @@ class TestVimureWithRandomNetworks:
     Tests of the VimureModel class
     """
 
-    def test_vimure_model_with_standard_sbm_reporting_scenario1(self):
+    def test_vimure_model_with_standard_sbm_reporting_scenario_1(self):
         """
         Tests the VimureModel class with a known synthetic network
         """
+
+        REPORTING_SCENARIO = 1 # Reporters only report on ties they are involved in as ego
 
         logger.debug("Generating synthetic network (Standard SBM) for testing")
         gt_network = vm.synthetic.StandardSBM(
@@ -394,7 +396,6 @@ class TestVimureWithReadData:
                 R=net_obj.R,
             )
 
-
 class TestInferredModel:
     @classmethod
     def setup_class(cls):
@@ -481,7 +482,6 @@ class TestInferredModel:
         
         for y in Y:
             self.check_output(y, self.model_mutuality)
-
 
 class TestVimureRealData:
 
