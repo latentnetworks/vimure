@@ -65,7 +65,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         mutuality: float = 0.5,
         sh_theta: float = 2.0,
         sc_theta: float = 0.5,
-        flag_self_reporter: bool = True,
+        reporting_scenario: int = 2, # 1, 2 or 3
         cutoff_X: bool = False,
         lambda_diff: float = None,
         Q: int = None,
@@ -88,8 +88,8 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
             and by default are modelled as a gamma function with shape `sh_theta` and scale `sc_theta`.
         sc_theta : float
             Scale of gamma distribution from which to draw theta.
-        flag_self_reporter : bool
-            Indicates whether a node can only report about their own ties.
+        reporting_scenario : bool
+            Indicates the scenario for the reporter mask R.
         Q : int
             Maximum value of X entries. If None, it will use the network's K parameter.
         cutoff_X : bool
@@ -111,6 +111,17 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         if mutuality < 0 or mutuality >= 1:
             msg = "The mutuality parameter has to be in [0, 1)!"
+            raise ValueError(msg)
+        
+        if reporting_scenario not in [1, 2, 3]:
+            msg = """
+            The reporting_scenario parameter has to be 1, 2 or 3!
+
+            1: Only self-reporters reporting ego ties.
+            2: Only self-reporters reporting ego ties and alter ties.
+            3: Reporters can report on any tie, including those they are not part of.
+            """
+
             raise ValueError(msg)
 
         # generate_x uses its own pseudo-random seed generator, so we can better control the generation of theta.
@@ -164,9 +175,10 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         if cutoff_X and Q is None:
             Q = self.K
 
-        if flag_self_reporter:
-            #TODO: Change this according to one of the three reporting_scenario
-            R = build_self_reporter_mask(self)
+        #TODO: Change this according to one of the three reporting_scenario
+        R = build_self_reporter_mask(self,reporting_scenario)
+
+        if reporting_scenario in [1, 2]:
 
             for l in range(L):
                 for m in range(M):
@@ -997,7 +1009,7 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
     def build_X(
         self,
         Rinput: None,
-        flag_self_reporter: bool = True,
+        reporting_scenario: int = 2, # either 1, 2 or 3
         cutoff_X: bool = False,
         Q: int = None,
         seed_X: int = None,
@@ -1056,7 +1068,7 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         if cutoff_X and Q is None:
             Q = self.K
 
-        if flag_self_reporter:
+        if reporting_scenario in [1, 2]:
             if Rinput is None:
                 R = build_self_reporter_mask(self)
             else:
@@ -1108,6 +1120,9 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         else:
             R = np.ones((self.L, self.N, self.N, self.M))
+            # Remove self-loops
+            for l in range(self.L):
+                np.fill_diagonal(R[l], 0)
             for l in range(self.L):
                 for m in range(self.M):
                     for i in range(self.N):
@@ -1182,13 +1197,13 @@ FUNCTIONS TO GENERATE X (OBSERVED NETWORK) FROM A GENERATED GROUND TRUTH NETWORK
 """
 
 
-def build_self_reporter_mask(gt_network):
+def build_self_reporter_mask(gt_network, reporting_scenario=2):
     """
-    Build the reporters' mask in a way such that:
+    Build the reporters' mask according to one of the 3 reporting scenarios.
 
-    - A reporter `m` can report ties in which she is ego:   `m --> i`
-    - A reporter `m` can report ties in which she is alter: `i --> m`
-    - A reporter `m` **cannot** report ties she is not involved, that is `i --> j` where `i != m` and `j != m`
+    1. A reporter `m` can report only the ties in which she is ego:   `m --> i`
+    2. A reporter `m` can report only the ties they are involved in, either as ego or alter:   `m --> j` or `i --> m`
+    3. A reporter `m` can report all ties, even those she is not involved.
     
     Parameters
     ----------
@@ -1198,9 +1213,17 @@ def build_self_reporter_mask(gt_network):
 
     # TODO: Use sparse matrices instead
 
-    R = np.zeros((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
-    R[:, np.arange(gt_network.M), :, np.arange(gt_network.M)] = 1
-    R[:, :, np.arange(gt_network.M), np.arange(gt_network.M)] = 1
+    if reporting_scenario == 1:
+        R = np.zeros((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
+        R[:, np.arange(gt_network.M), :, np.arange(gt_network.M)] = 1
+    elif reporting_scenario == 2:
+        R = np.zeros((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
+        R[:, np.arange(gt_network.M), :, np.arange(gt_network.M)] = 1
+        R[:, :, np.arange(gt_network.M), np.arange(gt_network.M)] = 1
+    elif reporting_scenario == 3:
+        R = np.ones((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
+        for l in range(gt_network.L):
+            np.fill_diagonal(R[l], 0)
 
     return R
 

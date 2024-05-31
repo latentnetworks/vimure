@@ -51,7 +51,7 @@ def check_final_parameters(model, net_obj):
     assert type(model.nu_rte) == np.float64
     assert model.nu_rte >= 0
 
-def check_reporting_mask(model, net_obj, reporting_scenario):
+def check_reporting_mask(model, reporting_scenario):
     """
     If reporting_scenario == 1, then the model.R should only allow self-reporting on the ego side
 
@@ -112,7 +112,7 @@ class TestVimureWithRandomNetworks:
         )
 
         logger.debug("Generating observed X from given Y")
-        gt_network._build_X(flag_self_reporter=True)
+        gt_network._build_X(reporting_scenario=REPORTING_SCENARIO)
 
         logger.debug("Starting VimureModel")
         model = vm.model.VimureModel()
@@ -121,6 +121,8 @@ class TestVimureWithRandomNetworks:
                 model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
 
         check_final_parameters(model, gt_network)
+
+        check_reporting_mask(model, reporting_scenario=REPORTING_SCENARIO)
 
     def test_vimure_model_issues_appropriate_warnings(self):
         """
@@ -139,7 +141,7 @@ class TestVimureWithRandomNetworks:
         )
 
         logger.debug("Generating observed X from given Y")
-        gt_network._build_X(flag_self_reporter=True)
+        gt_network._build_X(reporting_scenario=2)
 
         logger.debug("Starting VimureModel without providing R")
         model = vm.model.VimureModel()
@@ -196,7 +198,7 @@ class TestVimureWithRandomNetworks:
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
                 lambda_diff=LAMBDA_DIFF,
-                flag_self_reporter=True,
+                reporting_scenario=2,
                 seed=seed,
                 verbose=False,
             )
@@ -269,7 +271,7 @@ class TestVimureWithRandomNetworks:
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
                 lambda_diff=LAMBDA_DIFF,
-                flag_self_reporter=True,
+                reporting_scenario=2,
                 seed=seed,
                 verbose=False,
             )
@@ -342,7 +344,7 @@ class TestVimureWithRandomNetworks:
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
                 lambda_diff=LAMBDA_DIFF,
-                flag_self_reporter=True,
+                reporting_scenario=2,
                 seed=seed,
                 verbose=False,
             )
@@ -400,7 +402,7 @@ class TestInferredModel:
     @classmethod
     def setup_class(cls):
         cls.synth_net = vm.synthetic.StandardSBM(K=2)
-        cls.synth_net._build_X(flag_self_reporter=True)
+        cls.synth_net._build_X(reporting_scenario=2)
 
         cls.model = vm.model.VimureModel()
         with suppress_stdout_stderr():
@@ -533,4 +535,4 @@ class TestVimureRealData:
 
         check_final_parameters(model, net_obj)
 
-        check_reporting_mask(model, net_obj, reporting_scenario=REPORTING_SCENARIO)
+        check_reporting_mask(model, reporting_scenario=REPORTING_SCENARIO)
