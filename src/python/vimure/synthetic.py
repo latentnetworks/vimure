@@ -1222,8 +1222,11 @@ def build_self_reporter_mask(gt_network, reporting_scenario=2):
         R[:, :, np.arange(gt_network.M), np.arange(gt_network.M)] = 1
     elif reporting_scenario == 3:
         R = np.ones((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
-        for l in range(gt_network.L):
-            np.fill_diagonal(R[l], 0)
+    else:
+        raise ValueError(f"Unrecognised reporting scenario: {reporting_scenario}")
+
+    for l in range(gt_network.L):
+        np.fill_diagonal(R[l], 0)
 
     return R
 
