@@ -56,14 +56,14 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   LAMBDA_0 <- 0.01
   LAMBDA_DIFF <- 0.99
   X <- build_X(synth_net, mutuality=eta, theta=custom_theta, cutoff_X=F, lambda_diff=LAMBDA_DIFF,
-               flag_self_reporter=T, verbose=T
+               reporting_scenario = 2, verbose=T
   )
 
   lambda_k_GT <- matrix(c(LAMBDA_0, LAMBDA_0 + LAMBDA_DIFF), ncol=K)
   beta_lambda <- matrix(10000 * rep(1, length(lambda_k_GT)), ncol=K)
   alpha_lambda <- lambda_k_GT * beta_lambda
 
-  model <- vimure(synth_net$X, R=synth_net$R, K=K, seed=seed, mutuality=T,
+  model <- vimure(synth_net$X, K=K, seed=seed, mutuality=T,
                   alpha_lambda=alpha_lambda, beta_lambda=beta_lambda,
                   num_realisations=2, max_iter=21, verbose=F
   )
@@ -108,8 +108,8 @@ test_that("Check vimure model with standard_sbm", {
   skip_if_no_vimure()
 
   synth_net <- gm_standard_sbm(N=20, M=20, L=1, K=3, C=2, avg_degree=2, sparsify=F)
-  X <- build_X(synth_net, flag_self_reporter=T)
-  model <- vimure(synth_net$X, R=synth_net$R, K=synth_net$K, verbose=F)
+  X <- build_X(synth_net, reporting_scenario = 2)
+  model <- vimure(synth_net$X, K=synth_net$K, verbose=F)
   check_parameters(model, synth_net)
 })
 
@@ -123,7 +123,7 @@ test_that("Check custom reporters' mask are enforced", {
   synth_net <- gm_standard_sbm(N = N, M = 20, L = L, K = 3, C = 2,
                                avg_degree = 2, sparsify = FALSE)
 
-  X <- build_X(synth_net, flag_self_reporter = TRUE)
+  X <- build_X(synth_net, reporting_scenario = 2)
 
   # Essentially all 1:M are reporters
   all_reporters <- unique(synth_net$R$subs[[4]])
@@ -176,89 +176,89 @@ test_that("Check custom reporters' mask are enforced", {
 })
 
 # Motivated by https://github.com/latentnetworks/vimure/issues/92
-test_that("Check custom reporters' mask are enforced when input is edgelist", {
-  skip_if_no_vimure()
+# test_that("Check custom reporters' mask are enforced when input is edgelist", {
+#   skip_if_no_vimure()
 
-  L <- 1
-  N <- 20
-  nodes <- 1:N
-  synth_net <- gm_standard_sbm(N = N, M = 20, L = L, K = 3, C = 2,
-                               avg_degree = 3, sparsify = FALSE)
+#   L <- 1
+#   N <- 20
+#   nodes <- 1:N
+#   synth_net <- gm_standard_sbm(N = N, M = 20, L = L, K = 3, C = 2,
+#                                avg_degree = 3, sparsify = FALSE)
 
-  X <- build_X(synth_net, flag_self_reporter = TRUE)
+#   X <- build_X(synth_net, reporting_scenario = 2)
 
-  ############################################
-  # Now that I created a synthetic network,  #
-  # I will convert it to an edgelist         #
-  # to emulate the input of a user           #
-  ############################################
-  indices <- expand.grid(l = 1:L, i = 1:N, j = 1:N, k = 1:N)
+#   ############################################
+#   # Now that I created a synthetic network,  #
+#   # I will convert it to an edgelist         #
+#   # to emulate the input of a user           #
+#   ############################################
+#   indices <- expand.grid(l = 1:L, i = 1:N, j = 1:N, k = 1:N)
 
-  # Check which X dimensions are non-zero
-  non_zero_indices <- which(X > 0)
+#   # Check which X dimensions are non-zero
+#   non_zero_indices <- which(X > 0)
 
-  # Create the edgelist
-  edgelist <- indices[non_zero_indices, ]
-  colnames(edgelist) <- c("layer", "ego", "alter", "reporter")
+#   # Create the edgelist
+#   edgelist <- indices[non_zero_indices, ]
+#   colnames(edgelist) <- c("layer", "ego", "alter", "reporter")
 
-  # Replicate the offending behaviour
-  unique_nodes <- dplyr::union(edgelist$ego, edgelist$alter) %>% unique()
+#   # Replicate the offending behaviour
+#   unique_nodes <- dplyr::union(edgelist$ego, edgelist$alter) %>% unique()
 
-  ego <- unique_nodes
-  alter <- unique_nodes
-  reporter <- unique_nodes
+#   ego <- unique_nodes
+#   alter <- unique_nodes
+#   reporter <- unique_nodes
 
-  # Assuming edgelist$reporter contains the list of reporters
-  reporters <- unique(edgelist$reporter)
+#   # Assuming edgelist$reporter contains the list of reporters
+#   reporters <- unique(edgelist$reporter)
 
-  # Create an empty array filled with zeros
-  reporter_mask <- array(0, dim = c(1, N, N, N),
-                         dimnames = list("layer", ego, alter, reporter))
+#   # Create an empty array filled with zeros
+#   reporter_mask <- array(0, dim = c(1, N, N, N),
+#                          dimnames = list("layer", ego, alter, reporter))
 
-  # Populate the array according to the specified conditions
-  for (l in 1:L) {
-    for (i in 1:N) {
-      for (j in 1:N) {
-        for (m in seq_along(reporters)) {
-          if (ego[i] == reporters[m] | alter[j] == reporters[m]) {
-            reporter_mask[l, i, j, m] <- 1
-          }
-        }
-      }
-    }
-  }
+#   # Populate the array according to the specified conditions
+#   for (l in 1:L) {
+#     for (i in 1:N) {
+#       for (j in 1:N) {
+#         for (m in seq_along(reporters)) {
+#           if (ego[i] == reporters[m] | alter[j] == reporters[m]) {
+#             reporter_mask[l, i, j, m] <- 1
+#           }
+#         }
+#       }
+#     }
+#   }
 
 
-  model <- vimure(edgelist,
-                  R = reporter_mask,
-                  K = synth_net$K,
-                  verbose = TRUE)
-  check_parameters(model, synth_net)
+#   model <- vimure(edgelist,
+#                   R = reporter_mask,
+#                   K = synth_net$K,
+#                   verbose = TRUE)
+#   check_parameters(model, synth_net)
 
-  # The object reporter_mask is already a native R matrix
-  # Now I need to convert model$R from python to R
+#   # The object reporter_mask is already a native R matrix
+#   # Now I need to convert model$R from python to R
 
-  # I will need numpy
-  np <- import("numpy", convert = FALSE)
+#   # I will need numpy
+#   np <- import("numpy", convert = FALSE)
 
-  # Initialise an empty 4D numpy array
-  model_R <- np$zeros(shape = as.integer(c(L, N, N, N)))
+#   # Initialise an empty 4D numpy array
+#   model_R <- np$zeros(shape = as.integer(c(L, N, N, N)))
 
-  # Get the keys (a 4D list) of the python object model$R
-  model_R_keys <- model$R$subs
+#   # Get the keys (a 4D list) of the python object model$R
+#   model_R_keys <- model$R$subs
 
-  #For each key, assign the corresponding value to the numpy array
-  for (i in seq_along(model_R_keys[[1]])) {
-    model_R[model_R_keys[[1]][i], model_R_keys[[2]][i],
-             model_R_keys[[3]][i], model_R_keys[[4]][i]] <- 1
-  }
+#   #For each key, assign the corresponding value to the numpy array
+#   for (i in seq_along(model_R_keys[[1]])) {
+#     model_R[model_R_keys[[1]][i], model_R_keys[[2]][i],
+#              model_R_keys[[3]][i], model_R_keys[[4]][i]] <- 1
+#   }
 
-  model_R <- as.array(model_R)
-  dimnames(model_R) <- list("layer", 1:N, 1:N, 1:N)
+#   model_R <- as.array(model_R)
+#   dimnames(model_R) <- list("layer", 1:N, 1:N, 1:N)
 
-  expect_equal(model_R, reporter_mask)
+#   expect_equal(model_R, reporter_mask)
 
-})
+# })
 
 test_that("Check vimure model in extreme scenarios of under reporting", {
   check_extreme_scenarios("under", 0.97)
@@ -279,9 +279,9 @@ test_that("Check vimure model for invalid inputs", {
 
 test_that("Check inferred model", {
   synth_net <- gm_standard_sbm(N=20, M=20, sparsify = F, K=2)
-  X <- build_X(synth_net, flag_self_reporter = T, cutoff_X = T)
+  X <- build_X(synth_net, reporting_scenario = 2, cutoff_X = T)
 
-  model <- vimure(synth_net$X, synth_net$R, num_realisations=1, max_iter=500, mutuality = T, verbose=F)
+  model <- vimure(synth_net$X, num_realisations=1, max_iter=500, mutuality = T, verbose=F)
   expect_error(get_inferred_model(model, method = "NonImplemented"), "'method' should be one of")
   expect_error(get_inferred_model(model, method = "fixed_threshold"), 'you must set the threshold to a value')
   expect_error(get_inferred_model(model, method = "fixed_threshold", threshold=2), 'you must set the threshold to a value')

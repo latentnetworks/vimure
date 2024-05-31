@@ -73,10 +73,19 @@ check_reporters_mask <- function(R){
 #'
 #' @param x An adjancency matrix with dimensions L x N x N x N
 #' or a igraph object.
-#' @param R Reporters mask (TRUE/FALSE) indicating whether a node
+#' @param R Reporters mask (TRUE/FALSE ) indicating whether a node
 #' _CAN_ report on a particular tie, with dimensions L x N x N x N.
 #' If reporters mask was not informed, the model will assume that
 #' every reporter can report on any tie.
+#' It is NULL by default, as the preferred option is to use
+#' the reporting_scenario parameter.
+#' @param reporting_scenario The reporting scenario to be used. Default is 2.
+#' - Scenario 1: Reporters report only on ties they are involved in
+#' as ego (excluding self-loops).
+#' - Scenario 2: Reporters report on all ties they are involved in,
+#' as either ego or alter (double sampling, excluding self-loops).
+#' - Scenario 3: Ego reports on any ties,
+#' even those they are not involved in (excludes self-loops).
 #' @param K Value of the maximum entry of the network - i.
 #' @param undirected Whether the network is undirected.
 #' @param mutuality Whether to use the mutuality parameter.
@@ -93,6 +102,7 @@ check_reporters_mask <- function(R){
 #' @export
 vimure <-
   function(x,
+           reporting_scenario = 2,
            R = NULL,
            mutuality = TRUE,
            undirected = FALSE,
@@ -115,7 +125,8 @@ vimure <-
   model <- vimureP$model$VimureModel(mutuality = mutuality,
                                      undirected = undirected,
                                      convergence_tol = etol,
-                                     verbose = verbose)
+                                     verbose = verbose,
+                                     reporting_scenario = reporting_scenario)
 
   if (length(seed) > 0) {
     seed <- as.integer(seed)
