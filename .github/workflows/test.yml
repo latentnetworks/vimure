@@ -4,13 +4,15 @@ name: test
 # events but only for the develop branch
 on:
   push:
-    branches: [ develop, main ]
+    branches: [ main ]
+    tags: [v*]
     paths:
       - src/python/**
   pull_request:
-    branches: [ develop, main ]
+    branches: [ main ]
     paths:
       - src/python/**
+      - .github/workflows/test.yml
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
