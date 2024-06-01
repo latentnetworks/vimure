@@ -1,6 +1,7 @@
 require(testthat)
 require(reticulate)
 
+
 skip_if_no_vimure <- function() {
   have_vimure <- reticulate::py_module_available("vimure")
   if (!have_vimure)
@@ -43,7 +44,7 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   K <- 2
 
   synth_net <- gm_crep(N=100, M=100, L=1, C=2,
-                               K=K, avg_degree=5, sparsify=T, seed=seed, eta=eta
+                       K=K, avg_degree=5, sparsify=T, seed=seed, eta=eta
   )
 
   custom_theta <- build_custom_theta(
@@ -56,7 +57,7 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   LAMBDA_0 <- 0.01
   LAMBDA_DIFF <- 0.99
   X <- build_X(synth_net, mutuality=eta, theta=custom_theta, cutoff_X=F, lambda_diff=LAMBDA_DIFF,
-               reporting_scenario = 2, verbose=T
+               reporting_scenario = 3, verbose=T
   )
 
   lambda_k_GT <- matrix(c(LAMBDA_0, LAMBDA_0 + LAMBDA_DIFF), ncol=K)
@@ -65,7 +66,8 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
 
   model <- vimure(synth_net$X, K=K, seed=seed, mutuality=T,
                   alpha_lambda=alpha_lambda, beta_lambda=beta_lambda,
-                  num_realisations=2, max_iter=21, verbose=F
+                  num_realisations=2, max_iter=21, verbose=F,
+                  reporting_scenario = 3
   )
 
   Y_true <- as.vector(synth_net$Y$toarray())
@@ -176,89 +178,95 @@ test_that("Check custom reporters' mask are enforced", {
 })
 
 # Motivated by https://github.com/latentnetworks/vimure/issues/92
-# test_that("Check custom reporters' mask are enforced when input is edgelist", {
-#   skip_if_no_vimure()
+test_that("Check custom reporters' mask are enforced when input is edgelist", {
+  skip_if_no_vimure()
 
-#   L <- 1
-#   N <- 20
-#   nodes <- 1:N
-#   synth_net <- gm_standard_sbm(N = N, M = 20, L = L, K = 3, C = 2,
-#                                avg_degree = 3, sparsify = FALSE)
+  L <- 1
+  N <- 10
+  nodes <- 1:N
+  synth_net <- gm_standard_sbm(N = N, M = N, L = L, K = 3, C = 2,
+                               avg_degree = 3, sparsify = FALSE)
 
-#   X <- build_X(synth_net, reporting_scenario = 2)
+  X <- build_X(synth_net, reporting_scenario = 2)
 
-#   ############################################
-#   # Now that I created a synthetic network,  #
-#   # I will convert it to an edgelist         #
-#   # to emulate the input of a user           #
-#   ############################################
-#   indices <- expand.grid(l = 1:L, i = 1:N, j = 1:N, k = 1:N)
+  ############################################
+  # Now that I created a synthetic network,  #
+  # I will convert it to an edgelist         #
+  # to emulate the input of a user           #
+  ############################################
+  indices <- expand.grid(l = 1:L, i = 1:N, j = 1:N, k = 1:N)
 
-#   # Check which X dimensions are non-zero
-#   non_zero_indices <- which(X > 0)
+  # Check which X dimensions are non-zero
+  non_zero_indices <- which(X > 0)
 
-#   # Create the edgelist
-#   edgelist <- indices[non_zero_indices, ]
-#   colnames(edgelist) <- c("layer", "ego", "alter", "reporter")
+  # Create the edgelist
+  edgelist <- indices[non_zero_indices, ]
+  rownames(edgelist) <- NULL
+  colnames(edgelist) <- c("layer", "ego", "alter", "reporter")
 
-#   # Replicate the offending behaviour
-#   unique_nodes <- dplyr::union(edgelist$ego, edgelist$alter) %>% unique()
+  # Replicate the offending behaviour
+  unique_nodes <-
+    dplyr::union(edgelist$ego, edgelist$alter) %>%
+    unique() %>%
+    as.character()
 
-#   ego <- unique_nodes
-#   alter <- unique_nodes
-#   reporter <- unique_nodes
+  # Create an empty array filled with zeros
+  dims <- list("layer", unique_nodes, unique_nodes, unique_nodes)
+  reporter_mask <- array(0, dim = c(1, N, N, N), dimnames = dims)
 
-#   # Assuming edgelist$reporter contains the list of reporters
-#   reporters <- unique(edgelist$reporter)
-
-#   # Create an empty array filled with zeros
-#   reporter_mask <- array(0, dim = c(1, N, N, N),
-#                          dimnames = list("layer", ego, alter, reporter))
-
-#   # Populate the array according to the specified conditions
-#   for (l in 1:L) {
-#     for (i in 1:N) {
-#       for (j in 1:N) {
-#         for (m in seq_along(reporters)) {
-#           if (ego[i] == reporters[m] | alter[j] == reporters[m]) {
-#             reporter_mask[l, i, j, m] <- 1
-#           }
-#         }
-#       }
-#     }
-#   }
+  # Populate the array according to the specified conditions
+  for (l in 1:L) {
+    for (i in unique_nodes) {
+      for (j in unique_nodes) {
+        for (m in unique_nodes) {
+          if (i == m | j == m) {
+            reporter_mask[l, i, j, m] <- 1
+          }
+        }
+      }
+    }
+  }
 
 
-#   model <- vimure(edgelist,
-#                   R = reporter_mask,
-#                   K = synth_net$K,
-#                   verbose = TRUE)
-#   check_parameters(model, synth_net)
+  model <- vimure(edgelist,
+                  R = reporter_mask,
+                  K = synth_net$K,
+                  verbose = TRUE)
+  check_parameters(model, synth_net)
 
-#   # The object reporter_mask is already a native R matrix
-#   # Now I need to convert model$R from python to R
+  # The object reporter_mask is already a native R matrix
+  # Now I need to convert model$R from python to R
+  # I will start by getting the nonzero indices of the python object model$R
 
-#   # I will need numpy
-#   np <- import("numpy", convert = FALSE)
+  # Get the keys (a 4D list) of the python object model$R
+  model_R_keys <- data.frame(model$R$subs)
+  colnames(model_R_keys) <- c("layer", "ego", "alter", "reporter")
 
-#   # Initialise an empty 4D numpy array
-#   model_R <- np$zeros(shape = as.integer(c(L, N, N, N)))
+  # There is an issue though, the order of the nodes in the edgelist
+  # is not the same as the order of the nodes stored in the model
+  # We will need to match the node names precisely as they are registered
+  ordering <- setNames(model$nodeNames$name, model$nodeNames$id)
 
-#   # Get the keys (a 4D list) of the python object model$R
-#   model_R_keys <- model$R$subs
+  model_R_keys$layer <- model_R_keys$layer + 1 # R is 1-indexed
+  model_R_keys$ego <- ordering[as.character(model_R_keys$ego)]
+  model_R_keys$alter <- ordering[as.character(model_R_keys$alter)]
+  model_R_keys$reporter <- ordering[as.character(model_R_keys$reporter)]
 
-#   #For each key, assign the corresponding value to the numpy array
-#   for (i in seq_along(model_R_keys[[1]])) {
-#     model_R[model_R_keys[[1]][i], model_R_keys[[2]][i],
-#              model_R_keys[[3]][i], model_R_keys[[4]][i]] <- 1
-#   }
+  # Initialise an empty 4D R array
+  model_R <- array(0, dim = as.integer(c(L, N, N, N)), dimnames = dims)
 
-#   model_R <- as.array(model_R)
-#   dimnames(model_R) <- list("layer", 1:N, 1:N, 1:N)
+  #For each key, assign the corresponding value to the numpy array
+  for (idx in seq_len(dim(model_R_keys)[[1]])) {
+    l <- model_R_keys[idx, 1]
+    i <- model_R_keys[idx, 2]
+    j <- model_R_keys[idx, 3]
+    m <- model_R_keys[idx, 4]
+    model_R[l, i, j, m] <- 1
+  }
 
-#   expect_equal(model_R, reporter_mask)
+  expect_equal(model_R, reporter_mask)
 
-# })
+})
 
 test_that("Check vimure model in extreme scenarios of under reporting", {
   check_extreme_scenarios("under", 0.97)
