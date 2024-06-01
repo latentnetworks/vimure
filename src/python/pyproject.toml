@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "vimure"
-version = "0.1.2"
+version = "0.2.0-alpha"
 authors = [
   "Jon Cardoso-Silva <J.Cardoso-Silva@lse.ac.uk>",
   "Caterina de Bacco <caterina.debacco@tuebingen.mpg.de>",
