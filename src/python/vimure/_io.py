@@ -219,6 +219,7 @@ def read_from_edgelist(
         """
         Infer R
         """
+        warnings.warn("Informed reporters. Using them to infer R.", UserWarning)
 
         # While in theory R would be of dimension (M x L), we chose it to be (N x L)
         #  since R and X are later converted to sparse tensors
@@ -238,6 +239,7 @@ def read_from_edgelist(
                 R[rep][layerIdx] = sparse_max(R[rep][layerIdx], R[rep][layerIdx].T,) # type: ignore
                 R[rep][layerIdx] = R[rep][layerIdx].tocoo() # type: ignore
     elif R is None:
+        # No R was informed. Using reporting_scenario to infer R
         # Second priority is for reporting_scenario
         if reporting_scenario not in [1, 2, 3]:
             msg = f"Invalid reporting scenario: {reporting_scenario}."
@@ -251,6 +253,9 @@ def read_from_edgelist(
         msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
         module_logger.error(msg)
         raise ValueError(msg)
+    else:
+        # R was passed as a parameter, using it as is
+        R = preprocess(R)
 
     """
     Set X

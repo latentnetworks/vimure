@@ -120,7 +120,24 @@ class VimureModel(TransformerMixin, BaseEstimator):
         if isinstance(X, pd.DataFrame) or isinstance(X, ig.Graph):
 
             if isinstance(X, pd.DataFrame):
-                net_obj = read_from_edgelist(X)
+                if "R" in extra_params:
+                    msg = (
+                        "The parameter R was passed to the fit() method. "
+                        "The model will use this matrix to determine the reporters' mask, "
+                        "ignoring the reporting_scenario parameter set in the VimureModel object."
+                    )
+                    warnings.warn(msg, UserWarning)
+                    self.logger.warning(msg)
+
+                    R = extra_params["R"]
+                    if R.shape != (self.L, self.N, self.N, self.M):
+                        msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
+                        self.logger.error(msg)
+                        raise ValueError(msg)
+                    self.R = preprocess(R)
+                    net_obj = read_from_edgelist(X, R=self.R)
+                else:
+                    net_obj = read_from_edgelist(X, reporting_scenario=self.reporting_scenario)
             else:
                 net_obj = read_from_igraph(X)
 
@@ -210,24 +227,11 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         # If X was not passed as a DataFrame nor an igraph object...
         if not hasattr(self, "R"):
+            
             if "R" in extra_params:
-
-                msg = (
-                    "The parameter R was passed to the fit() method. "
-                    "The model will use this matrix to determine the reporters' mask, "
-                    "ignoring the reporting_scenario parameter set in the VimureModel object."
-                )
-                warnings.warn(msg, UserWarning)
-                self.logger.warning(msg)
-
                 R = extra_params["R"]
-                if R.shape != (self.L, self.N, self.N, self.M):
-                    msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
-                    self.logger.error(msg)
-                    raise ValueError(msg)
             else:
                 R = build_self_reporter_mask(self.reporting_scenario, self.L, self.N, self.M)
-
             self.R = preprocess(R)
 
         if "EPS" in extra_params:
