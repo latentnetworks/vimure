@@ -66,7 +66,7 @@ check_reporters_mask <- function(R){
 #' Fit a probabilistic generative model to double sampled networks.
 #' It returns reliability parameters for the reporters (theta),
 #' average interactions for the links (lambda) and the estimate of
-#' the true and unknown network (rho). 
+#' the true and unknown network (rho).
 #' The inference is performed with a Variational Inference approach.
 #'
 #' @family vimure
@@ -148,7 +148,8 @@ vimure <-
     eta_prior <- reticulate::tuple(as.list(eta_prior))
   }
 
-  if (length(R) > 0) {
+
+  if (!is.null(R)) {
     check_reporters_mask(R)
 
     model$fit(

@@ -57,7 +57,7 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   LAMBDA_0 <- 0.01
   LAMBDA_DIFF <- 0.99
   X <- build_X(synth_net, mutuality=eta, theta=custom_theta, cutoff_X=F, lambda_diff=LAMBDA_DIFF,
-               reporting_scenario = 3, verbose=T
+               reporting_scenario = 2, verbose=T
   )
 
   lambda_k_GT <- matrix(c(LAMBDA_0, LAMBDA_0 + LAMBDA_DIFF), ncol=K)
@@ -67,7 +67,7 @@ check_extreme_scenarios <- function(exaggeration_type, f1_expected){
   model <- vimure(synth_net$X, K=K, seed=seed, mutuality=T,
                   alpha_lambda=alpha_lambda, beta_lambda=beta_lambda,
                   num_realisations=2, max_iter=21, verbose=F,
-                  reporting_scenario = 3
+                  reporting_scenario = 2
   )
 
   Y_true <- as.vector(synth_net$Y$toarray())
@@ -101,7 +101,7 @@ test_that("Check reporters' mask", {
 
   reporter_mask[, , , reporters] <- "clearly_wrong"
 
-  expect_error(vimure(adj_matrix, R = reporter_mask), 
+  expect_error(vimure(adj_matrix, R = reporter_mask),
                "R must be either entirely made of TRUE/FALSE or of 0s/1s.")
 
 })
@@ -219,7 +219,7 @@ test_that("Check custom reporters' mask are enforced when input is edgelist", {
     for (i in unique_nodes) {
       for (j in unique_nodes) {
         for (m in unique_nodes) {
-          if (i == m | j == m) {
+          if (i == m | j == m & i != j) {
             reporter_mask[l, i, j, m] <- 1
           }
         }
@@ -247,24 +247,25 @@ test_that("Check custom reporters' mask are enforced when input is edgelist", {
   # We will need to match the node names precisely as they are registered
   ordering <- setNames(model$nodeNames$name, model$nodeNames$id)
 
-  model_R_keys$layer <- model_R_keys$layer + 1 # R is 1-indexed
-  model_R_keys$ego <- ordering[as.character(model_R_keys$ego)]
-  model_R_keys$alter <- ordering[as.character(model_R_keys$alter)]
-  model_R_keys$reporter <- ordering[as.character(model_R_keys$reporter)]
+  model_R_keys$layer <- as.integer(model_R_keys$layer + 1) # R is 1-indexed
+  model_R_keys$ego <- as.integer(ordering[as.character(model_R_keys$ego)])
+  model_R_keys$alter <- as.integer(ordering[as.character(model_R_keys$alter)])
+  model_R_keys$reporter <- as.integer(ordering[as.character(model_R_keys$reporter)])
 
-  # Initialise an empty 4D R array
-  model_R <- array(0, dim = as.integer(c(L, N, N, N)), dimnames = dims)
+  model_R_keys <- model_R_keys[order(model_R_keys$reporter,
+                                     model_R_keys$ego,
+                                     model_R_keys$alter), ]
+  row.names(model_R_keys) <- NULL
 
-  #For each key, assign the corresponding value to the numpy array
-  for (idx in seq_len(dim(model_R_keys)[[1]])) {
-    l <- model_R_keys[idx, 1]
-    i <- model_R_keys[idx, 2]
-    j <- model_R_keys[idx, 3]
-    m <- model_R_keys[idx, 4]
-    model_R[l, i, j, m] <- 1
-  }
+  df_reporter_mask <- data.frame(which(reporter_mask != 0, arr.ind = TRUE),
+                                 row.names = NULL)
+  colnames(df_reporter_mask) <- c("layer", "ego", "alter", "reporter")
+  df_reporter_mask <- df_reporter_mask[order(df_reporter_mask$reporter,
+                                             df_reporter_mask$ego,
+                                             df_reporter_mask$alter), ]
+  row.names(df_reporter_mask) <- NULL
 
-  expect_equal(model_R, reporter_mask)
+  expect_identical(model_R_keys, df_reporter_mask)
 
 })
 
@@ -283,7 +284,6 @@ test_that("Check vimure model for invalid inputs", {
                "ValueError: Required columns not found in data frame")
   expect_error(vimure(1:10), "invalid 'type'")
 })
-
 
 test_that("Check inferred model", {
   synth_net <- gm_standard_sbm(N=20, M=20, sparsify = F, K=2)
