@@ -130,10 +130,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
                     self.logger.warning(msg)
 
                     R = extra_params["R"]
-                    if R.shape != (self.L, self.N, self.N, self.M):
-                        msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
-                        self.logger.error(msg)
-                        raise ValueError(msg)
                     self.R = preprocess(R)
                     net_obj = read_from_edgelist(X, R=self.R)
                 else:
