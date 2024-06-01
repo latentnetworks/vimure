@@ -17,6 +17,7 @@ from abc import ABCMeta, abstractmethod
 from ._io import BaseNetwork
 from ._log import setup_logging
 from .utils import preprocess, sptensor_from_dense_array, transpose_ij
+from .utils import build_self_reporter_mask
 
 DEFAULT_N = 100
 DEFAULT_M = 100
@@ -176,7 +177,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
             Q = self.K
 
         #TODO: Change this according to one of the three reporting_scenario
-        R = build_self_reporter_mask(self,reporting_scenario)
+        R = build_self_reporter_mask(reporting_scenario, self.L, self.N, self.M)
 
         if reporting_scenario in [1, 2]:
 
@@ -1069,7 +1070,7 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         if reporting_scenario in [1, 2]:
             if Rinput is None:
-                R = build_self_reporter_mask(self)
+                R = build_self_reporter_mask(reporting_scenario, self.L, self.N, self.M)
             else:
                 try:
                     R = Rinput.toarray()
@@ -1194,41 +1195,6 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 """
 FUNCTIONS TO GENERATE X (OBSERVED NETWORK) FROM A GENERATED GROUND TRUTH NETWORK, Y
 """
-
-
-def build_self_reporter_mask(gt_network, reporting_scenario=2):
-    """
-    Build the reporters' mask according to one of the 3 reporting scenarios.
-
-    1. A reporter `m` can report only the ties in which she is ego:   `m --> i`
-    2. A reporter `m` can report only the ties they are involved in, either as ego or alter:   `m --> j` or `i --> m`
-    3. A reporter `m` can report all ties, even those she is not involved.
-    
-    Parameters
-    ----------
-    gt_network : vimure.synthetic.BaseSyntheticNetwork
-        Generative ground truth model.
-    """
-
-    # TODO: Use sparse matrices instead
-
-    if reporting_scenario == 1:
-        R = np.zeros((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
-        R[:, np.arange(gt_network.M), :, np.arange(gt_network.M)] = 1
-    elif reporting_scenario == 2:
-        R = np.zeros((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
-        R[:, np.arange(gt_network.M), :, np.arange(gt_network.M)] = 1
-        R[:, :, np.arange(gt_network.M), np.arange(gt_network.M)] = 1
-    elif reporting_scenario == 3:
-        R = np.ones((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
-    else:
-        raise ValueError(f"Unrecognised reporting scenario: {reporting_scenario}")
-
-    for l in range(gt_network.L):
-        for m in range(gt_network.M):
-            np.fill_diagonal(R[l,:,:, m], 0)
-
-    return R
 
 
 def build_custom_theta(

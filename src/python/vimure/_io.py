@@ -13,6 +13,7 @@ from scipy import sparse
 
 from ._log import setup_logging
 from .utils import sparse_max, sptensor_from_list
+from .utils import build_self_reporter_mask, preprocess
 
 """
 CONSTANTS
@@ -131,6 +132,7 @@ class RealNetwork(BaseNetwork):
 
 def read_from_edgelist(
     df: pd.DataFrame,
+    reporting_scenario: int = 2,
     nodes: list = [],
     reporters: list = [],
     is_weighted: bool = False,
@@ -181,6 +183,7 @@ def read_from_edgelist(
     """
 
     all_params = {key: value for key, value in locals().items() if key != 'self'}
+    reporters_informed = reporters != []
     df, nodes, reporters = _check_params_consistency(**all_params) # type: ignore
 
     # Put nodes and reporters in alphabetical order
@@ -210,15 +213,9 @@ def read_from_edgelist(
         layerName2Id[l] = i
         layerId2Name[i] = l
 
-    if R is None:
-        msg = (
-            "Reporters Mask was not informed (parameter R). "
-            "Parser will build it from reporter column, "
-            "assuming a reporter can only report their own ties."
-        )
-
-        warnings.warn(msg, UserWarning)
-
+    if reporters_informed:
+        # There was a list of reporters informed. 
+        # Priority is given to this list.
         """
         Infer R
         """
@@ -240,7 +237,16 @@ def read_from_edgelist(
                 R[rep][layerIdx] = sparse.coo_matrix((data, (row, col)), shape=(N, N))
                 R[rep][layerIdx] = sparse_max(R[rep][layerIdx], R[rep][layerIdx].T,) # type: ignore
                 R[rep][layerIdx] = R[rep][layerIdx].tocoo() # type: ignore
-
+    elif R is None:
+        # Second priority is for reporting_scenario
+        if reporting_scenario not in [1, 2, 3]:
+            msg = f"Invalid reporting scenario: {reporting_scenario}."
+            msg += "Reporting_scenario must be 1, 2 or 3"
+            logger.error(msg)
+            raise ValueError(msg)
+        else:
+            R = build_self_reporter_mask(reporting_scenario, L, N, M)
+            R = preprocess(R)
     elif R.shape != (L, N, N, M):
         msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
         module_logger.error(msg)

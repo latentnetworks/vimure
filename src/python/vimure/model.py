@@ -13,6 +13,7 @@ from scipy.stats import poisson
 from ._io import read_from_edgelist, read_from_igraph
 from ._log import setup_logging
 from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_threshold
+from .utils import build_self_reporter_mask
 
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.utils.validation import _deprecate_positional_args
@@ -225,7 +226,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
                     self.logger.error(msg)
                     raise ValueError(msg)
             else:
-                R = self.__build_self_reporter_mask(self.reporting_scenario, self.L, self.N, self.M)
+                R = build_self_reporter_mask(self.reporting_scenario, self.L, self.N, self.M)
 
             self.R = preprocess(R)
 
@@ -1308,32 +1309,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
         rho_PoissonMean = skt.sptensor(subs=R_subs, vals=vals)
 
         return rho_PoissonMean
-
-    def __build_self_reporter_mask(self, reporting_scenario, L, N, M):
-        """
-        Build the reporters' mask according to one of the 3 reporting scenarios.
-
-        1. A reporter `m` can report only the ties in which she is ego:   `m --> i`
-        2. A reporter `m` can report only the ties they are involved in, either as ego or alter:   `m --> j` or `i --> m`
-        3. A reporter `m` can report all ties, even those she is not involved.
-        """
-
-        if reporting_scenario in [1, 2]:
-            mask = np.zeros((L, N, N, M))
-        elif reporting_scenario == 3:
-            mask = np.ones((L, N, N, M))
-        else:
-            raise ValueError(f"Invalid reporting scenario: {reporting_scenario}")
-        
-        if reporting_scenario == 1:
-            mask[:, np.arange(M), :, np.arange(M)] = 1
-        elif reporting_scenario == 2:
-            mask[:, :, np.arange(M), np.arange(M)] = 1
-        
-        for l in range(L):
-            for m in range(M):
-                np.fill_diagonal(mask[l,:,:, m], 0)
-        return mask
 
 """
 UTIL FUNCTIONS FOR INFERENCE
