@@ -10,7 +10,7 @@ logger = setup_logging("karnataka-script")
 
 # Refer to the data folder within the tests directory
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_INPUT_FOLDER = os.path.join(CURRENT_DIR, "data/input/india_microfinance/formatted/")
+DATA_INPUT_FOLDER = os.path.join(CURRENT_DIR, "data/")
 
 LAYERS = ["advice", "kerorice", "money", "visit"]
 

@@ -1,3 +1,40 @@
+# vimure 0.2.0 (2024-06-02)
+
+This version introduces major changes to the way reporters' mask is handled.
+
+(Major)
+
+- Instead of creating a custom reporter's mask, users are now encouraged to choose from three preset reporting scenarios that are hardcoded into the code:
+  - `reporting_scenario = 1` (single-sampling, excluding self-loops)
+  - `reporting_scenario = 2` (double-sampling, excluding self-loops)
+  - `reporting_scenario = 3` (nodes can report any ties in the network, excluding self-loops)
+
+- Updated the internal logic of the Python function `read_from_edgelist()` (Python) to properly enforce the new parameter `reporting_scenario` or a custom reporter mask, if informed. **This function is also involked by the R package when the user passes an data.frame as input**. The logic behind reporters' mask is now handled in the following priority order:
+  1. For backward compatibility, the function first checks if the parameter `reporters` (a list) was passed to the function (i.e. `read_from_edgelist(edgelist, reporters=reporting_nodes)`). If it was, the reporters' mask is set to double-sampling (i.e. `reporting_scenario = 2`), but applied only to the subset of nodes passed as reporters.
+  2. If no `reporters` parameter is passed, the function checks if the parameter `R` was passed to the function (i.e., `read_from_edgelist(edgelist, R=custom_mask)`). If it was, then this custom mask is checked for validity and used as the reporters' mask.
+  3. If neither `reporters` nor `R` parameters are passed, the `reporting_scenario` parameter is used to determine the reporting scenario.
+
+(R) 
+
+- Adds `reporting_scenario` (int) parameter to `vimure()` function.
+- Adds `reporting_scenario` (int) parameter to `generate_X()` function, used when creating synthetic X data.
+- Removes `flag_self_reporter` parameter from `generate_X()` function, as this functionality is now handled by the `reporting_scenario` parameter.
+- Remove a warning message that was printed when no custom reporter mask was passed to `vimure()` function . By default, the model will use the double-sampling scenario and does not expect a custom reporter mask.
+- [TESTS] Adds two new unit tests to address GitHub Issue '#92 [BUG] Custom `reporter_mask` being ignored by the R package': 1) Check that custom reporters' mask are enforced 2) Check that custom reporters' mask are enforced when input is edgelist.
+
+
+(Python)
+- Adds `reporting_scenario` (int) parameter to `VIMureModel()` constructor.
+- Adds `reporting_scenario` (int) parameter to `_build_X()` method, used when creating synthetic X data.
+- Removes `flag_self_reporter` parameter from `_build_X()` method, as this functionality is now handled by the `reporting_scenario` parameter.
+- Remove a warning message that was printed when no custom reporter mask was passed to `VIMureModel#fit()` method. By default, the model will use the double-sampling scenario and does not expect a custom reporter mask. 
+- [TESTS] Adds new unit tests within the class `TestSyntheticWithReportingScenarios` to ensure the new reporting scenarios work as expected.
+- [TESTS] Add a new test `test_data_as_edgelist_reporting_scenario_2`, using Karnataka data, to check if the `reporting_scenario` parameter is working as expected when the real data is passed as an edgelist.
+
+(Internal)
+
+- There were multiple functions, in the Python code, that created a reporters' mask. These functions were refactored to a single function called `build_self_reporters_mask(reporting_scenario, L, N, M)` hosted in the `utils.py` file. This function is now used by the `read_from_edgelist()` function to create the reporters' mask, by the `generate_X()` function to create the synthetic X data and by the `VIMureModel#fit()` method to create the reporters' mask for the model.
+
 # vimure 0.1.3 (2023-08-18)
 
 (R)
