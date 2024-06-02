@@ -8,7 +8,13 @@
 #' @param sh_theta Shape of gamma distribution from which to draw theta. The 'reliability' of nodes is represented by the parameter $theta_{lm}$ and by default are modelled as a gamma function with shape `sh_theta` and scale `sc_theta`.
 #' @param sc_theta Scale of gamma distribution from which to draw theta.
 #' @param theta Custom values of theta, if provided sh_theta and sc_theta will be ignored.
-#' @param flag_self_reporter Indicates whether a node can only report about their own ties (default is true).
+#' @param reporting_scenario The reporting scenario to be used. Default is 2.
+#' - Scenario 1: Reporters report only on ties they are involved in
+#' as ego (excluding self-loops).
+#' - Scenario 2: Reporters report on all ties they are involved in,
+#' as either ego or alter (double sampling, excluding self-loops).
+#' - Scenario 3: Ego reports on any ties,
+#' even those they are not involved in (excludes self-loops).
 #' @param Q Maximum value of X entries. If None, it will use the network's K parameter
 #' @param cutoff_X Whether to set X as a binary
 #' @param lambda_diff The difference between each subsequent K
@@ -20,26 +26,34 @@
 #' @examples
 #'
 #' random_net <- gm_crep(N=100, M=100, L=1, eta=0.99)
-#' X <- build_X(random_net, flag_self_reporter=TRUE, cutoff_X=FALSE, seed=10L)
+#' X <- build_X(random_net, reporting_scenario=2, cutoff_X=FALSE, seed=10L)
 #' dim(X)
 build_X <- function(
-  synthetic, mutuality=0.5, sh_theta=2, sc_theta=0.5, theta=NULL, flag_self_reporter=T,
-  Q=NULL, cutoff_X=F, lambda_diff=NULL, verbose=T, ...
-){
+  synthetic,
+  mutuality = 0.5,
+  sh_theta = 2,
+  sc_theta = 0.5,
+  theta = NULL,
+  reporting_scenario = 2,
+  Q = NULL,
+  cutoff_X = FALSE,
+  lambda_diff = NULL,
+  verbose = TRUE,
+  ...) {
   synthetic$`_build_X`(
-    mutuality=mutuality,
-    sh_theta=sh_theta,
-    sc_theta=sc_theta,
-    theta=theta,
-    flag_self_reporter=flag_self_reporter,
-    Q=Q,
-    cutoff_X=cutoff_X,
-    lambda_diff=lambda_diff,
-    verbose=verbose,
+    mutuality = mutuality,
+    sh_theta = sh_theta,
+    sc_theta = sc_theta,
+    theta = theta,
+    reporting_scenario = reporting_scenario,
+    Q = Q,
+    cutoff_X = cutoff_X,
+    lambda_diff = lambda_diff,
+    verbose = verbose,
     ...
   )
 
-  return (py_to_r.sktensor.sptensor.sptensor(synthetic$X))
+  return(py_to_r.sktensor.sptensor.sptensor(synthetic$X))
 }
 
 

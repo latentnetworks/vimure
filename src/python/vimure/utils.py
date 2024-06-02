@@ -5,6 +5,32 @@ import sktensor as skt
 
 from sktensor.sptensor import fromarray
 
+def build_self_reporter_mask(reporting_scenario, L, N, M):
+    """
+    Build the reporters' mask according to one of the 3 reporting scenarios.
+
+    1. A reporter `m` can report only the ties in which she is ego:   `m --> i`
+    2. A reporter `m` can report only the ties they are involved in, either as ego or alter:   `m --> j` or `i --> m`
+    3. A reporter `m` can report all ties, even those she is not involved.
+    """
+
+    if reporting_scenario in [1, 2]:
+        mask = np.zeros((L, N, N, M))
+        mask[:, np.arange(M), :, np.arange(M)] = 1
+
+        if reporting_scenario == 2:
+            mask[:, :, np.arange(M), np.arange(M)] = 1
+    elif reporting_scenario == 3:
+        mask = np.ones((L, N, N, M))
+    else:
+        raise ValueError(f"Invalid reporting scenario: {reporting_scenario}")
+    
+    for l in range(L):
+        for m in range(M):
+            np.fill_diagonal(mask[l,:,:, m], 0)
+
+    return mask
+
 def transpose_ij(M):
     """
     Compute the transpose of a matrix.

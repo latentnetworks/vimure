@@ -38,7 +38,7 @@ This repository has the following main branches:
 
 However, you should not be working directly on `develop`. **Instead, you should create a new branch from `develop` and work on that branch**. When you are done, you should open a pull request to merge your branch into `develop`. This way, we can review your changes before merging them into `develop`. This is a good practice, often called [GitFlow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) that will help us avoid mistakes and also make it easier to revert changes if needed. 
 
-💡 Not familiar with Git branches? Check out [this tutorial](https://www.atlassian.com/git/tutorials/using-branches), or [this one](https://www.youtube.com/watch?v=JTE2Fn_sCZs), and keep a bookmark for [this cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet), or, perhaps the [Pro](https://git-scm.com/book/en/v2) Git book](https://git-scm.com/book/en/v2).
+💡 Not familiar with Git branches? Check out [this tutorial](https://www.atlassian.com/git/tutorials/using-branches), or [this one](https://www.youtube.com/watch?v=JTE2Fn_sCZs), and keep a bookmark for [this cheat sheet](https://www.atlassian.com/git/tutorials/atlassian-git-cheatsheet), or, perhaps the [Pro Git book](https://git-scm.com/book/en/v2).
 
 
 ## 🧰 Dev Setup

@@ -22,10 +22,9 @@ py_pkg_suffix <- "#egg=vimure&subdirectory=src/python/"
 
   vimureP <<- reticulate::import("vimure", delay_load = list(
     on_load = function() {
-      print("Loaded")
+      packageStartupMessage("Loaded")
       pkg_version <- get_pkg_version()
-      emit <- get("packageStartupMessage") # R CMD check
-      emit("Loaded vimure version ", pkg_version)
+      packageStartupMessage("Loaded vimure version ", pkg_version)
     },
     on_error = function(e) {
       config <- vm_config()

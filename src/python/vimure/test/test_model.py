@@ -1,12 +1,14 @@
 from typing import Any
 import pytest
 import logging
+import sktensor
 
 import numpy as np
 import pandas as pd
 import vimure as vm
 
 from sklearn.metrics import f1_score
+
 
 from . import karnataka_edgelist_vil1_money, suppress_stdout_stderr
 
@@ -51,68 +53,49 @@ def check_final_parameters(model, net_obj):
     assert type(model.nu_rte) == np.float64
     assert model.nu_rte >= 0
 
+def check_reporting_mask(model, reporting_scenario):
+    """
+    If reporting_scenario == 1, then the model.R should only allow self-reporting on the ego side
+
+    If reporting_scenario == 2, then the model.R should only allow self-reporting, both on ego and alter sides (double-sampling)
+
+    If reporting_scenario == 3, then the model.R should allow self-reporting on any ties
+    
+    """
+
+    if reporting_scenario == 1:
+        
+        # Assuming model.R is a 4D tensor (sktensor.sptensor), I will work directly with the nonzero indices
+        R = pd.DataFrame(np.stack(model.R.subs).T, columns=['l', 'i', 'j', 'm'])
+        # Check that all nonzero indices are on the ego side (remove self-loop)
+        assert R.query("m == i").shape[0] == R.shape[0]
+
+    elif reporting_scenario == 2:
+        
+        # Assuming model.R is a 4D tensor (sktensor.sptensor), I will work directly with the nonzero indices
+        R = pd.DataFrame(np.stack(model.R.subs).T, columns=['l', 'i', 'j', 'm'])
+
+        # The only possible values for m are i and j
+        assert R.query("m == i | m == j").shape[0] == R.shape[0]
+
+        # Or, in other words
+        assert R.query("m != i & m != j").empty
+
+    elif reporting_scenario == 3:
+        
+        assert isinstance(model.R, sktensor.dtensor)
+
+        # model R should be a 4D tensor full of 1s with the exception of the diagonal
+        assert len(model.R.nonzero()[0]) == model.L * model.N * model.N * (model.M - 1)
+
+    else:
+        raise ValueError(f"Invalid reporting_scenario: {reporting_scenario}. Must be one of 1, 2, 3.")
+
+
 class TestVimureWithRandomNetworks:
     """
     Tests of the VimureModel class
     """
-
-    def test_vimure_model_with_standard_sbm(self):
-        """
-        Tests the VimureModel class with a known synthetic network
-        """
-
-        logger.debug("Generating synthetic network (Standard SBM) for testing")
-        gt_network = vm.synthetic.StandardSBM(
-            N=20,
-            M=20,
-            L=1,
-            K=3,
-            C=2,
-            avg_degree=2,
-            sparsify=False,
-        )
-
-        logger.debug("Generating observed X from given Y")
-        gt_network._build_X(flag_self_reporter=True)
-
-        logger.debug("Starting VimureModel")
-        model = vm.model.VimureModel()
-        with pytest.warns(None) as record:
-            with suppress_stdout_stderr():
-                model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
-
-        check_final_parameters(model, gt_network)
-
-    def test_vimure_model_issues_appropriate_warnings(self):
-        """
-        Tests the VimureModel class with a known synthetic network
-        """
-
-        logger.debug("Generating synthetic network (Standard SBM) for testing")
-        gt_network = vm.synthetic.StandardSBM(
-            N=20,
-            M=20,
-            L=1,
-            K=3,
-            C=2,
-            avg_degree=2,
-            sparsify=False,
-        )
-
-        logger.debug("Generating observed X from given Y")
-        gt_network._build_X(flag_self_reporter=True)
-
-        logger.debug("Starting VimureModel without providing R")
-        model = vm.model.VimureModel()
-        with suppress_stdout_stderr():
-            with pytest.warns(UserWarning):
-                model.fit(gt_network.X, K=gt_network.K)
-
-        logger.debug("Starting VimureModel without providing K")
-        model = vm.model.VimureModel()
-        with suppress_stdout_stderr():
-            with pytest.warns(UserWarning):
-                model.fit(gt_network.X, R=gt_network.R)
 
     def test_vimure_model_extreme_scenarios_over_reporting(self):
         """
@@ -157,7 +140,7 @@ class TestVimureWithRandomNetworks:
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
                 lambda_diff=LAMBDA_DIFF,
-                flag_self_reporter=True,
+                reporting_scenario=2,
                 seed=seed,
                 verbose=False,
             )
@@ -230,7 +213,7 @@ class TestVimureWithRandomNetworks:
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
                 lambda_diff=LAMBDA_DIFF,
-                flag_self_reporter=True,
+                reporting_scenario=2,
                 seed=seed,
                 verbose=False,
             )
@@ -303,7 +286,7 @@ class TestVimureWithRandomNetworks:
                 theta=theta,  # Pre-defined theta
                 cutoff_X=False,
                 lambda_diff=LAMBDA_DIFF,
-                flag_self_reporter=True,
+                reporting_scenario=2,
                 seed=seed,
                 verbose=False,
             )
@@ -333,6 +316,75 @@ class TestVimureWithRandomNetworks:
 
         assert np.allclose(f1_score(Y_true, Y_rec), 0.97, atol=1e-2)
 
+class TestSyntheticWithReportingScenarios:
+    """
+    Tests, using SBMs, the three reporting scenarios
+    
+    1 - Only ego can report on their own ties (excluding self-loops)
+    2 - Both ego and alter can report on their own ties (double-sampling, excluding self-loops)
+    3 - Any tie can be reported on (except self-loops) 
+
+    """
+
+    def __common_test(self, reporting_scenario):
+        
+        logger.debug("Generating synthetic network (Standard SBM) for testing")
+        gt_network = vm.synthetic.StandardSBM(
+            N=20,
+            M=20,
+            L=1,
+            K=3,
+            C=2,
+            avg_degree=2,
+            sparsify=False,
+        )
+
+        logger.debug("Generating observed X from given Y")
+        gt_network._build_X(reporting_scenario=reporting_scenario)
+
+        logger.debug("Starting VimureModel")
+        model = vm.model.VimureModel(reporting_scenario=reporting_scenario)
+        with pytest.warns(None) as record:
+            with suppress_stdout_stderr():
+                model.fit(gt_network.X, K=gt_network.K, R=gt_network.R)
+
+        check_final_parameters(model, gt_network)
+
+        check_reporting_mask(model, reporting_scenario)
+
+    def test_reporting_scenario_1(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
+        # Reporters only report on ties they are involved in as ego
+        self.__common_test(reporting_scenario=1)
+ 
+    def test_reporting_scenario_2(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
+        # Reporters report on ties they are involved in as ego and alter
+        self.__common_test(reporting_scenario=2)
+
+    def test_reporting_scenario_3(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
+        # Reporters report on any tie
+        self.__common_test(reporting_scenario=3)
+
+    def tests_invalid_reporting_scenario(self):
+        """
+        Tests the VimureModel class with a known synthetic network
+        """
+
+        # Reporters report on any tie
+        with pytest.raises(ValueError) as e_info:
+            self.__common_test(reporting_scenario=4)
+            assert str(e_info.value) == "Invalid reporting_scenario: 4. Must be one of 1, 2, 3."
 
 class TestVimureWithReadData:
     """
@@ -358,12 +410,11 @@ class TestVimureWithReadData:
                 R=net_obj.R,
             )
 
-
 class TestInferredModel:
     @classmethod
     def setup_class(cls):
         cls.synth_net = vm.synthetic.StandardSBM(K=2)
-        cls.synth_net._build_X(flag_self_reporter=True)
+        cls.synth_net._build_X(reporting_scenario=2)
 
         cls.model = vm.model.VimureModel()
         with suppress_stdout_stderr():
@@ -446,7 +497,6 @@ class TestInferredModel:
         for y in Y:
             self.check_output(y, self.model_mutuality)
 
-
 class TestVimureRealData:
 
     def test_internal_api(self, karnataka_edgelist_vil1_money):
@@ -480,3 +530,21 @@ class TestVimureRealData:
         with pytest.warns(None) as record:
             net_obj = vm._io.read_from_edgelist(df, K=2)
         check_final_parameters(model, net_obj)
+
+    def test_data_as_edgelist_reporting_scenario_2(self, karnataka_edgelist_vil1_money):
+    
+        REPORTING_SCENARIO = 2 # The default
+
+        df, _, _ = karnataka_edgelist_vil1_money
+
+        with pytest.warns(None) as record:
+            net_obj = vm._io.read_from_edgelist(df, K=2)
+
+        model = vm.model.VimureModel()
+
+        with suppress_stdout_stderr():
+            model.fit(net_obj.X, K=net_obj.K, R=net_obj.R, reporting_scenario=REPORTING_SCENARIO)
+
+        check_final_parameters(model, net_obj)
+
+        check_reporting_mask(model, reporting_scenario=REPORTING_SCENARIO)

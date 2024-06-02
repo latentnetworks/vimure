@@ -43,7 +43,7 @@ test_that("Check X generation", {
     seed=10,
   )
 
-  X <- build_X(synth_net, flag_self_reporter=F, cutoff_X=F, mutuality=0.5)
+  X <- build_X(synth_net, reporting_scenario = 3, cutoff_X=F, mutuality=0.5)
 
   check_X_matrix(synth_net)
   check_theta(synth_net)

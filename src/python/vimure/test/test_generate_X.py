@@ -66,7 +66,7 @@ class TestGenerateXForStandardSBM:
         )
 
         gt_network._build_X(
-            flag_self_reporter=False,
+            reporting_scenario=3,
             cutoff_X=False,
             mutuality=0.5,
             seed=20,
@@ -89,7 +89,7 @@ class TestGenerateXForStandardSBM:
         gt_network = vm.synthetic.StandardSBM(
             N=20, M=20, L=1, K=4, C=2, avg_degree=4, sparsify=False, seed=10
         )
-        gt_network._build_X(flag_self_reporter=False, cutoff_X=True, mutuality=0.5, seed=20)
+        gt_network._build_X(reporting_scenario=3, cutoff_X=True, mutuality=0.5, seed=20)
 
         check_objects(gt_network)
         assert np.max(gt_network.X.vals) <= (gt_network.K - 1)
@@ -117,8 +117,8 @@ class TestGenerateXForStandardSBM:
         network1 = deepcopy(gt_network)
         network2 = deepcopy(gt_network)
 
-        network1._build_X(flag_self_reporter=False, cutoff_X=False, mutuality=0.5, seed=18)
-        network2._build_X(flag_self_reporter=False, cutoff_X=False, mutuality=0.5, seed=30)
+        network1._build_X(reporting_scenario=3, cutoff_X=False, mutuality=0.5, seed=18)
+        network2._build_X(reporting_scenario=3, cutoff_X=False, mutuality=0.5, seed=30)
 
         msg = "If assert fails, X1 matrix matches X2 perfectly -- which is supposed to be very unlikely."
         np.testing.assert_raises(
@@ -145,7 +145,7 @@ class TestGenerateXForStandardSBM:
         )
 
         gt_network._build_X(
-            flag_self_reporter=True,
+            reporting_scenario=2,
             cutoff_X=True,
             mutuality=0.5,
             seed=20,
@@ -190,7 +190,7 @@ class TestGenerateXForStandardSBM:
 
         expected_X_intersection = np.zeros(sumX.shape).astype('int')
 
-        # Because flag_self_reporter=True, the maximum number of reporters that can report on a specific tie is 2. 
+        # Because reporting_scenario=2, the maximum number of reporters that can report on a specific tie is 2. 
         # This is because, under this assumption, reporters are only asked about ties they are ego or alter.
         expected_X_intersection[sumX == gt_network.K] = 1
 
@@ -220,7 +220,7 @@ class TestGenerateXForStandardSBM:
         )
 
         gt_network._build_X(
-            flag_self_reporter=True,
+            reporting_scenario=2,
             cutoff_X=True,
             mutuality=0.5,
             seed=20,
@@ -261,7 +261,7 @@ class TestGenerateXForStandardSBM:
 
         nonzero_lijm = pd.DataFrame(np.stack(gt_network.X.subs).T, columns=["l", "i", "j", "m"])
 
-        # Because flag_self_reporter=True, the maximum number of reporters that can report on a specific tie is 2. 
+        # Because reporting_scenario=2, the maximum number of reporters that can report on a specific tie is 2. 
         # This is because, under this assumption, reporters are only asked about ties they are ego or alter.
         nonzero_indices = nonzero_lijm.groupby(["l", "i", "j"]).count().query("m == 2")
         nonzero_indices = nonzero_indices.reset_index().drop(columns="m")

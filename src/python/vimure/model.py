@@ -13,6 +13,7 @@ from scipy.stats import poisson
 from ._io import read_from_edgelist, read_from_igraph
 from ._log import setup_logging
 from .utils import preprocess, get_item_array_from_subs, match_arg, apply_rho_threshold
+from .utils import build_self_reporter_mask
 
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.utils.validation import _deprecate_positional_args
@@ -42,6 +43,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
         mutuality: bool = True,
         convergence_tol: float = 0.1,
         decision: int = 1,
+        reporting_scenario: int = 2,
         verbose: bool = False,
     ):
         """
@@ -53,9 +55,20 @@ class VimureModel(TransformerMixin, BaseEstimator):
             Whether to use the mutuality parameter.
         convergence_tol : float
             Controls when to stop the optimisation algorithm (CAVI)
+        reporting_scenario : int
+            Scenario to consider for the reporters. Either 1, 2 or 3.
+            Scenario 1: Reporters report only on ties they are involved in as ego (excluding self-loops).
+            Scenario 2: Reporters report on all ties they are involved in, as either ego or alter (double sampling, excluding self-loops).
+            Scenario 3: Ego reports on any ties, even those they are not involved in (excludes self-loops).
         """
 
         self.undirected = undirected
+
+        if reporting_scenario not in [1, 2, 3]:
+            msg = "reporting_scenario must be 1, 2 or 3"
+            self.logger.error(msg)
+            raise ValueError(msg)
+        self.reporting_scenario = reporting_scenario
 
         if undirected:
             msg = "Overriding mutuality to False because the network is undirected"
@@ -102,12 +115,25 @@ class VimureModel(TransformerMixin, BaseEstimator):
         for extra_param in extra_params:
             if extra_param not in available_extra_params:
                 msg = "Ignoring unrecognised parameter %s." % extra_param
-                self.logger.warn(msg)
+                self.logger.warning(msg)
 
         if isinstance(X, pd.DataFrame) or isinstance(X, ig.Graph):
 
             if isinstance(X, pd.DataFrame):
-                net_obj = read_from_edgelist(X)
+                if "R" in extra_params:
+                    msg = (
+                        "The parameter R was passed to the fit() method. "
+                        "The model will use this matrix to determine the reporters' mask, "
+                        "ignoring the reporting_scenario parameter set in the VimureModel object."
+                    )
+                    warnings.warn(msg, UserWarning)
+                    self.logger.warning(msg)
+
+                    R = extra_params["R"]
+                    self.R = preprocess(R)
+                    net_obj = read_from_edgelist(X, R=self.R)
+                else:
+                    net_obj = read_from_edgelist(X, reporting_scenario=self.reporting_scenario)
             else:
                 net_obj = read_from_igraph(X)
 
@@ -197,19 +223,11 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         # If X was not passed as a DataFrame nor an igraph object...
         if not hasattr(self, "R"):
+            
             if "R" in extra_params:
                 R = extra_params["R"]
-                if R.shape != (self.L, self.N, self.N, self.M):
-                    msg = "Dimensions of reporter mask (R) do not match L x N x N x M"
-                    self.logger.error(msg)
-                    raise ValueError(msg)
             else:
-                msg = "Reporters Mask was not informed (parameter R). "
-                msg += "The model will assume that every reporter can report on any tie."
-
-                warnings.warn(msg, UserWarning)
-                R = np.ones((self.L, self.N, self.N, self.M))
-
+                R = build_self_reporter_mask(self.reporting_scenario, self.L, self.N, self.M)
             self.R = preprocess(R)
 
         if "EPS" in extra_params:
@@ -1291,7 +1309,6 @@ class VimureModel(TransformerMixin, BaseEstimator):
         rho_PoissonMean = skt.sptensor(subs=R_subs, vals=vals)
 
         return rho_PoissonMean
-
 
 """
 UTIL FUNCTIONS FOR INFERENCE

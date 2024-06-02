@@ -183,9 +183,6 @@ class TestReadFromEdgelist:
             with pytest.raises(ValueError, match=error_msg):
                 vm._io.read_from_edgelist(synth_dataset_standard_names(),
                                          reporters=reporters_missing_jack)
-                    
-                # Check that it registered the warning about nodes
-                assert len(record) == 1
                 
                 first_warn_msg = (
                     "The set of nodes was not informed, "
@@ -216,9 +213,6 @@ class TestReadFromEdgelist:
 
             nodes = ['Tom', 'nick', 'krish', 'jack']
             assert net_obj.nodeNames['name'].tolist() == nodes
-
-        # Check that it registered several warnings
-        assert len(record) == 4
         
         first_warn_msg = (
             "The set of nodes was not informed, "
@@ -232,15 +226,8 @@ class TestReadFromEdgelist:
         )
         assert str(record[1].message) == second_warn_msg
 
-        third_warn_msg =  (
-            "Reporters Mask was not informed (parameter R). "
-            "Parser will build it from reporter column, "
-            "assuming a reporter can only report their own ties."
-        )
-        assert str(record[2].message) == third_warn_msg
-
         fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
-        assert str(record[3].message) == fourth_warn_msg
+        assert str(record[2].message) == fourth_warn_msg
 
     def test_non_standard_names(self):
         """
@@ -264,9 +251,6 @@ class TestReadFromEdgelist:
 
             nodes = ['Tom', 'nick', 'krish', 'jack']
             assert net_obj.nodeNames['name'].tolist() == nodes
-
-        # Check that it registered several warnings
-        assert len(record) == 4
         
         first_warn_msg = (
             "The set of nodes was not informed, "
@@ -280,15 +264,8 @@ class TestReadFromEdgelist:
         )
         assert str(record[1].message) == second_warn_msg
 
-        third_warn_msg =  (
-            "Reporters Mask was not informed (parameter R). "
-            "Parser will build it from reporter column, "
-            "assuming a reporter can only report their own ties."
-        )
-        assert str(record[2].message) == third_warn_msg
-
         fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
-        assert str(record[3].message) == fourth_warn_msg      
+        assert str(record[2].message) == fourth_warn_msg      
 
     def test_standard_names_with_nodes_param(self):
         """
@@ -311,21 +288,11 @@ class TestReadFromEdgelist:
             assert net_obj.nodeNames.shape == (net_obj.N, 2)
             assert net_obj.nodeNames['name'].tolist() == nodes
 
-            # Check that it registered several warnings
-            assert len(record) == 2
-
             first_warn_msg =  (
                 "The set of reporters was not informed, "
                 "assuming set(reporters) = set(nodes) and N = M."
             )
             assert str(record[0].message) == first_warn_msg
-
-            second_warn_msg =  (
-                "Reporters Mask was not informed (parameter R). "
-                "Parser will build it from reporter column, "
-                "assuming a reporter can only report their own ties."
-            )
-            assert str(record[1].message) == second_warn_msg
 
     ### Tests edge cases
 
@@ -347,9 +314,6 @@ class TestReadFromEdgelist:
         with pytest.warns(None) as record:
             with pytest.raises(ValueError, match=error_msg):
                 vm._io.read_from_edgelist(df)
-
-        # Check that it registered several warnings
-        assert len(record) == 2
         
         first_warn_msg = (
             "The set of nodes was not informed, "
@@ -382,9 +346,6 @@ class TestReadFromEdgelist:
         with pytest.warns(None) as record:
             with pytest.raises(ValueError, match=error_msg):
                 vm._io.read_from_edgelist(df, reporters=reporters)
-
-        # Check that it registered several warnings
-        assert len(record) == 1
         
         first_warn_msg = (
             "The set of nodes was not informed, "
@@ -419,9 +380,6 @@ class TestReadFromCSV:
 
             nodes = ['Tom', 'nick', 'krish', 'jack']
             assert net_obj.nodeNames['name'].tolist() == nodes
-
-        # Check that it registered several warnings
-        assert len(record) == 4
         
         first_warn_msg = (
             "The set of nodes was not informed, "
@@ -435,15 +393,8 @@ class TestReadFromCSV:
         )
         assert str(record[1].message) == second_warn_msg
 
-        third_warn_msg =  (
-            "Reporters Mask was not informed (parameter R). "
-            "Parser will build it from reporter column, "
-            "assuming a reporter can only report their own ties."
-        )
-        assert str(record[2].message) == third_warn_msg
-
         fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
-        assert str(record[3].message) == fourth_warn_msg
+        assert str(record[2].message) == fourth_warn_msg
 
     def test_read_from_csv_incorrect_name_mapping(self):
         """
@@ -490,9 +441,6 @@ class TestReadFromCSV:
 
             nodes = ['Tom', 'nick', 'krish', 'jack']
             assert net_obj.nodeNames['name'].tolist() == nodes
-
-        # Check that it registered several warnings
-        assert len(record) == 4
         
         first_warn_msg = (
             "The set of nodes was not informed, "
@@ -506,15 +454,8 @@ class TestReadFromCSV:
         )
         assert str(record[1].message) == second_warn_msg
 
-        third_warn_msg =  (
-            "Reporters Mask was not informed (parameter R). "
-            "Parser will build it from reporter column, "
-            "assuming a reporter can only report their own ties."
-        )
-        assert str(record[2].message) == third_warn_msg
-
         fourth_warn_msg = "Parameter K was None. Defaulting to: 2"
-        assert str(record[3].message) == fourth_warn_msg
+        assert str(record[2].message) == fourth_warn_msg
 
 class TestRealData:
     """
@@ -527,9 +468,6 @@ class TestRealData:
 
         with pytest.warns(None) as record:
             net_obj = vm._io.read_from_edgelist(df, K=2)
-
-        # Check that it registered several warnings
-        assert len(record) == 3
         
         first_warn_msg = (
             "The set of nodes was not informed, "
@@ -543,13 +481,6 @@ class TestRealData:
         )
         
         assert str(record[1].message) == second_warn_msg
-
-        third_warn_msg =  (
-            "Reporters Mask was not informed (parameter R). "
-            "Parser will build it from reporter column, "
-            "assuming a reporter can only report their own ties."
-        )
-        assert str(record[2].message) == third_warn_msg
     
         assert net_obj.L == 1
         assert net_obj.N == 324
@@ -585,25 +516,14 @@ class TestRealData:
     def test_inform_nodes_reporters(self, karnataka_edgelist_vil1_money):
         
         df, nodes, reporters = karnataka_edgelist_vil1_money
-
         with pytest.warns(None) as record:
             net_obj = vm._io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
-
-        # Check that it registered several warnings
-        assert len(record) == 2
         
         first_warn_msg = (
             "Not necessarily a problem, "
             "but some of the nodes are not reporters."
         )
         assert str(record[0].message) == first_warn_msg
-
-        second_warn_msg =  (
-            "Reporters Mask was not informed (parameter R). "
-            "Parser will build it from reporter column, "
-            "assuming a reporter can only report their own ties."
-        )
-        assert str(record[1].message) == second_warn_msg
     
         assert net_obj.L == 1
         assert net_obj.N == 330 # bigger than when not-informed

@@ -17,6 +17,7 @@ from abc import ABCMeta, abstractmethod
 from ._io import BaseNetwork
 from ._log import setup_logging
 from .utils import preprocess, sptensor_from_dense_array, transpose_ij
+from .utils import build_self_reporter_mask
 
 DEFAULT_N = 100
 DEFAULT_M = 100
@@ -65,7 +66,7 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         mutuality: float = 0.5,
         sh_theta: float = 2.0,
         sc_theta: float = 0.5,
-        flag_self_reporter: bool = True,
+        reporting_scenario: int = 2, # 1, 2 or 3
         cutoff_X: bool = False,
         lambda_diff: float = None,
         Q: int = None,
@@ -88,8 +89,8 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
             and by default are modelled as a gamma function with shape `sh_theta` and scale `sc_theta`.
         sc_theta : float
             Scale of gamma distribution from which to draw theta.
-        flag_self_reporter : bool
-            Indicates whether a node can only report about their own ties.
+        reporting_scenario : bool
+            Indicates the scenario for the reporter mask R.
         Q : int
             Maximum value of X entries. If None, it will use the network's K parameter.
         cutoff_X : bool
@@ -111,6 +112,17 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         if mutuality < 0 or mutuality >= 1:
             msg = "The mutuality parameter has to be in [0, 1)!"
+            raise ValueError(msg)
+        
+        if reporting_scenario not in [1, 2, 3]:
+            msg = """
+            The reporting_scenario parameter has to be 1, 2 or 3!
+
+            1: Only self-reporters reporting ego ties.
+            2: Only self-reporters reporting ego ties and alter ties.
+            3: Reporters can report on any tie, including those they are not part of.
+            """
+
             raise ValueError(msg)
 
         # generate_x uses its own pseudo-random seed generator, so we can better control the generation of theta.
@@ -164,8 +176,10 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         if cutoff_X and Q is None:
             Q = self.K
 
-        if flag_self_reporter:
-            R = build_self_reporter_mask(self)
+        #TODO: Change this according to one of the three reporting_scenario
+        R = build_self_reporter_mask(reporting_scenario, self.L, self.N, self.M)
+
+        if reporting_scenario in [1, 2]:
 
             for l in range(L):
                 for m in range(M):
@@ -209,7 +223,6 @@ class BaseSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
                                 X[l, i, j, m] = cond_exp
 
         else:
-            R = np.ones((L, N, N, M))
             for l in range(L):
                 for m in range(M):
                     for i in range(N):
@@ -837,7 +850,7 @@ class Multitensor(StandardSBM):
         Returns
         -------
         M : numpy.array
-            Mean `\lambda^{0}_{ij}` for all entries.
+            Mean `\\lambda^{0}_{ij}` for all entries.
         """
 
         M = np.einsum("ik,jq->ijkq", u, v)
@@ -996,7 +1009,7 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
     def build_X(
         self,
         Rinput: None,
-        flag_self_reporter: bool = True,
+        reporting_scenario: int = 2, # either 1, 2 or 3
         cutoff_X: bool = False,
         Q: int = None,
         seed_X: int = None,
@@ -1055,9 +1068,9 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
         if cutoff_X and Q is None:
             Q = self.K
 
-        if flag_self_reporter:
+        if reporting_scenario in [1, 2]:
             if Rinput is None:
-                R = build_self_reporter_mask(self)
+                R = build_self_reporter_mask(reporting_scenario, self.L, self.N, self.M)
             else:
                 try:
                     R = Rinput.toarray()
@@ -1107,6 +1120,9 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 
         else:
             R = np.ones((self.L, self.N, self.N, self.M))
+            # Remove self-loops
+            for l in range(self.L):
+                np.fill_diagonal(R[l], 0)
             for l in range(self.L):
                 for m in range(self.M):
                     for i in range(self.N):
@@ -1179,29 +1195,6 @@ class PosteriorSyntheticNetwork(BaseNetwork, metaclass=ABCMeta):
 """
 FUNCTIONS TO GENERATE X (OBSERVED NETWORK) FROM A GENERATED GROUND TRUTH NETWORK, Y
 """
-
-
-def build_self_reporter_mask(gt_network):
-    """
-    Build the reporters' mask in a way such that:
-
-    - A reporter `m` can report ties in which she is ego:   `m --> i`
-    - A reporter `m` can report ties in which she is alter: `i --> m`
-    - A reporter `m` **cannot** report ties she is not involved, that is `i --> j` where `i != m` and `j != m`
-    
-    Parameters
-    ----------
-    gt_network : vimure.synthetic.BaseSyntheticNetwork
-        Generative ground truth model.
-    """
-
-    # TODO: Use sparse matrices instead
-
-    R = np.zeros((gt_network.L, gt_network.N, gt_network.N, gt_network.M))
-    R[:, np.arange(gt_network.M), :, np.arange(gt_network.M)] = 1
-    R[:, :, np.arange(gt_network.M), np.arange(gt_network.M)] = 1
-
-    return R
 
 
 def build_custom_theta(

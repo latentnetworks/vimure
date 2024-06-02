@@ -81,7 +81,7 @@ Simply create an object with the desired synthetic network class:
 ``` r
 random_net <- gm_crep(N=100, M=100, L=1, C=2, avg_degree=10, sparsify=T, eta=0.99, seed=10)
 Y <- extract_Y(random_net)
-X <- build_X(random_net, flag_self_reporter=T, cutoff_X=F, seed=10L)
+X <- build_X(random_net, reporting_scenario=2, cutoff_X=F, seed=10L)
 
 paste("Reciprocity Y:", round(overall_reciprocity(Y[1,,]),3))
 ```
