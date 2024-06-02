@@ -14,7 +14,7 @@ Choose your language:
 
 # R
 
-`vimure` is not yet available on CRAN, but you can still it with [devtools](https://devtools.r-lib.org/).
+`vimure` is not yet available on CRAN, but you can still use it with [devtools](https://devtools.r-lib.org/).
 
 
 Install the latest `vimure` (v0.1.3) with the following command:
@@ -47,7 +47,7 @@ Underneath it all, our R package runs on [reticulate](https://rstudio.github.io/
 Install the latest `vimure` (v0.1.3) with the following command:
 
 ```bash
-pip install "git+https://github.com/latentnetworks/vimure.git#egg=vimure&subdirectory=src/python/"
+pip install "git+https://github.com/latentnetworks/vimure.git@v0.1.3#egg=vimure&subdirectory=src/python/"
 ```
 
 This Python package was tested on Python >= 3.8, and it is expected to work fine in all major OSes (Windows, Mac, Ubuntu).
