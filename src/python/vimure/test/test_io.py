@@ -179,10 +179,10 @@ class TestReadFromEdgelist:
             "Hint: Compare the unique values of the `reporter` column "
             "with the list of reporters passed as parameter."
         )
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             with pytest.raises(ValueError, match=error_msg):
                 vm._io.read_from_edgelist(synth_dataset_standard_names(),
-                                         reporters=reporters_missing_jack)
+                                          reporters=reporters_missing_jack)
                 
                 first_warn_msg = (
                     "The set of nodes was not informed, "
@@ -199,7 +199,7 @@ class TestReadFromEdgelist:
 
         df = synth_dataset_standard_names()
 
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             net_obj = vm._io.read_from_edgelist(df)
 
             assert net_obj.L == 1
@@ -237,7 +237,7 @@ class TestReadFromEdgelist:
 
         df = synth_dataset_custom_names()
 
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             net_obj = vm._io.read_from_edgelist(df, ego="i", alter="j", reporter="r")
 
             assert net_obj.L == 1
@@ -275,7 +275,7 @@ class TestReadFromEdgelist:
         df = synth_dataset_standard_names()
         nodes = ['Tom', 'nick', 'krish', 'jack']
 
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             net_obj = vm._io.read_from_edgelist(df, nodes=nodes, K=2)
 
             assert net_obj.L == 1
@@ -311,7 +311,7 @@ class TestReadFromEdgelist:
             "with those of the `ego` and `alter` columns."
         )
 
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             with pytest.raises(ValueError, match=error_msg):
                 vm._io.read_from_edgelist(df)
         
@@ -343,7 +343,7 @@ class TestReadFromEdgelist:
             "with those of the `ego` and `alter` columns."
         )
 
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             with pytest.raises(ValueError, match=error_msg):
                 vm._io.read_from_edgelist(df, reporters=reporters)
         
@@ -366,7 +366,7 @@ class TestReadFromCSV:
         temp_filename = os.path.join(tempfile.gettempdir(), "test.csv")
         df.to_csv(temp_filename, index=False)
 
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             net_obj = vm._io.read_from_csv(temp_filename)
 
             assert net_obj.L == 1
@@ -424,7 +424,7 @@ class TestReadFromCSV:
         temp_filename = os.path.join(tempfile.gettempdir(), "test.csv")
         df.to_csv(temp_filename, index=False)
 
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             net_obj = vm._io.read_from_csv(temp_filename, 
                                                    ego="i",
                                           alter="j",
@@ -466,7 +466,7 @@ class TestRealData:
         
         df, _, _ = karnataka_edgelist_vil1_money
 
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             net_obj = vm._io.read_from_edgelist(df, K=2)
         
         first_warn_msg = (
@@ -516,7 +516,7 @@ class TestRealData:
     def test_inform_nodes_reporters(self, karnataka_edgelist_vil1_money):
         
         df, nodes, reporters = karnataka_edgelist_vil1_money
-        with pytest.warns(None) as record:
+        with pytest.warns(UserWarning) as record:
             net_obj = vm._io.read_from_edgelist(df, K=2, nodes=list(nodes), reporters=list(reporters))
         
         first_warn_msg = (

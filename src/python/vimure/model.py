@@ -72,7 +72,7 @@ class VimureModel(TransformerMixin, BaseEstimator):
 
         if undirected:
             msg = "Overriding mutuality to False because the network is undirected"
-            warnings.warn(msg)
+            warnings.warn(msg, UserWarning)
             self.mutuality = False
         else:
             self.mutuality = mutuality
