@@ -72,9 +72,17 @@ message(
 Then, given a network Y, we can generate N observed adjacency matrices as would have been reported by reporting nodes $m$ for $m \in N$ This is achieved by the function `build_X`. Example:
 
 ```r
-X <- build_X(net, flag_self_reporter=T, cutoff_X=F, seed=10L)
+X <- build_X(net, reporting_scenario=2, cutoff_X=F, seed=10L)
 dim(X)
 ```
+
+The `reporting_scenario` parameter defines how the reporting nodes report the network. The options are:
+
+- Scenario 1: Reporters report only on ties they are involved in as ego (excluding self-loops).
+- Scenario 2: **The default**. Reporters report on all ties they are involved in, as either ego or alter (double sampling, excluding self-loops).
+- Scenario 3: Ego reports on any ties, even those they are not involved in (excludes self-loops).
+
+
 Use the code below to explore the network from the point of view of different reporting nodes:
 
 ```r
@@ -97,8 +105,10 @@ See more info about arguments in `help(vimure)`.
 In R, the `vimure` takes as data input an adjancency matrix or an igraph object.
 
 ```r
-model <- vimure(net$X, net$R, mutuality=T, K=2, num_realisations=5, max_iter=1000)
+model <- vimure(net$X, reporting_scenario=2, mutuality=T, K=2, num_realisations=5, max_iter=1000)
 ```
+
+💡 Remember to use the same `reporting_scenario` you used to generate the X matrix.
 
 > Note: Run model without mutuality is not particularly useful since we know this network has some level of reciprocity and mutuality. We are doing this for testing purposes only.
 

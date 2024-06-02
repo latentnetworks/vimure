@@ -26,7 +26,7 @@
 #' @examples
 #'
 #' random_net <- gm_crep(N=100, M=100, L=1, eta=0.99)
-#' X <- build_X(random_net, reporting_scdenario=2, cutoff_X=FALSE, seed=10L)
+#' X <- build_X(random_net, reporting_scenario=2, cutoff_X=FALSE, seed=10L)
 #' dim(X)
 build_X <- function(
   synthetic,

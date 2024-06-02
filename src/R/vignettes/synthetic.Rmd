@@ -58,7 +58,7 @@ message(
 Given a network Y, we can generate N observed adjacency matrices as would have been reported by reporting nodes $m$ for $m \in N$. This is achieved by the function `build_X`. Example:
 
 ```r
-X <- build_X(random_net, flag_self_reporter=T, cutoff_X=F, seed=10L)
+X <- build_X(random_net, reporting_scenario=2, cutoff_X=F, seed=10L)
 dim(X)
 ```
 
@@ -133,7 +133,7 @@ If using a custom theta, pass it to function build_X:
 ```r
 X_custom <- build_X(
   random_net,
-  flag_self_reporter=T,
+  reporting_scenario=2,
   seed=10L,
   theta=custom_theta, 
   cutoff_X=T
@@ -153,7 +153,7 @@ The mutuality parameter ($\eta$) models people’s propensity of naming of the s
 **An example of impossibly High Mutuality on X**
 
 ```r
-X_custom <- build_X(random_net, cutoff_X=T, mutuality=0.99, flag_self_reporter=T, seed=10L)
+X_custom <- build_X(random_net, cutoff_X=T, mutuality=0.99, reporting_scenario=2, seed=10L)
 Xavg <- extract_Xavg(random_net)
 ggcorrplot( Xavg[1, ,]) + 
    ggplot2::scale_fill_gradient(low="white", high="#003396")
@@ -162,7 +162,7 @@ ggcorrplot( Xavg[1, ,]) +
 **An example of NO mutuality on X ($\eta = 0.0$)**
 
 ```r
-X_custom <- build_X(random_net, cutoff_X=T, mutuality=0, flag_self_reporter=T, seed=10L)
+X_custom <- build_X(random_net, cutoff_X=T, mutuality=0, reporting_scenario=2, seed=10L)
 Xavg <- extract_Xavg(random_net)
 
 ggcorrplot( Xavg[1, ,]) + 

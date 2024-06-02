@@ -6,6 +6,7 @@
 \usage{
 vimure(
   x,
+  reporting_scenario = 2,
   R = NULL,
   mutuality = TRUE,
   undirected = FALSE,
@@ -24,10 +25,22 @@ vimure(
 \item{x}{An adjancency matrix with dimensions L x N x N x N
 or a igraph object.}
 
-\item{R}{Reporters mask (TRUE/FALSE) indicating whether a node
+\item{reporting_scenario}{The reporting scenario to be used. Default is 2.
+\itemize{
+\item Scenario 1: Reporters report only on ties they are involved in
+as ego (excluding self-loops).
+\item Scenario 2: Reporters report on all ties they are involved in,
+as either ego or alter (double sampling, excluding self-loops).
+\item Scenario 3: Ego reports on any ties,
+even those they are not involved in (excludes self-loops).
+}}
+
+\item{R}{Reporters mask (TRUE/FALSE ) indicating whether a node
 \emph{CAN} report on a particular tie, with dimensions L x N x N x N.
 If reporters mask was not informed, the model will assume that
-every reporter can report on any tie.}
+every reporter can report on any tie.
+It is NULL by default, as the preferred option is to use
+the reporting_scenario parameter.}
 
 \item{mutuality}{Whether to use the mutuality parameter.}
 

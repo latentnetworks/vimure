@@ -10,11 +10,11 @@ build_X(
   sh_theta = 2,
   sc_theta = 0.5,
   theta = NULL,
-  flag_self_reporter = T,
+  reporting_scenario = 2,
   Q = NULL,
-  cutoff_X = F,
+  cutoff_X = FALSE,
   lambda_diff = NULL,
-  verbose = T,
+  verbose = TRUE,
   ...
 )
 }
@@ -29,7 +29,15 @@ build_X(
 
 \item{theta}{Custom values of theta, if provided sh_theta and sc_theta will be ignored.}
 
-\item{flag_self_reporter}{Indicates whether a node can only report about their own ties (default is true).}
+\item{reporting_scenario}{The reporting scenario to be used. Default is 2.
+\itemize{
+\item Scenario 1: Reporters report only on ties they are involved in
+as ego (excluding self-loops).
+\item Scenario 2: Reporters report on all ties they are involved in,
+as either ego or alter (double sampling, excluding self-loops).
+\item Scenario 3: Ego reports on any ties,
+even those they are not involved in (excludes self-loops).
+}}
 
 \item{Q}{Maximum value of X entries. If None, it will use the network's K parameter}
 
@@ -51,6 +59,6 @@ have been reported by reporting nodes $m$ ($m in N$).
 \examples{
 
 random_net <- gm_crep(N=100, M=100, L=1, eta=0.99)
-X <- build_X(random_net, flag_self_reporter=TRUE, cutoff_X=FALSE, seed=10L)
+X <- build_X(random_net, reporting_scenario=2, cutoff_X=FALSE, seed=10L)
 dim(X)
 }
